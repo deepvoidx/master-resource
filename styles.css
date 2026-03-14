@@ -88,16 +88,16 @@ header{-webkit-user-select:none;user-select:none;}
 /* ── Clickable card active state (tap feedback) ── */
 .card[data-url]:active{transform:translateY(0px) scale(0.98);border-color:rgba(108,99,255,.6);transition:transform .08s,border-color .08s;}
 
-@media(max-width:599px){:root{--card-min:calc(50vw - 20px);--gap:8px;}}
 @media(min-width:600px) and (max-width:1024px){:root{--card-min:clamp(200px,42vw,320px);}}
 @media(min-width:1025px){:root{--card-min:clamp(240px,20vw,340px);}}
 @supports(padding:max(0px)){.wrap{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
 
-/* ── Mobile 2-col: tighter card internals ── */
+/* ── Mobile: force 2 columns on all browsers ── */
 @media(max-width:599px){
+  .grid{grid-template-columns:repeat(2,1fr) !important;gap:8px;}
   .card{padding:12px 10px;gap:4px;}
   .tool-name{font-size:0.78rem;}
-  .tool-desc{font-size:0.68rem;-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
+  .tool-desc{font-size:0.68rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   .card-actions{margin-top:6px;}
   .ca-btn{padding:6px 4px;font-size:0.65rem;}
 }
