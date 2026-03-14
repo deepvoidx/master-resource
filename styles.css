@@ -26,9 +26,9 @@ h1 span{color:var(--acc);}
 .ctrl{display:flex;flex-wrap:wrap;gap:clamp(8px,1vw,14px);align-items:flex-start;position:sticky;top:0;z-index:50;padding:clamp(10px,1.2vw,16px) 0;background:linear-gradient(to bottom,var(--bg) 82%,transparent);}
 .sw{flex:1 1 clamp(180px,30vw,520px);max-width:600px;position:relative;}
 .sw svg{position:absolute;left:clamp(10px,1.2vw,16px);top:50%;transform:translateY(-50%);color:var(--mute);pointer-events:none;width:clamp(13px,1.4vw,20px);height:clamp(13px,1.4vw,20px);}
-input[type=search]{width:100%;background:var(--surf);border:1.5px solid var(--bdr);color:var(--txt);padding:clamp(10px,1.1vw,16px) clamp(12px,1.5vw,20px) clamp(10px,1.1vw,16px) clamp(36px,3.8vw,52px);border-radius:clamp(8px,1vw,14px);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:max(16px, var(--t-base));outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;}
+input[type=search]{width:100%;background:var(--surf);border:1.5px solid var(--bdr);color:var(--txt);padding:clamp(10px,1.1vw,16px) clamp(12px,1.5vw,20px) clamp(10px,1.1vw,16px) clamp(36px,3.8vw,52px);border-radius:clamp(8px,1vw,14px);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:var(--t-base);outline:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;}
 input[type=search]:focus{border-color:var(--acc);box-shadow:0 0 0 clamp(2px,.3vw,4px) rgba(108,99,255,.18);}
-input[type=search]::placeholder{color:var(--mute);font-size:max(16px, var(--t-base));}
+input[type=search]::placeholder{color:var(--mute);}
 .fwrap{display:flex;flex-wrap:wrap;gap:clamp(4px,.6vw,8px);}
 .fb{background:var(--surf);border:1.5px solid var(--bdr);color:var(--mute);padding:clamp(5px,.7vw,10px) clamp(10px,1.3vw,20px);border-radius:100px;font-size:var(--t-xs);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .15s;}
 .fb:hover{border-color:var(--acc);color:var(--acc);}
@@ -88,6 +88,16 @@ header{-webkit-user-select:none;user-select:none;}
 /* ── Clickable card active state (tap feedback) ── */
 .card[data-url]:active{transform:translateY(0px) scale(0.98);border-color:rgba(108,99,255,.6);transition:transform .08s,border-color .08s;}
 
+@media(max-width:599px){:root{--card-min:calc(50vw - 20px);--gap:8px;}}
 @media(min-width:600px) and (max-width:1024px){:root{--card-min:clamp(200px,42vw,320px);}}
 @media(min-width:1025px){:root{--card-min:clamp(240px,20vw,340px);}}
 @supports(padding:max(0px)){.wrap{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
+
+/* ── Mobile 2-col: tighter card internals ── */
+@media(max-width:599px){
+  .card{padding:12px 10px;gap:4px;}
+  .tool-name{font-size:0.78rem;}
+  .tool-desc{font-size:0.68rem;-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
+  .card-actions{margin-top:6px;}
+  .ca-btn{padding:6px 4px;font-size:0.65rem;}
+}
