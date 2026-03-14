@@ -25,26 +25,47 @@
         '<p style="color:#e11d48;padding:40px">Failed to load tools.json — make sure the file is in the same folder as index.html.</p>';
     });
 
-  // ── Toast (declared early so buildCard can use it) ─────────
+  // ── Toast ──────────────────────────────────────────────────
   var toastT;
-  function toast(msg) {
+  function toast(msg, icon) {
     var t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 1800);
+    t.innerHTML = (icon ? '<span class="toast-icon">' + icon + '</span>' : '') + '<span>' + msg + '</span>';
+    t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { t.classList.remove('show'); }, 2200);
   }
 
   function fallbackCopy(txt) {
     var ta = document.createElement('textarea');
-    ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0;';
+    ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
     document.body.appendChild(ta); ta.select();
     try { document.execCommand('copy'); } catch (e) {}
     document.body.removeChild(ta);
   }
 
-  function copyText(txt) {
-    if (navigator.clipboard && navigator.clipboard.writeText)
-      navigator.clipboard.writeText(txt).then(function () { toast('Copied to clipboard!'); }).catch(function () { fallbackCopy(txt); toast('Copied to clipboard!'); });
-    else { fallbackCopy(txt); toast('Copied to clipboard!'); }
+  // ── Share — native sheet on mobile, clipboard on desktop ───
+  function shareCard(name, description, url) {
+    var text = name + ' — ' + description;
+
+    // Try native Web Share API first (mobile browsers)
+    if (navigator.share) {
+      navigator.share({ title: name, text: description, url: url })
+        .catch(function () {
+          // User cancelled or error — silently ignore
+        });
+      return;
+    }
+
+    // Desktop: copy to clipboard with a nicer confirmation
+    var fullText = text + (url ? '\n' + url : '');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullText)
+        .then(function () { toast('Copied to clipboard', '📋'); })
+        .catch(function () { fallbackCopy(fullText); toast('Copied to clipboard', '📋'); });
+    } else {
+      fallbackCopy(fullText);
+      toast('Copied to clipboard', '📋');
+    }
   }
 
   // ── Build category filter buttons ─────────────────────────
@@ -60,7 +81,8 @@
       var btn = document.createElement('button');
       btn.className = 'fb';
       btn.setAttribute('data-f', cat.id);
-      btn.textContent = cat.icon + ' ' + cat.label.split(' ')[0];
+      // Use short label to avoid duplicate-looking buttons
+      btn.textContent = cat.icon + ' ' + (cat.short || cat.label);
       fwrap.appendChild(btn);
     });
   }
@@ -114,7 +136,6 @@
       card.setAttribute('data-url', tool.url);
       card.setAttribute('role', 'link');
       card.setAttribute('tabindex', '0');
-      card.style.cursor = 'pointer';
     }
 
     var nameEl = document.createElement('div');
@@ -136,28 +157,24 @@
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = domain + ' \u2197';
-      link.addEventListener('click', function (e) { e.stopPropagation(); });
-      link.addEventListener('touchend', function (e) { e.stopPropagation(); });
       card.appendChild(link);
 
       var actions = document.createElement('div');
       actions.className = 'card-actions';
 
-      // Share button — handler attached directly, NOT via document delegation
-      var shareTxt = tool.name + ' \u2014 ' + tool.description + ' \u2014 ' + tool.url;
       var shareBtn = document.createElement('button');
       shareBtn.className = 'ca-btn share-btn';
       shareBtn.title = 'Share';
       shareBtn.innerHTML = '\u2197\uFE0E Share';
-      shareBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        copyText(shareTxt);
-      });
-      shareBtn.addEventListener('touchend', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        copyText(shareTxt);
-      });
+
+      // Capture tool data in closure
+      (function (n, d, u) {
+        shareBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          shareCard(n, d, u);
+        });
+      })(tool.name, tool.description, tool.url);
 
       actions.appendChild(shareBtn);
       card.appendChild(actions);
@@ -172,35 +189,20 @@
     return card;
   }
 
-  // ── Card tap / click to open URL ───────────────────────────
-  var tappedUrl = null;
-  var tappedAt = 0;
-
-  document.addEventListener('touchstart', function (e) {
-    var card = e.target.closest('.card[data-url]');
-    if (!card || e.target.closest('button, a')) return;
-    tappedUrl = card.getAttribute('data-url');
-    tappedAt = Date.now();
-  }, { passive: true });
-
-  document.addEventListener('touchend', function (e) {
-    var card = e.target.closest('.card[data-url]');
-    if (!card || e.target.closest('button, a')) return;
-    var url = card.getAttribute('data-url');
-    if (url && url === tappedUrl && Date.now() - tappedAt < 600) {
-      e.preventDefault();
-      window.open(url, '_blank', 'noopener,noreferrer');
-      tappedUrl = null;
-    }
-  });
-
+  // ── Card click to open URL ─────────────────────────────────
+  // Single click handler only — CSS touch-action:manipulation removes
+  // the 300ms iOS delay without needing touchend hacks.
+  // This also fixes the iOS double-tab bug (touchend + click firing twice).
   document.addEventListener('click', function (e) {
+    // Don't trigger if clicking a button or link inside the card
+    if (e.target.closest('button') || e.target.closest('a')) return;
     var card = e.target.closest('.card[data-url]');
-    if (card && !e.target.closest('button, a')) {
-      window.open(card.getAttribute('data-url'), '_blank', 'noopener,noreferrer');
-    }
+    if (!card) return;
+    var url = card.getAttribute('data-url');
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
 
+  // Keyboard: Enter on focused card opens URL
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var card = e.target.closest('.card[data-url]');

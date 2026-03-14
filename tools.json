@@ -4,121 +4,141 @@
       "id": "ai-assistants",
       "label": "AI Assistants & Chatbots",
       "icon": "🤖",
-      "color": "#6c63ff"
+      "color": "#6c63ff",
+      "short": "Assistants"
     },
     {
       "id": "ai-directories",
       "label": "AI Tool Directories",
       "icon": "🗂️",
-      "color": "#f59e0b"
+      "color": "#f59e0b",
+      "short": "Directories"
     },
     {
       "id": "image-gen",
       "label": "Image Generation & Editing",
       "icon": "🖼️",
-      "color": "#ec4899"
+      "color": "#ec4899",
+      "short": "Image Gen"
     },
     {
       "id": "video-gen",
       "label": "Video Generation & Editing",
       "icon": "🎬",
-      "color": "#ef4444"
+      "color": "#ef4444",
+      "short": "Video Gen"
     },
     {
       "id": "audio",
       "label": "Audio, Voice & Music",
       "icon": "🎵",
-      "color": "#10b981"
+      "color": "#10b981",
+      "short": "Audio"
     },
     {
       "id": "free-audio",
       "label": "Free Sound, Music & SFX",
       "icon": "🎞️",
-      "color": "#8b5cf6"
+      "color": "#8b5cf6",
+      "short": "Free SFX"
     },
     {
       "id": "design",
       "label": "Design, Templates & Assets",
       "icon": "🎨",
-      "color": "#f97316"
+      "color": "#f97316",
+      "short": "Design"
     },
     {
       "id": "research",
       "label": "Research & Academic",
       "icon": "📚",
-      "color": "#06b6d4"
+      "color": "#06b6d4",
+      "short": "Research"
     },
     {
       "id": "study",
       "label": "Learning & Study Tools",
       "icon": "🧑‍🎓",
-      "color": "#84cc16"
+      "color": "#84cc16",
+      "short": "Study"
     },
     {
       "id": "ai-detection",
       "label": "AI Detection & Humanizer",
       "icon": "🔍",
-      "color": "#e11d48"
+      "color": "#e11d48",
+      "short": "Detection"
     },
     {
       "id": "linkedin",
       "label": "LinkedIn & Professional",
       "icon": "💼",
-      "color": "#0ea5e9"
+      "color": "#0ea5e9",
+      "short": "LinkedIn"
     },
     {
       "id": "dev",
       "label": "Developer & Code Tools",
       "icon": "💻",
-      "color": "#a78bfa"
+      "color": "#a78bfa",
+      "short": "Dev Tools"
     },
     {
       "id": "content",
       "label": "Content Creation & Captions",
       "icon": "🎥",
-      "color": "#fb923c"
+      "color": "#fb923c",
+      "short": "Content"
     },
     {
       "id": "streaming",
       "label": "Movies & Streaming",
       "icon": "🍿",
-      "color": "#f43f5e"
+      "color": "#f43f5e",
+      "short": "Streaming"
     },
     {
       "id": "books",
       "label": "Books & Libraries",
       "icon": "📖",
-      "color": "#c084fc"
+      "color": "#c084fc",
+      "short": "Books"
     },
     {
       "id": "fun",
       "label": "Fun & Explore",
       "icon": "🎮",
-      "color": "#f472b6"
+      "color": "#f472b6",
+      "short": "Fun"
     },
     {
       "id": "png",
       "label": "Free PNG & Image Resources",
       "icon": "🖼",
-      "color": "#22d3ee"
+      "color": "#22d3ee",
+      "short": "PNG"
     },
     {
       "id": "security",
       "label": "Security & Verification",
       "icon": "🔐",
-      "color": "#34d399"
+      "color": "#34d399",
+      "short": "Security"
     },
     {
       "id": "pdf",
       "label": "PDF & Document Tools",
       "icon": "📄",
-      "color": "#fbbf24"
+      "color": "#fbbf24",
+      "short": "PDF"
     },
     {
       "id": "misc",
       "label": "Miscellaneous",
       "icon": "🏠",
-      "color": "#94a3b8"
+      "color": "#94a3b8",
+      "short": "Misc"
     }
   ],
   "tools": [
@@ -1316,7 +1336,23 @@
       "description": "AI-powered reverse image search engine",
       "url": "https://lenso.ai/en",
       "category": "security",
-      "tags": ["ai", "security", "image"]
-   }
+      "tags": [
+        "ai",
+        "security",
+        "image"
+      ]
+    },
+    {
+      "name": "Gling AI",
+      "description": "AI-powered video editor that auto-removes filler words and silences for creators",
+      "url": "https://www.gling.ai/",
+      "category": "content",
+      "tags": [
+        "ai",
+        "creative",
+        "content",
+        "video"
+      ]
+    }
   ]
 }
