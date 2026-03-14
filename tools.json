@@ -1,0 +1,1322 @@
+{
+  "categories": [
+    {
+      "id": "ai-assistants",
+      "label": "AI Assistants & Chatbots",
+      "icon": "🤖",
+      "color": "#6c63ff"
+    },
+    {
+      "id": "ai-directories",
+      "label": "AI Tool Directories",
+      "icon": "🗂️",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "image-gen",
+      "label": "Image Generation & Editing",
+      "icon": "🖼️",
+      "color": "#ec4899"
+    },
+    {
+      "id": "video-gen",
+      "label": "Video Generation & Editing",
+      "icon": "🎬",
+      "color": "#ef4444"
+    },
+    {
+      "id": "audio",
+      "label": "Audio, Voice & Music",
+      "icon": "🎵",
+      "color": "#10b981"
+    },
+    {
+      "id": "free-audio",
+      "label": "Free Sound, Music & SFX",
+      "icon": "🎞️",
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "design",
+      "label": "Design, Templates & Assets",
+      "icon": "🎨",
+      "color": "#f97316"
+    },
+    {
+      "id": "research",
+      "label": "Research & Academic",
+      "icon": "📚",
+      "color": "#06b6d4"
+    },
+    {
+      "id": "study",
+      "label": "Learning & Study Tools",
+      "icon": "🧑‍🎓",
+      "color": "#84cc16"
+    },
+    {
+      "id": "ai-detection",
+      "label": "AI Detection & Humanizer",
+      "icon": "🔍",
+      "color": "#e11d48"
+    },
+    {
+      "id": "linkedin",
+      "label": "LinkedIn & Professional",
+      "icon": "💼",
+      "color": "#0ea5e9"
+    },
+    {
+      "id": "dev",
+      "label": "Developer & Code Tools",
+      "icon": "💻",
+      "color": "#a78bfa"
+    },
+    {
+      "id": "content",
+      "label": "Content Creation & Captions",
+      "icon": "🎥",
+      "color": "#fb923c"
+    },
+    {
+      "id": "streaming",
+      "label": "Movies & Streaming",
+      "icon": "🍿",
+      "color": "#f43f5e"
+    },
+    {
+      "id": "books",
+      "label": "Books & Libraries",
+      "icon": "📖",
+      "color": "#c084fc"
+    },
+    {
+      "id": "fun",
+      "label": "Fun & Explore",
+      "icon": "🎮",
+      "color": "#f472b6"
+    },
+    {
+      "id": "png",
+      "label": "Free PNG & Image Resources",
+      "icon": "🖼",
+      "color": "#22d3ee"
+    },
+    {
+      "id": "security",
+      "label": "Security & Verification",
+      "icon": "🔐",
+      "color": "#34d399"
+    },
+    {
+      "id": "pdf",
+      "label": "PDF & Document Tools",
+      "icon": "📄",
+      "color": "#fbbf24"
+    },
+    {
+      "id": "misc",
+      "label": "Miscellaneous",
+      "icon": "🏠",
+      "color": "#94a3b8"
+    }
+  ],
+  "tools": [
+    {
+      "name": "Claude",
+      "description": "Anthropic's AI — research, coding, writing & analysis",
+      "url": "https://claude.ai",
+      "category": "ai-assistants",
+      "tags": [
+        "x27",
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "ChatGPT Pro",
+      "description": "Unofficial mirror site for ChatGPT Pro access",
+      "url": "https://chatgptplus.cn",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Perplexity AI",
+      "description": "AI-powered search with cited real-time answers",
+      "url": "https://perplexity.ai",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Grok",
+      "description": "xAI's chatbot integrated with X (Twitter)",
+      "url": "https://grok.com",
+      "category": "ai-assistants",
+      "tags": [
+        "x27",
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Kimi",
+      "description": "Long-context AI assistant by Moonshot AI",
+      "url": "https://www.kimi.com/en",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Blackbox AI",
+      "description": "AI coding assistant and chat tool",
+      "url": "https://www.blackbox.ai",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Sarvam AI",
+      "description": "Indian-language focused AI assistant",
+      "url": "https://www.sarvam.ai",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot",
+        "india"
+      ]
+    },
+    {
+      "name": "Character AI",
+      "description": "Chat with custom AI characters and personas",
+      "url": "https://character.ai",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Gemini",
+      "description": "Google multimodal AI assistant",
+      "url": "https://gemini.google.com",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "HSuper Tools",
+      "description": "Curated directory of AI tools",
+      "url": "https://hsuper.tools",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "AIGC21",
+      "description": "AI-generated content tools collection",
+      "url": "https://aigc21.com/#term-7",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "10015.io",
+      "description": "All-in-one AI toolbox with 100+ utilities",
+      "url": "https://10015.io",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "SEO Studio",
+      "description": "AI-powered SEO tools collection",
+      "url": "https://seostudio.tools",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "LMArena",
+      "description": "Compare and benchmark multiple LLMs",
+      "url": "https://lmarena.ai",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "Open Directory",
+      "description": "Search open directories on the web",
+      "url": "https://ewasion.github.io/opendirectory-finder/",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory"
+      ]
+    },
+    {
+      "name": "Seedream 4.0",
+      "description": "High-quality AI image generation model by ByteDance",
+      "url": "https://seed.bytedance.com/en/seedream4_0",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Leonardo AI",
+      "description": "AI image generation with fine-tuned models",
+      "url": "https://leonardo.ai",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Grok Imagine",
+      "description": "Image generation via Grok",
+      "url": "https://grok.com/imagine",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "GetIMG Realtime",
+      "description": "Real-time AI image generation in browser",
+      "url": "https://getimg.ai/realtime",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Clipdrop",
+      "description": "AI image editing suite by Stability AI",
+      "url": "https://clipdrop.co",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Pixelcut",
+      "description": "AI image editor with magic object remover",
+      "url": "https://www.pixelcut.ai",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Adobe BG Remover",
+      "description": "Remove image backgrounds instantly for free",
+      "url": "https://express.adobe.com/tools/remove-background/",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "LogoDiffusion",
+      "description": "AI-powered logo generator",
+      "url": "https://logodiffusion.com",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "Seedance 1.0",
+      "description": "AI video generation model by ByteDance",
+      "url": "https://seed.bytedance.com/en/seedance",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Higgsfield Soul",
+      "description": "AI video generation with cinematic effects",
+      "url": "https://higgsfield.ai/soul",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Runway AI",
+      "description": "Text or image to edited and animated visual content",
+      "url": "https://runwayml.com",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Sora (OpenAI)",
+      "description": "OpenAI flagship video generation model",
+      "url": "https://openai.com/index/sora",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "SoraAI",
+      "description": "Sora-style video generation interface",
+      "url": "https://www.soraai.onl",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Pollo AI",
+      "description": "AI video generation platform",
+      "url": "https://pollo.ai",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "HailuoAI",
+      "description": "AI video generation by MiniMax",
+      "url": "https://hailuoai.video",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Luma Dream Machine",
+      "description": "High-quality text-to-video by Luma AI",
+      "url": "https://lumalabs.ai/dream-machine",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "ElevenLabs",
+      "description": "Industry-leading AI voice cloning and TTS",
+      "url": "https://elevenlabs.io",
+      "category": "audio",
+      "tags": [
+        "ai",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Uberduck",
+      "description": "AI voices and rap vocal generation",
+      "url": "https://www.uberduck.ai",
+      "category": "audio",
+      "tags": [
+        "ai",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Adobe Podcast",
+      "description": "AI audio enhancer that removes noise and sharpens clarity",
+      "url": "https://podcast.adobe.com",
+      "category": "audio",
+      "tags": [
+        "ai",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Image to Music",
+      "description": "Generate music from an uploaded image",
+      "url": "https://huggingface.co/spaces/fffiloni/image-to-music-v2",
+      "category": "audio",
+      "tags": [
+        "ai",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "ZapSplat",
+      "description": "Free SFX and music pack downloads",
+      "url": "https://www.zapsplat.com",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "SoundQ",
+      "description": "Professional sound effects library",
+      "url": "https://www.prosoundeffects.com/soundq",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "MyInstants",
+      "description": "Instant sound effects soundboard",
+      "url": "https://www.myinstants.com",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Storyblocks",
+      "description": "Stock music, SFX and video subscription",
+      "url": "https://www.storyblocks.com",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Pixabay SFX",
+      "description": "Free sound effects, no attribution required",
+      "url": "https://pixabay.com/sound-effects/",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Chosic",
+      "description": "Free royalty-free advertising and background music",
+      "url": "https://www.chosic.com/free-music/advertising/",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Epidemic Sound",
+      "description": "Licensed music for creators subscription",
+      "url": "https://www.epidemicsound.com",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "IG Music Library",
+      "description": "Instagram background music collection",
+      "url": "https://creator-economy.notion.site/IG-Background-MusicLibrary-492fde9e1dc24f978608c66871789e44",
+      "category": "free-audio",
+      "tags": [
+        "free",
+        "audio",
+        "creative"
+      ]
+    },
+    {
+      "name": "Napkin AI",
+      "description": "Turn text into visual diagrams for research and PPT",
+      "url": "https://www.napkin.ai",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Jitter",
+      "description": "Free animation templates for designers",
+      "url": "https://www.jitter.video",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "ShareAE",
+      "description": "Free After Effects project templates",
+      "url": "https://www.shareae.com",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Mixkit",
+      "description": "Free video clips, music and motion templates",
+      "url": "https://www.mixkit.co",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "FreeFaces",
+      "description": "Curated free font gallery",
+      "url": "https://www.freefaces.gallery",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "FreshLUTs",
+      "description": "Free color grading LUT packs for video",
+      "url": "https://www.freshluts.com",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "WorldVectorLogo",
+      "description": "Company and brand SVG logos free download",
+      "url": "https://worldvectorlogo.com",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Luma Labs 3D",
+      "description": "AI-generated 3D objects and scenes",
+      "url": "https://lumalabs.ai",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Google Earth Studio",
+      "description": "Cinematic 3D earth animations for free",
+      "url": "https://www.google.com/earth/studio/",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Paper Animator",
+      "description": "Animate paper-style illustrations in seconds",
+      "url": "https://paperanimator.com",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "AutoAE",
+      "description": "AI Motion Graphic Designer for viral animations",
+      "url": "https://autoae.online",
+      "category": "design",
+      "tags": [
+        "free",
+        "creative",
+        "design"
+      ]
+    },
+    {
+      "name": "Google Scholar",
+      "description": "Search academic papers, citations and authors",
+      "url": "https://scholar.google.com",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Semantic Scholar",
+      "description": "AI-powered academic paper search engine",
+      "url": "https://semantic.scholar.org",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "NotebookLM",
+      "description": "Upload notes to get podcasts, Q&A and summaries",
+      "url": "https://notebooklm.google",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Mapify",
+      "description": "Summarise content into visual mind maps",
+      "url": "https://mapify.so",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Perplexity AI",
+      "description": "AI search with cited real-time answers",
+      "url": "https://perplexity.ai",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Wikipedia",
+      "description": "Free encyclopedia with 60M+ articles in 300+ languages",
+      "url": "https://www.wikipedia.org/",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Youlearn",
+      "description": "Turn learning materials into notes, quizzes and chat",
+      "url": "https://youlearn.ai",
+      "category": "study",
+      "tags": [
+        "study",
+        "free"
+      ]
+    },
+    {
+      "name": "MyJotBot",
+      "description": "AI note-taking and writing assistant",
+      "url": "https://myjotbot.com",
+      "category": "study",
+      "tags": [
+        "study",
+        "free"
+      ]
+    },
+    {
+      "name": "Studyfetch",
+      "description": "AI-powered study tool with flashcards and notes",
+      "url": "https://www.studyfetch.com",
+      "category": "study",
+      "tags": [
+        "study",
+        "free"
+      ]
+    },
+    {
+      "name": "GPTZero",
+      "description": "Detect AI-written text in documents",
+      "url": "https://gptzero.me",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "Scribbr Detector",
+      "description": "AI content detector for academic writing",
+      "url": "https://www.scribbr.com/ai-detector/",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "Undetectable AI",
+      "description": "Detect and humanize AI text dual-purpose tool",
+      "url": "https://undetectable.ai",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "Scribbr Plagiarism",
+      "description": "Plagiarism checker for academic work",
+      "url": "https://app.scribbr.com/plagiarism-checker",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "PaperOwl",
+      "description": "Plagiarism checker for student work",
+      "url": "https://paperowl.com",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "HumanizeAI",
+      "description": "Rewrite AI-generated text to sound natural",
+      "url": "https://www.humanizeai.pro",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "QuillBot Humanizer",
+      "description": "Paraphrase and humanize AI content",
+      "url": "https://quillbot.com/ai-humanizer",
+      "category": "ai-detection",
+      "tags": [
+        "ai",
+        "detection"
+      ]
+    },
+    {
+      "name": "RedactAI Review",
+      "description": "Free AI-powered LinkedIn profile review",
+      "url": "https://redactai.io/free-tools/linkedin-profile-review",
+      "category": "linkedin",
+      "tags": [
+        "professional"
+      ]
+    },
+    {
+      "name": "Self.so",
+      "description": "Convert your LinkedIn PDF into a personal website",
+      "url": "https://self.so",
+      "category": "linkedin",
+      "tags": [
+        "professional"
+      ]
+    },
+    {
+      "name": "GitHub",
+      "description": "World's largest code hosting and version control platform",
+      "url": "https://github.com/",
+      "category": "dev",
+      "tags": [
+        "x27",
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "UIthub",
+      "description": "Fetch full GitHub repo context for AI code analysis",
+      "url": "https://uithub.com",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "GitMVP",
+      "description": "Generate AI prompts from a GitHub repo",
+      "url": "https://gitmvp.com",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "Blackbox AI",
+      "description": "AI-powered code assistant with chat and autocomplete",
+      "url": "https://www.blackbox.ai",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "Enggroom",
+      "description": "Free engineering project resources and ideas",
+      "url": "https://www.enggroom.com",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "Captions AI",
+      "description": "AI script writer, auto captions, video editing app",
+      "url": "https://www.captions.ai",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "Hootsuite Captions",
+      "description": "AI social media caption generator",
+      "url": "https://www.hootsuite.com/social-media-tools/ai-caption-generator-social-media",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "Planable Captions",
+      "description": "Instagram-specific AI caption generator",
+      "url": "https://planable.io/instagram-caption-generator/",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "Solidpoint",
+      "description": "YouTube video summarizer paste URL get summary",
+      "url": "https://solidpoint.ai",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "PlayPhrase",
+      "description": "Search movies and TV shows by spoken phrases",
+      "url": "https://www.playphrase.me",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "EyeCannndy",
+      "description": "Curated cinematic movie stills for inspiration",
+      "url": "https://eyecannndy.com",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "Film-Grab",
+      "description": "High-quality movie screenshot archive",
+      "url": "https://film-grab.com",
+      "category": "content",
+      "tags": [
+        "creative",
+        "content"
+      ]
+    },
+    {
+      "name": "Moviesmod",
+      "description": "Free movie streaming and downloads — modlist.in",
+      "url": "https://www.modlist.in/",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "UHDMovies",
+      "description": "4K HDR quality movie downloads",
+      "url": "",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "VegaMovies",
+      "description": "Free Bollywood and Hollywood streaming",
+      "url": "",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "MoviesNation",
+      "description": "Free movie and TV show streaming",
+      "url": "",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "AnimeToons Hindi",
+      "description": "Hindi-dubbed anime streaming site",
+      "url": "",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "Z-Library",
+      "description": "World's largest free e-book and article library",
+      "url": "https://z-lib.id",
+      "category": "books",
+      "tags": [
+        "x27",
+        "free",
+        "books"
+      ]
+    },
+    {
+      "name": "Welib.st",
+      "description": "Free online book and document library",
+      "url": "https://welib.st",
+      "category": "books",
+      "tags": [
+        "free",
+        "books"
+      ]
+    },
+    {
+      "name": "Human Benchmark",
+      "description": "Test reaction time, memory, typing speed and cognitive skills",
+      "url": "https://humanbenchmark.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Murdle",
+      "description": "Daily murder mystery logic puzzle game",
+      "url": "https://murdle.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "The Useless Web",
+      "description": "Click a button — land on a random bizarre website",
+      "url": "https://theuselessweb.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Bored Button",
+      "description": "Instantly teleport to a random fun website",
+      "url": "https://www.boredbutton.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Wander The Web",
+      "description": "Discover random interesting corners of the internet",
+      "url": "https://wandertheweb.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Darebee",
+      "description": "Free science-based workout programs and fitness resources",
+      "url": "https://darebee.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "CleanPNG",
+      "description": "Transparent PNG downloads large library",
+      "url": "https://cleanpng.com",
+      "category": "png",
+      "tags": [
+        "free",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "SimilarPNG",
+      "description": "Find visually similar PNG images",
+      "url": "https://similarpng.com",
+      "category": "png",
+      "tags": [
+        "free",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "PNGWing",
+      "description": "Free PNG clip art millions of images",
+      "url": "https://pngwing.com",
+      "category": "png",
+      "tags": [
+        "free",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "PNGEgg",
+      "description": "High-quality transparent PNGs",
+      "url": "https://pngegg.com",
+      "category": "png",
+      "tags": [
+        "free",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "PNGImg",
+      "description": "Large transparent PNG database",
+      "url": "https://pngimg.com",
+      "category": "png",
+      "tags": [
+        "free",
+        "creative",
+        "image"
+      ]
+    },
+    {
+      "name": "URLVoid",
+      "description": "Check if a URL is safe or blacklisted",
+      "url": "https://www.urlvoid.com",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "EmailVeritas",
+      "description": "Check if an email address is real, valid, or disposable",
+      "url": "https://emailveritas.com",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "Findclone",
+      "description": "Reverse facial search Russian photo database",
+      "url": "",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "Search4Faces",
+      "description": "Facial recognition search engine",
+      "url": "",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "Facecheck.id",
+      "description": "Search the web by face photo",
+      "url": "https://facecheck.id",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "PimEyes",
+      "description": "Powerful facial search engine",
+      "url": "https://pimeyes.com",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "InstaUsername",
+      "description": "Check Instagram username availability",
+      "url": "https://instausername.com/availability",
+      "category": "security",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "Sejda PDF Editor",
+      "description": "Free online PDF editor annotate fill sign",
+      "url": "https://www.sejda.com/pdf-editor",
+      "category": "pdf",
+      "tags": [
+        "free",
+        "tools"
+      ]
+    },
+    {
+      "name": "Kosmi.io",
+      "description": "Free platform for online hangout rooms and watch parties",
+      "url": "https://kosmi.io",
+      "category": "misc",
+      "tags": []
+    },
+    {
+      "name": "ChatGPT",
+      "description": "OpenAI flagship conversational AI assistant",
+      "url": "https://chatgpt.com/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot"
+      ]
+    },
+    {
+      "name": "Happenstance AI",
+      "description": "AI-powered relationship and networking intelligence",
+      "url": "https://happenstance.ai/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "professional"
+      ]
+    },
+    {
+      "name": "Lovable",
+      "description": "AI-powered full-stack web app builder from prompts",
+      "url": "https://lovable.dev/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "code"
+      ]
+    },
+    {
+      "name": "Veo 3",
+      "description": "Google DeepMind state-of-the-art video generation model",
+      "url": "https://aistudio.google.com/models/veo-3",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "creative",
+        "video"
+      ]
+    },
+    {
+      "name": "Lenso AI",
+      "description": "AI-powered reverse image search engine",
+      "url": "https://lenso.ai/en",
+      "category": "security",
+      "tags": ["ai", "security", "image"]
+   }
+  ]
+}
