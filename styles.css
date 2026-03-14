@@ -38,7 +38,7 @@ input[type=search]::placeholder{color:var(--mute);}
 .cat-ico{width:clamp(28px,3vw,44px);height:clamp(28px,3vw,44px);border-radius:clamp(6px,.8vw,12px);display:flex;align-items:center;justify-content:center;font-size:clamp(13px,1.6vw,22px);flex-shrink:0;}
 .cat-title{font-family:'Syne','Trebuchet MS','Century Gothic',system-ui,sans-serif;font-weight:700;font-size:var(--t-md);color:#fff;}
 .cat-cnt{margin-left:auto;background:#1a1a2e;color:var(--mute);padding:clamp(2px,.3vw,4px) clamp(8px,1vw,14px);border-radius:100px;font-size:var(--t-xs);font-family:'Syne','Trebuchet MS','Century Gothic',system-ui,sans-serif;white-space:nowrap;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));gap:var(--gap);}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);}@media(min-width:500px){.grid{grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));}}
 .card{background:var(--card);border:1.5px solid var(--bdr);border-radius:clamp(10px,1.2vw,16px);padding:clamp(12px,1.4vw,22px) clamp(12px,1.5vw,22px);display:flex;flex-direction:column;gap:clamp(4px,.6vw,8px);position:relative;overflow:hidden;transition:transform .15s,border-color .15s,box-shadow .15s;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:clamp(2px,.25vw,3px);background:var(--ca,var(--acc));opacity:0;transition:opacity .15s;}
 .card:hover{transform:translateY(-2px);border-color:rgba(108,99,255,.4);box-shadow:0 6px 28px rgba(108,99,255,.1);}
@@ -92,9 +92,8 @@ header{-webkit-user-select:none;user-select:none;}
 @media(min-width:1025px){:root{--card-min:clamp(240px,20vw,340px);}}
 @supports(padding:max(0px)){.wrap{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
 
-/* ── Mobile: force 2 columns on all browsers ── */
-@media(max-width:599px){
-  .grid{grid-template-columns:repeat(2,1fr) !important;gap:8px;}
+/* ── Mobile 2-col card internals ── */
+@media(max-width:499px){
   .card{padding:12px 10px;gap:4px;}
   .tool-name{font-size:0.78rem;}
   .tool-desc{font-size:0.68rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
