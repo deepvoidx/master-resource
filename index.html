@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="description" content="Master Resource — 112+ AI tools, creative resources and dev utilities, properly categorised. Search and filter across AI assistants, design, research, development, streaming and more."/>
+  <meta name="theme-color" content="#0a0a0f"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230a0a0f'/><text x='16' y='22' font-size='20' text-anchor='middle' font-family='serif'>&#x26A1;</text></svg>"/>
+  <title>Master Resource</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<div class="gbg"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">&#9889; Ultimate Collection</div>
+    <h1>Master <span>Resource</span></h1>
+    <p class="sub">Every AI tool, creative resource &amp; dev utility &#8212; properly categorised.</p>
+    <div class="stats">
+      <div class="stat"><strong id="stat-tools">112</strong><small>Tools</small></div>
+      <div class="stat"><strong id="stat-cats">20</strong><small>Categories</small></div>
+    </div>
+  </header>
+
+  <div class="ctrl">
+    <div class="sw">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="search" id="srch"
+        placeholder="Search tools, categories&#8230;"
+        autocomplete="off" autocorrect="off"
+        autocapitalize="off" spellcheck="false"/>
+    </div>
+    <!-- Category filter buttons are injected here by app.js -->
+    <div class="fwrap" id="fwrap"></div>
+  </div>
+
+  <div class="ctrl-meta">
+    <span id="lc" class="live-count"></span>
+    <div class="tags-row" id="tags-row">
+      <span class="tags-label">Quick filters:</span>
+      <button class="tag-pill" data-tag="#ai">#ai</button>
+      <button class="tag-pill" data-tag="#free">#free</button>
+      <button class="tag-pill" data-tag="#creative">#creative</button>
+      <button class="tag-pill" data-tag="#research">#research</button>
+      <button class="tag-pill" data-tag="#dev">#dev</button>
+      <button class="tag-pill" data-tag="#fun">#fun</button>
+      <button class="tag-pill" data-tag="#movies">#movies</button>
+      <button class="tag-pill" data-tag="#audio">#audio</button>
+      <button class="tag-pill" data-tag="#india">#india</button>
+      <button class="tag-pill" data-tag="#security">#security</button>
+    </div>
+  </div>
+
+  <div class="nores" id="nores"><em>&#128269;</em>No tools found.</div>
+
+  <!-- Tool cards are injected here by app.js -->
+  <div class="cats" id="cats">
+    <p class="loading">Loading tools...</p>
+  </div>
+
+</div>
+
+<button id="topbtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+<div id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
