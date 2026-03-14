@@ -85,20 +85,14 @@ input[type=search]::placeholder{color:var(--mute);}
 header{-webkit-user-select:none;user-select:none;}
 .eyebrow,.stat{-webkit-user-select:none;user-select:none;}
 
-
+/* ── Clickable card active state (tap feedback) ── */
 .card[data-url]:active{transform:translateY(0px) scale(0.98);border-color:rgba(108,99,255,.6);transition:transform .08s,border-color .08s;}
 
 @media(min-width:600px) and (max-width:1024px){:root{--card-min:clamp(200px,42vw,320px);}}
 @media(min-width:1025px){:root{--card-min:clamp(240px,20vw,340px);}}
 @supports(padding:max(0px)){.wrap{padding-bottom:max(60px,env(safe-area-inset-bottom));}}
 
-/* ── Touch fix: removes 300ms iOS delay & oversensitivity ── */
-.card[data-url],.fb,.tag-pill,.ca-btn,#topbtn{touch-action:manipulation;}
-
-/* ── Clickable card cursor & active feedback ── */
-.card[data-url]{cursor:pointer;}
-.card[data-url]:active{transform:scale(0.98);border-color:rgba(108,99,255,.6);transition:transform .08s,border-color .08s;}
-
-/* ── Toast icon support ── */
-#toast{display:flex;align-items:center;gap:8px;}
-.toast-icon{font-size:1.1em;flex-shrink:0;}
+/* ── iOS zoom fix: Safari zooms when input font-size < 16px ── */
+@media(max-width:767px){
+  input[type=search]{font-size:16px !important;}
+}
