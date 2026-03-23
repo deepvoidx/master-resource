@@ -106,3 +106,14 @@ header{-webkit-user-select:none;user-select:none;}
 /* ── Toast icon ── */
 #toast{display:flex;align-items:center;gap:8px;}
 .toast-icon{font-size:1.1em;flex-shrink:0;}
+
+/* ── New badge ── */
+.new-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(108,99,255,.18);color:var(--acc);border:1px solid rgba(108,99,255,.35);vertical-align:middle;font-family:'Syne',system-ui,sans-serif;}
+
+/* ── Sort controls ── */
+.sort-wrap{display:flex;align-items:center;gap:clamp(4px,.5vw,7px);margin-left:auto;}
+.sort-label{font-size:var(--t-xs);color:var(--mute);white-space:nowrap;}
+.sort-btn{background:transparent;border:1px solid var(--bdr);color:var(--mute);padding:clamp(3px,.4vw,5px) clamp(8px,.9vw,12px);border-radius:100px;font-size:var(--t-xs);cursor:pointer;font-family:'DM Sans',-apple-system,sans-serif;transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+.sort-btn:hover{border-color:var(--acc);color:var(--acc);}
+.sort-btn.active{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:500;}
+@media(max-width:499px){.sort-wrap{margin-left:0;width:100%;}.sort-label{display:none;}}

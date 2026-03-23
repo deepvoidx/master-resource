@@ -1,5 +1,5 @@
 (function () {
-  var af = 'all', at = 'all';
+  var af = 'all', at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
 
@@ -81,8 +81,8 @@
       var btn = document.createElement('button');
       btn.className = 'fb';
       btn.setAttribute('data-f', cat.id);
-      // Use short label to avoid duplicate-looking buttons
-      btn.textContent = cat.icon + ' ' + (cat.short || cat.label);
+      var count = allTools.filter(function (t) { return t.category === cat.id; }).length;
+      btn.textContent = cat.icon + ' ' + (cat.short || cat.label) + ' · ' + count;
       fwrap.appendChild(btn);
     });
   }
@@ -95,6 +95,29 @@
     var statCatEl = document.getElementById('stat-cats');
     if (statsEl) statsEl.textContent = TOTAL;
     if (statCatEl) statCatEl.textContent = allCategories.length;
+
+    // ── Inject sort controls ───────────────────────────────
+    var existingSort = document.getElementById('sort-wrap');
+    if (!existingSort) {
+      var sortWrap = document.createElement('div');
+      sortWrap.id = 'sort-wrap';
+      sortWrap.className = 'sort-wrap';
+      sortWrap.innerHTML =
+        '<span class="sort-label">Sort:</span>' +
+        '<button class="sort-btn active" data-sort="default">Default</button>' +
+        '<button class="sort-btn" data-sort="az">A → Z</button>' +
+        '<button class="sort-btn" data-sort="recent">Recently Added</button>';
+      var ctrlMeta = document.getElementById('lc').parentNode;
+      ctrlMeta.appendChild(sortWrap);
+
+      sortWrap.addEventListener('click', function (e) {
+        var b = e.target.closest('.sort-btn'); if (!b) return;
+        document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        sortMode = b.getAttribute('data-sort');
+        apply(true);
+      });
+    }
 
     allCategories.forEach(function (cat) {
       var tools = allTools.filter(function (t) { return t.category === cat.id; });
@@ -122,6 +145,9 @@
 
   // ── Build a single card ────────────────────────────────────
   function buildCard(tool, color) {
+    var toolIndex = allTools.indexOf(tool);
+    var isNew = toolIndex >= allTools.length - 11;
+
     var searchStr = [
       tool.name, tool.description, tool.category, tool.url,
       tool.tags.map(function (t) { return '#' + t; }).join(' ')
@@ -130,6 +156,7 @@
     var card = document.createElement('div');
     card.className = 'card';
     card.setAttribute('data-s', searchStr);
+    card.setAttribute('data-idx', toolIndex);
     card.style.setProperty('--ca', color);
 
     if (tool.url) {
@@ -141,6 +168,13 @@
     var nameEl = document.createElement('div');
     nameEl.className = 'tool-name';
     nameEl.textContent = tool.name;
+
+    if (isNew) {
+      var badge = document.createElement('span');
+      badge.className = 'new-badge';
+      badge.textContent = 'New';
+      nameEl.appendChild(badge);
+    }
 
     var descEl = document.createElement('div');
     descEl.className = 'tool-desc';
@@ -245,6 +279,25 @@
     });
     document.getElementById('nores').classList[any ? 'remove' : 'add']('show');
     updateCount(vis);
+
+    // ── Sort cards within each visible grid ────────────────
+    if (sortMode !== 'default') {
+      document.querySelectorAll('.cat:not(.hidden) .grid').forEach(function (grid) {
+        var cards = Array.from(grid.querySelectorAll('.card'));
+        cards.sort(function (a, b) {
+          if (sortMode === 'az') {
+            var na = a.querySelector('.tool-name').textContent.trim().toLowerCase();
+            var nb = b.querySelector('.tool-name').textContent.trim().toLowerCase();
+            return na.localeCompare(nb);
+          }
+          if (sortMode === 'recent') {
+            return parseInt(b.getAttribute('data-idx')) - parseInt(a.getAttribute('data-idx'));
+          }
+          return 0;
+        });
+        cards.forEach(function (c) { grid.appendChild(c); });
+      });
+    }
   }
 
   document.getElementById('srch').addEventListener('input', function () { apply(false); });
