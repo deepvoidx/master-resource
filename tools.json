@@ -1353,6 +1353,119 @@
         "content",
         "video"
       ]
+    },
+    {
+      "name": "Firebase",
+      "description": "Google's app development platform — auth, database, hosting & cloud functions",
+      "url": "https://firebase.google.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "free"
+      ]
+    },
+    {
+      "name": "Supabase",
+      "description": "Open-source Firebase alternative — Postgres database, auth, storage & edge functions",
+      "url": "https://supabase.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "free"
+      ]
+    },
+    {
+      "name": "Google Antigravity",
+      "description": "Google's quirky experimental fun page — defy gravity in your browser",
+      "url": "https://antigravity.google/",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Google Stitch",
+      "description": "Google's AI-powered tool for generating and iterating on UI designs from prompts",
+      "url": "https://stitch.withgoogle.com/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "creative"
+      ]
+    },
+    {
+      "name": "Neal.fun",
+      "description": "Addictive interactive experiments — spend Bill Gates' money, life stats, and more",
+      "url": "https://neal.fun",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Vatnisse Interactive",
+      "description": "Indie interactive game experiences on itch.io by Vatnisse",
+      "url": "https://vatnisse-interactive.itch.io",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Draw a Stickman",
+      "description": "Draw your own stickman and watch it come to life in an interactive adventure",
+      "url": "https://drawastickman.com",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free",
+        "creative"
+      ]
+    },
+    {
+      "name": "Sort the Court!",
+      "description": "Cute browser game where you rule a kingdom by saying yes or no to your subjects",
+      "url": "https://graebor.itch.io/sort-the-court",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Project Gutenberg",
+      "description": "Over 70,000 free public domain e-books — classics, literature & non-fiction",
+      "url": "https://www.gutenberg.org/",
+      "category": "books",
+      "tags": [
+        "free",
+        "books",
+        "research"
+      ]
+    },
+    {
+      "name": "World Monitor App",
+      "description": "Real-time global monitoring — disasters, conflicts, weather & world events",
+      "url": "https://www.worldmonitor.app/",
+      "category": "misc",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "World Monitor",
+      "description": "Live world event tracker — news, crises and geopolitical developments in real time",
+      "url": "https://world-monitor.com/",
+      "category": "misc",
+      "tags": [
+        "research",
+        "free"
+      ]
     }
   ]
 }
