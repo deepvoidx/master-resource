@@ -1376,11 +1376,12 @@
     },
     {
       "name": "Google Antigravity",
-      "description": "Google's quirky experimental fun page — defy gravity in your browser",
+      "description": "Google's free agentic AI IDE — multi-agent coding platform powered by Gemini 3, Claude & GPT models",
       "url": "https://antigravity.google/",
-      "category": "fun",
+      "category": "dev",
       "tags": [
-        "fun",
+        "ai",
+        "dev",
         "free"
       ]
     },
@@ -1449,22 +1450,24 @@
     },
     {
       "name": "World Monitor App",
-      "description": "Real-time global monitoring — disasters, conflicts, weather & world events",
+      "description": "Real-time global intelligence dashboard — OSINT, live news, military tracking, markets & geopolitical data in one view",
       "url": "https://www.worldmonitor.app/",
-      "category": "misc",
+      "category": "research",
       "tags": [
         "research",
-        "free"
+        "free",
+        "ai"
       ]
     },
     {
       "name": "World Monitor",
-      "description": "Live world event tracker — news, crises and geopolitical developments in real time",
+      "description": "Real-time global conflict & incident monitoring — live maps, AI summaries, DEFCON tracker & 170+ intelligence feeds",
       "url": "https://world-monitor.com/",
-      "category": "misc",
+      "category": "research",
       "tags": [
         "research",
-        "free"
+        "free",
+        "ai"
       ]
     }
   ]
