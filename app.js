@@ -251,8 +251,15 @@
 
   document.getElementById('fwrap').addEventListener('click', function (e) {
     var b = e.target.closest('.fb'); if (!b) return;
+    var isActive = b.classList.contains('active');
     document.querySelectorAll('.fb').forEach(function (x) { x.classList.remove('active'); });
-    b.classList.add('active'); af = b.getAttribute('data-f'); apply(true);
+    if (isActive && b.getAttribute('data-f') !== 'all') {
+      document.querySelector('.fb[data-f="all"]').classList.add('active');
+      af = 'all';
+    } else {
+      b.classList.add('active'); af = b.getAttribute('data-f');
+    }
+    apply(true);
   });
 
   document.getElementById('tags-row').addEventListener('click', function (e) {
