@@ -46,20 +46,13 @@
     document.body.removeChild(ta);
   }
 
-  // ── Share — native sheet on mobile, clipboard on desktop ───
+  // ── Share ──────────────────────────────────────────────────
   function shareCard(name, description, url) {
     var text = name + ' — ' + description;
-
-    // Try native Web Share API first (mobile browsers)
     if (navigator.share) {
-      navigator.share({ title: name, text: description, url: url })
-        .catch(function () {
-          // User cancelled or error — silently ignore
-        });
+      navigator.share({ title: name, text: description, url: url }).catch(function () {});
       return;
     }
-
-    // Desktop: copy to clipboard with a nicer confirmation
     var fullText = text + (url ? '\n' + url : '');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(fullText)
@@ -90,7 +83,7 @@
     });
   }
 
-  // ── Build category sections and cards ─────────────────────
+  // ── Build grouped category view ────────────────────────────
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
@@ -123,7 +116,7 @@
     });
   }
 
-  // ── Build flat view container (used by A-Z and Recently Added) ──
+  // ── Build flat view container ──────────────────────────────
   function buildFlatView() {
     var flatView = document.createElement('div');
     flatView.id = 'flat-view';
@@ -132,6 +125,7 @@
     grid.className = 'grid';
     grid.id = 'flat-grid';
     flatView.appendChild(grid);
+    // Insert right after #cats
     var cats = document.getElementById('cats');
     cats.parentNode.insertBefore(flatView, cats.nextSibling);
   }
@@ -154,6 +148,7 @@
       var isActive = b.classList.contains('active');
       var clicked = b.getAttribute('data-sort');
       document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
+      // Toggle: tapping active non-default snaps back to Default
       if (isActive && clicked !== 'default') {
         document.querySelector('.sort-btn[data-sort="default"]').classList.add('active');
         sortMode = 'default';
@@ -223,7 +218,6 @@
       shareBtn.title = 'Share';
       shareBtn.innerHTML = '\u2197\uFE0E Share';
 
-      // Capture tool data in closure
       (function (n, d, u) {
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -234,7 +228,6 @@
 
       actions.appendChild(shareBtn);
       card.appendChild(actions);
-
     } else {
       var noLink = document.createElement('span');
       noLink.className = 'no-link';
@@ -246,11 +239,7 @@
   }
 
   // ── Card click to open URL ─────────────────────────────────
-  // Single click handler only — CSS touch-action:manipulation removes
-  // the 300ms iOS delay without needing touchend hacks.
-  // This also fixes the iOS double-tab bug (touchend + click firing twice).
   document.addEventListener('click', function (e) {
-    // Don't trigger if clicking a button or link inside the card
     if (e.target.closest('button') || e.target.closest('a')) return;
     var card = e.target.closest('.card[data-url]');
     if (!card) return;
@@ -258,7 +247,6 @@
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
 
-  // Keyboard: Enter on focused card opens URL
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var card = e.target.closest('.card[data-url]');
@@ -271,7 +259,7 @@
     if (e.key === 'Escape') document.activeElement.blur();
   });
 
-  // ── Filter / search ────────────────────────────────────────
+  // ── Count ──────────────────────────────────────────────────
   function updateCount(n) {
     var lc = document.getElementById('lc');
     if (!lc) return;
@@ -280,18 +268,20 @@
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
+  // ── Core apply ─────────────────────────────────────────────
   function apply(flash) {
     var q = document.getElementById('srch').value.toLowerCase().trim();
-    var catsEl = document.getElementById('cats');
+    var catsEl   = document.getElementById('cats');
     var flatView = document.getElementById('flat-view');
     var flatGrid = document.getElementById('flat-grid');
 
-    // ── FLAT VIEW: A-Z or Recently Added ──────────────────
+    // ── FLAT MODE: A-Z or Recently Added ──────────────────
     if (sortMode === 'az' || sortMode === 'recent') {
       catsEl.classList.add('hidden');
       flatView.classList.remove('hidden');
       flatGrid.innerHTML = '';
 
+      // Filter tools
       var matched = allTools.filter(function (tool) {
         if (af !== 'all' && tool.category !== af) return false;
         var s = [
@@ -303,16 +293,19 @@
         return true;
       });
 
+      // Sort
       if (sortMode === 'az') {
         matched.sort(function (a, b) {
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         });
       } else {
+        // recently added = reverse index order
         matched.sort(function (a, b) {
           return allTools.indexOf(b) - allTools.indexOf(a);
         });
       }
 
+      // Render cards
       matched.forEach(function (tool) {
         var cat = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
         var card = buildCard(tool, cat.color || '#6c63ff');
@@ -320,13 +313,13 @@
         flatGrid.appendChild(card);
       });
 
-      var anyFlat = matched.length > 0;
-      document.getElementById('nores').classList[anyFlat ? 'remove' : 'add']('show');
+      var hasAny = matched.length > 0;
+      document.getElementById('nores').classList[hasAny ? 'remove' : 'add']('show');
       updateCount(matched.length);
       return;
     }
 
-    // ── DEFAULT: grouped category view ────────────────────
+    // ── DEFAULT MODE: grouped by category ─────────────────
     catsEl.classList.remove('hidden');
     flatView.classList.add('hidden');
 
@@ -353,6 +346,7 @@
 
   document.getElementById('srch').addEventListener('input', function () { apply(false); });
 
+  // Category filter toggle
   document.getElementById('fwrap').addEventListener('click', function (e) {
     var b = e.target.closest('.fb'); if (!b) return;
     var isActive = b.classList.contains('active');
@@ -366,6 +360,7 @@
     apply(true);
   });
 
+  // Tag pill toggle
   document.getElementById('tags-row').addEventListener('click', function (e) {
     var b = e.target.closest('.tag-pill'); if (!b) return;
     var tag = b.getAttribute('data-tag');

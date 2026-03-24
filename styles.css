@@ -120,4 +120,5 @@ header{-webkit-user-select:none;user-select:none;}
 .sort-btn{background:transparent;border:1px solid var(--bdr);color:var(--mute);padding:clamp(3px,.4vw,5px) clamp(8px,.9vw,12px);border-radius:100px;font-size:var(--t-xs);cursor:pointer;font-family:'DM Sans',-apple-system,sans-serif;transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
 .sort-btn:hover{border-color:var(--acc);color:var(--acc);}
 .sort-btn.active{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:500;}
+.sort-btn,.fb{touch-action:manipulation;}
 @media(max-width:499px){.sort-wrap{margin-left:0;width:100%;}.sort-label{display:none;}}
