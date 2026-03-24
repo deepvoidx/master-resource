@@ -2,6 +2,7 @@
   var af = 'all', at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
+  var NEW_COUNT = 11;
 
   // ── Logo / content protection ──────────────────────────────
   document.addEventListener('contextmenu', function (e) {
@@ -18,6 +19,8 @@
       TOTAL = allTools.length;
       buildFilterButtons();
       buildDOM();
+      buildFlatView();
+      buildSortControls();
       apply(false);
     })
     .catch(function () {
@@ -43,20 +46,13 @@
     document.body.removeChild(ta);
   }
 
-  // ── Share — native sheet on mobile, clipboard on desktop ───
+  // ── Share ──────────────────────────────────────────────────
   function shareCard(name, description, url) {
     var text = name + ' — ' + description;
-
-    // Try native Web Share API first (mobile browsers)
     if (navigator.share) {
-      navigator.share({ title: name, text: description, url: url })
-        .catch(function () {
-          // User cancelled or error — silently ignore
-        });
+      navigator.share({ title: name, text: description, url: url }).catch(function () {});
       return;
     }
-
-    // Desktop: copy to clipboard with a nicer confirmation
     var fullText = text + (url ? '\n' + url : '');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(fullText)
@@ -87,7 +83,7 @@
     });
   }
 
-  // ── Build category sections and cards ─────────────────────
+  // ── Build grouped category view ────────────────────────────
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
@@ -95,29 +91,6 @@
     var statCatEl = document.getElementById('stat-cats');
     if (statsEl) statsEl.textContent = TOTAL;
     if (statCatEl) statCatEl.textContent = allCategories.length;
-
-    // ── Inject sort controls ───────────────────────────────
-    var existingSort = document.getElementById('sort-wrap');
-    if (!existingSort) {
-      var sortWrap = document.createElement('div');
-      sortWrap.id = 'sort-wrap';
-      sortWrap.className = 'sort-wrap';
-      sortWrap.innerHTML =
-        '<span class="sort-label">Sort:</span>' +
-        '<button class="sort-btn active" data-sort="default">Default</button>' +
-        '<button class="sort-btn" data-sort="az">A → Z</button>' +
-        '<button class="sort-btn" data-sort="recent">Recently Added</button>';
-      var ctrlMeta = document.getElementById('lc').parentNode;
-      ctrlMeta.appendChild(sortWrap);
-
-      sortWrap.addEventListener('click', function (e) {
-        var b = e.target.closest('.sort-btn'); if (!b) return;
-        document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
-        b.classList.add('active');
-        sortMode = b.getAttribute('data-sort');
-        apply(true);
-      });
-    }
 
     allCategories.forEach(function (cat) {
       var tools = allTools.filter(function (t) { return t.category === cat.id; });
@@ -143,10 +116,53 @@
     });
   }
 
+  // ── Build flat view container ──────────────────────────────
+  function buildFlatView() {
+    var flatView = document.createElement('div');
+    flatView.id = 'flat-view';
+    flatView.className = 'flat-view hidden';
+    var grid = document.createElement('div');
+    grid.className = 'grid';
+    grid.id = 'flat-grid';
+    flatView.appendChild(grid);
+    var cats = document.getElementById('cats');
+    cats.parentNode.insertBefore(flatView, cats.nextSibling);
+  }
+
+  // ── Build sort controls ────────────────────────────────────
+  function buildSortControls() {
+    if (document.getElementById('sort-wrap')) return;
+    var sortWrap = document.createElement('div');
+    sortWrap.id = 'sort-wrap';
+    sortWrap.className = 'sort-wrap';
+    sortWrap.innerHTML =
+      '<span class="sort-label">Sort:</span>' +
+      '<button class="sort-btn active" data-sort="default">Default</button>' +
+      '<button class="sort-btn" data-sort="az">A \u2192 Z</button>' +
+      '<button class="sort-btn" data-sort="recent">Recently Added</button>';
+    document.getElementById('lc').parentNode.appendChild(sortWrap);
+
+    sortWrap.addEventListener('click', function (e) {
+      var b = e.target.closest('.sort-btn'); if (!b) return;
+      var isActive = b.classList.contains('active');
+      var clicked = b.getAttribute('data-sort');
+      document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
+      if (isActive && clicked !== 'default') {
+        // Deselect — snap back to default
+        document.querySelector('.sort-btn[data-sort="default"]').classList.add('active');
+        sortMode = 'default';
+      } else {
+        b.classList.add('active');
+        sortMode = clicked;
+      }
+      apply(true);
+    });
+  }
+
   // ── Build a single card ────────────────────────────────────
   function buildCard(tool, color) {
     var toolIndex = allTools.indexOf(tool);
-    var isNew = toolIndex >= allTools.length - 11;
+    var isNew = toolIndex >= allTools.length - NEW_COUNT;
 
     var searchStr = [
       tool.name, tool.description, tool.category, tool.url,
@@ -201,7 +217,6 @@
       shareBtn.title = 'Share';
       shareBtn.innerHTML = '\u2197\uFE0E Share';
 
-      // Capture tool data in closure
       (function (n, d, u) {
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -212,7 +227,6 @@
 
       actions.appendChild(shareBtn);
       card.appendChild(actions);
-
     } else {
       var noLink = document.createElement('span');
       noLink.className = 'no-link';
@@ -224,11 +238,7 @@
   }
 
   // ── Card click to open URL ─────────────────────────────────
-  // Single click handler only — CSS touch-action:manipulation removes
-  // the 300ms iOS delay without needing touchend hacks.
-  // This also fixes the iOS double-tab bug (touchend + click firing twice).
   document.addEventListener('click', function (e) {
-    // Don't trigger if clicking a button or link inside the card
     if (e.target.closest('button') || e.target.closest('a')) return;
     var card = e.target.closest('.card[data-url]');
     if (!card) return;
@@ -236,7 +246,6 @@
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
 
-  // Keyboard: Enter on focused card opens URL
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var card = e.target.closest('.card[data-url]');
@@ -249,7 +258,7 @@
     if (e.key === 'Escape') document.activeElement.blur();
   });
 
-  // ── Filter / search ────────────────────────────────────────
+  // ── Count + update ─────────────────────────────────────────
   function updateCount(n) {
     var lc = document.getElementById('lc');
     if (!lc) return;
@@ -258,8 +267,58 @@
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
+  // ── Core apply function ────────────────────────────────────
   function apply(flash) {
     var q = document.getElementById('srch').value.toLowerCase().trim();
+    var catsEl = document.getElementById('cats');
+    var flatView = document.getElementById('flat-view');
+    var flatGrid = document.getElementById('flat-grid');
+
+    // ── FLAT VIEW: A-Z or Recently Added ──────────────────
+    if (sortMode === 'az' || sortMode === 'recent') {
+      catsEl.classList.add('hidden');
+      flatView.classList.remove('hidden');
+      flatGrid.innerHTML = '';
+
+      var matched = allTools.filter(function (tool) {
+        if (af !== 'all' && tool.category !== af) return false;
+        var s = [
+          tool.name, tool.description, tool.category, tool.url,
+          tool.tags.map(function (t) { return '#' + t; }).join(' ')
+        ].join(' ').toLowerCase();
+        if (q && s.indexOf(q) === -1) return false;
+        if (at !== 'all' && s.indexOf(at) === -1) return false;
+        return true;
+      });
+
+      if (sortMode === 'az') {
+        matched.sort(function (a, b) {
+          return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+        });
+      } else {
+        // recently added = reverse order of tools array
+        matched.sort(function (a, b) {
+          return allTools.indexOf(b) - allTools.indexOf(a);
+        });
+      }
+
+      matched.forEach(function (tool) {
+        var cat = allCategories.find(function (c) { return c.id === tool.category; }) || {};
+        var card = buildCard(tool, cat.color || '#6c63ff');
+        if (flash) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
+        flatGrid.appendChild(card);
+      });
+
+      var any = matched.length > 0;
+      document.getElementById('nores').classList[any ? 'remove' : 'add']('show');
+      updateCount(matched.length);
+      return;
+    }
+
+    // ── DEFAULT: grouped category view ────────────────────
+    catsEl.classList.remove('hidden');
+    flatView.classList.add('hidden');
+
     var any = false, vis = 0;
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
@@ -279,25 +338,6 @@
     });
     document.getElementById('nores').classList[any ? 'remove' : 'add']('show');
     updateCount(vis);
-
-    // ── Sort cards within each visible grid ────────────────
-    if (sortMode !== 'default') {
-      document.querySelectorAll('.cat:not(.hidden) .grid').forEach(function (grid) {
-        var cards = Array.from(grid.querySelectorAll('.card'));
-        cards.sort(function (a, b) {
-          if (sortMode === 'az') {
-            var na = a.querySelector('.tool-name').textContent.trim().toLowerCase();
-            var nb = b.querySelector('.tool-name').textContent.trim().toLowerCase();
-            return na.localeCompare(nb);
-          }
-          if (sortMode === 'recent') {
-            return parseInt(b.getAttribute('data-idx')) - parseInt(a.getAttribute('data-idx'));
-          }
-          return 0;
-        });
-        cards.forEach(function (c) { grid.appendChild(c); });
-      });
-    }
   }
 
   document.getElementById('srch').addEventListener('input', function () { apply(false); });

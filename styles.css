@@ -107,6 +107,10 @@ header{-webkit-user-select:none;user-select:none;}
 #toast{display:flex;align-items:center;gap:8px;}
 .toast-icon{font-size:1.1em;flex-shrink:0;}
 
+/* ── Flat view (A-Z / Recently Added) ── */
+.flat-view{margin-top:clamp(8px,1vw,16px);}
+.flat-view.hidden{display:none;}
+
 /* ── New badge ── */
 .new-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(108,99,255,.18);color:var(--acc);border:1px solid rgba(108,99,255,.35);vertical-align:middle;font-family:'Syne',system-ui,sans-serif;}
 
