@@ -1,5 +1,6 @@
 (function () {
-  var af = 'all', at = 'all', sortMode = 'default';
+  // af is now a Set of selected category IDs. Empty = show all.
+  var af = new Set(), at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
   var NEW_COUNT = 11;
@@ -68,11 +69,13 @@
   function buildFilterButtons() {
     var fwrap = document.getElementById('fwrap');
     fwrap.innerHTML = '';
+
     var all = document.createElement('button');
     all.className = 'fb active';
     all.setAttribute('data-f', 'all');
     all.textContent = 'All';
     fwrap.appendChild(all);
+
     allCategories.forEach(function (cat) {
       var btn = document.createElement('button');
       btn.className = 'fb';
@@ -81,6 +84,17 @@
       btn.textContent = cat.icon + ' ' + (cat.short || cat.label) + ' · ' + count;
       fwrap.appendChild(btn);
     });
+  }
+
+  // ── Sync "All" button active state ────────────────────────
+  function syncAllBtn() {
+    var allBtn = document.querySelector('.fb[data-f="all"]');
+    if (!allBtn) return;
+    if (af.size === 0) {
+      allBtn.classList.add('active');
+    } else {
+      allBtn.classList.remove('active');
+    }
   }
 
   // ── Build grouped category view ────────────────────────────
@@ -125,7 +139,6 @@
     grid.className = 'grid';
     grid.id = 'flat-grid';
     flatView.appendChild(grid);
-    // Insert right after #cats
     var cats = document.getElementById('cats');
     cats.parentNode.insertBefore(flatView, cats.nextSibling);
   }
@@ -148,7 +161,6 @@
       var isActive = b.classList.contains('active');
       var clicked = b.getAttribute('data-sort');
       document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
-      // Toggle: tapping active non-default snaps back to Default
       if (isActive && clicked !== 'default') {
         document.querySelector('.sort-btn[data-sort="default"]').classList.add('active');
         sortMode = 'default';
@@ -174,6 +186,7 @@
     card.className = 'card';
     card.setAttribute('data-s', searchStr);
     card.setAttribute('data-idx', toolIndex);
+    card.setAttribute('data-cat', tool.category);
     card.style.setProperty('--ca', color);
 
     if (tool.url) {
@@ -268,6 +281,18 @@
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
+  // ── Helper: does this tool pass current filters? ───────────
+  function toolMatches(tool, q) {
+    if (af.size > 0 && !af.has(tool.category)) return false;
+    var s = [
+      tool.name, tool.description, tool.category, tool.url,
+      tool.tags.map(function (t) { return '#' + t; }).join(' ')
+    ].join(' ').toLowerCase();
+    if (q && s.indexOf(q) === -1) return false;
+    if (at !== 'all' && s.indexOf(at) === -1) return false;
+    return true;
+  }
+
   // ── Core apply ─────────────────────────────────────────────
   function apply(flash) {
     var q = document.getElementById('srch').value.toLowerCase().trim();
@@ -281,31 +306,18 @@
       flatView.classList.remove('hidden');
       flatGrid.innerHTML = '';
 
-      // Filter tools
-      var matched = allTools.filter(function (tool) {
-        if (af !== 'all' && tool.category !== af) return false;
-        var s = [
-          tool.name, tool.description, tool.category, tool.url,
-          tool.tags.map(function (t) { return '#' + t; }).join(' ')
-        ].join(' ').toLowerCase();
-        if (q && s.indexOf(q) === -1) return false;
-        if (at !== 'all' && s.indexOf(at) === -1) return false;
-        return true;
-      });
+      var matched = allTools.filter(function (tool) { return toolMatches(tool, q); });
 
-      // Sort
       if (sortMode === 'az') {
         matched.sort(function (a, b) {
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         });
       } else {
-        // recently added = reverse index order
         matched.sort(function (a, b) {
           return allTools.indexOf(b) - allTools.indexOf(a);
         });
       }
 
-      // Render cards
       matched.forEach(function (tool) {
         var cat = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
         var card = buildCard(tool, cat.color || '#6c63ff');
@@ -326,7 +338,8 @@
     var any = false, vis = 0;
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
-      if (af !== 'all' && af !== cid) { sec.classList.add('hidden'); return; }
+      // Hide section if it's not in the selected set (when set is non-empty)
+      if (af.size > 0 && !af.has(cid)) { sec.classList.add('hidden'); return; }
       var hasVis = false;
       sec.querySelectorAll('.card').forEach(function (c) {
         var s = c.getAttribute('data-s') || '';
@@ -346,21 +359,31 @@
 
   document.getElementById('srch').addEventListener('input', function () { apply(false); });
 
-  // Category filter toggle
+  // ── Multi-select category filter ───────────────────────────
   document.getElementById('fwrap').addEventListener('click', function (e) {
     var b = e.target.closest('.fb'); if (!b) return;
-    var isActive = b.classList.contains('active');
-    document.querySelectorAll('.fb').forEach(function (x) { x.classList.remove('active'); });
-    if (isActive && b.getAttribute('data-f') !== 'all') {
-      document.querySelector('.fb[data-f="all"]').classList.add('active');
-      af = 'all';
+    var fid = b.getAttribute('data-f');
+
+    if (fid === 'all') {
+      // All button: clear all selections
+      af.clear();
+      document.querySelectorAll('.fb').forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
     } else {
-      b.classList.add('active'); af = b.getAttribute('data-f');
+      // Toggle this category in/out of the set
+      if (af.has(fid)) {
+        af.delete(fid);
+        b.classList.remove('active');
+      } else {
+        af.add(fid);
+        b.classList.add('active');
+      }
+      syncAllBtn();
     }
     apply(true);
   });
 
-  // Tag pill toggle
+  // ── Tag pill toggle ────────────────────────────────────────
   document.getElementById('tags-row').addEventListener('click', function (e) {
     var b = e.target.closest('.tag-pill'); if (!b) return;
     var tag = b.getAttribute('data-tag');
