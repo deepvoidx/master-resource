@@ -46,13 +46,20 @@
     document.body.removeChild(ta);
   }
 
-  // ── Share ──────────────────────────────────────────────────
+  // ── Share — native sheet on mobile, clipboard on desktop ───
   function shareCard(name, description, url) {
     var text = name + ' — ' + description;
+
+    // Try native Web Share API first (mobile browsers)
     if (navigator.share) {
-      navigator.share({ title: name, text: description, url: url }).catch(function () {});
+      navigator.share({ title: name, text: description, url: url })
+        .catch(function () {
+          // User cancelled or error — silently ignore
+        });
       return;
     }
+
+    // Desktop: copy to clipboard with a nicer confirmation
     var fullText = text + (url ? '\n' + url : '');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(fullText)
@@ -83,7 +90,7 @@
     });
   }
 
-  // ── Build grouped category view ────────────────────────────
+  // ── Build category sections and cards ─────────────────────
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
@@ -116,7 +123,7 @@
     });
   }
 
-  // ── Build flat view container ──────────────────────────────
+  // ── Build flat view container (used by A-Z and Recently Added) ──
   function buildFlatView() {
     var flatView = document.createElement('div');
     flatView.id = 'flat-view';
@@ -148,7 +155,6 @@
       var clicked = b.getAttribute('data-sort');
       document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
       if (isActive && clicked !== 'default') {
-        // Deselect — snap back to default
         document.querySelector('.sort-btn[data-sort="default"]').classList.add('active');
         sortMode = 'default';
       } else {
@@ -217,6 +223,7 @@
       shareBtn.title = 'Share';
       shareBtn.innerHTML = '\u2197\uFE0E Share';
 
+      // Capture tool data in closure
       (function (n, d, u) {
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -227,6 +234,7 @@
 
       actions.appendChild(shareBtn);
       card.appendChild(actions);
+
     } else {
       var noLink = document.createElement('span');
       noLink.className = 'no-link';
@@ -238,7 +246,11 @@
   }
 
   // ── Card click to open URL ─────────────────────────────────
+  // Single click handler only — CSS touch-action:manipulation removes
+  // the 300ms iOS delay without needing touchend hacks.
+  // This also fixes the iOS double-tab bug (touchend + click firing twice).
   document.addEventListener('click', function (e) {
+    // Don't trigger if clicking a button or link inside the card
     if (e.target.closest('button') || e.target.closest('a')) return;
     var card = e.target.closest('.card[data-url]');
     if (!card) return;
@@ -246,6 +258,7 @@
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
 
+  // Keyboard: Enter on focused card opens URL
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
       var card = e.target.closest('.card[data-url]');
@@ -258,7 +271,7 @@
     if (e.key === 'Escape') document.activeElement.blur();
   });
 
-  // ── Count + update ─────────────────────────────────────────
+  // ── Filter / search ────────────────────────────────────────
   function updateCount(n) {
     var lc = document.getElementById('lc');
     if (!lc) return;
@@ -267,7 +280,6 @@
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
-  // ── Core apply function ────────────────────────────────────
   function apply(flash) {
     var q = document.getElementById('srch').value.toLowerCase().trim();
     var catsEl = document.getElementById('cats');
@@ -296,21 +308,20 @@
           return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
         });
       } else {
-        // recently added = reverse order of tools array
         matched.sort(function (a, b) {
           return allTools.indexOf(b) - allTools.indexOf(a);
         });
       }
 
       matched.forEach(function (tool) {
-        var cat = allCategories.find(function (c) { return c.id === tool.category; }) || {};
+        var cat = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
         var card = buildCard(tool, cat.color || '#6c63ff');
         if (flash) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
         flatGrid.appendChild(card);
       });
 
-      var any = matched.length > 0;
-      document.getElementById('nores').classList[any ? 'remove' : 'add']('show');
+      var anyFlat = matched.length > 0;
+      document.getElementById('nores').classList[anyFlat ? 'remove' : 'add']('show');
       updateCount(matched.length);
       return;
     }
