@@ -1,6 +1,6 @@
 (function () {
-  // af is now a Set of selected category IDs. Empty = show all.
-  var af = new Set(), at = 'all', sortMode = 'default';
+  // af is now an array of selected category IDs. Empty = show all.
+  var activeFilters = [], at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
   var NEW_COUNT = 11;
@@ -65,6 +65,17 @@
     }
   }
 
+  // ── Sync "All" button visual state ────────────────────────
+  function syncAllBtn() {
+    var allBtn = document.querySelector('.fb[data-f="all"]');
+    if (!allBtn) return;
+    if (activeFilters.length === 0) {
+      allBtn.classList.add('active');
+    } else {
+      allBtn.classList.remove('active');
+    }
+  }
+
   // ── Build category filter buttons ─────────────────────────
   function buildFilterButtons() {
     var fwrap = document.getElementById('fwrap');
@@ -84,17 +95,6 @@
       btn.textContent = cat.icon + ' ' + (cat.short || cat.label) + ' · ' + count;
       fwrap.appendChild(btn);
     });
-  }
-
-  // ── Sync "All" button active state ────────────────────────
-  function syncAllBtn() {
-    var allBtn = document.querySelector('.fb[data-f="all"]');
-    if (!allBtn) return;
-    if (af.size === 0) {
-      allBtn.classList.add('active');
-    } else {
-      allBtn.classList.remove('active');
-    }
   }
 
   // ── Build grouped category view ────────────────────────────
@@ -143,7 +143,7 @@
     cats.parentNode.insertBefore(flatView, cats.nextSibling);
   }
 
-  // ── Build sort controls ────────────────────────────────────
+  // ── Build sort controls (injected BELOW ctrl-meta) ─────────
   function buildSortControls() {
     if (document.getElementById('sort-wrap')) return;
     var sortWrap = document.createElement('div');
@@ -154,7 +154,10 @@
       '<button class="sort-btn active" data-sort="default">Default</button>' +
       '<button class="sort-btn" data-sort="az">A \u2192 Z</button>' +
       '<button class="sort-btn" data-sort="recent">Recently Added</button>';
-    document.getElementById('lc').parentNode.appendChild(sortWrap);
+
+    // Insert after ctrl-meta, not inside it
+    var ctrlMeta = document.getElementById('lc').parentNode;
+    ctrlMeta.parentNode.insertBefore(sortWrap, ctrlMeta.nextSibling);
 
     sortWrap.addEventListener('click', function (e) {
       var b = e.target.closest('.sort-btn'); if (!b) return;
@@ -186,7 +189,6 @@
     card.className = 'card';
     card.setAttribute('data-s', searchStr);
     card.setAttribute('data-idx', toolIndex);
-    card.setAttribute('data-cat', tool.category);
     card.style.setProperty('--ca', color);
 
     if (tool.url) {
@@ -283,7 +285,8 @@
 
   // ── Helper: does this tool pass current filters? ───────────
   function toolMatches(tool, q) {
-    if (af.size > 0 && !af.has(tool.category)) return false;
+    // Multi-category filter
+    if (activeFilters.length > 0 && activeFilters.indexOf(tool.category) === -1) return false;
     var s = [
       tool.name, tool.description, tool.category, tool.url,
       tool.tags.map(function (t) { return '#' + t; }).join(' ')
@@ -338,8 +341,10 @@
     var any = false, vis = 0;
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
-      // Hide section if it's not in the selected set (when set is non-empty)
-      if (af.size > 0 && !af.has(cid)) { sec.classList.add('hidden'); return; }
+      // Hide section if it's not in active filters
+      if (activeFilters.length > 0 && activeFilters.indexOf(cid) === -1) {
+        sec.classList.add('hidden'); return;
+      }
       var hasVis = false;
       sec.querySelectorAll('.card').forEach(function (c) {
         var s = c.getAttribute('data-s') || '';
@@ -365,18 +370,20 @@
     var fid = b.getAttribute('data-f');
 
     if (fid === 'all') {
-      // All button: clear all selections
-      af.clear();
+      // All: clear all selections
+      activeFilters = [];
       document.querySelectorAll('.fb').forEach(function (x) { x.classList.remove('active'); });
       b.classList.add('active');
     } else {
-      // Toggle this category in/out of the set
-      if (af.has(fid)) {
-        af.delete(fid);
-        b.classList.remove('active');
-      } else {
-        af.add(fid);
+      var idx = activeFilters.indexOf(fid);
+      if (idx === -1) {
+        // Add to selection
+        activeFilters.push(fid);
         b.classList.add('active');
+      } else {
+        // Remove from selection
+        activeFilters.splice(idx, 1);
+        b.classList.remove('active');
       }
       syncAllBtn();
     }
