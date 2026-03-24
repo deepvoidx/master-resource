@@ -47,7 +47,7 @@ input[type=search]::placeholder{color:var(--mute);}
 .tool-desc{font-size:var(--t-xs);color:var(--mute);line-height:1.55;flex:1;}
 .tool-link{display:inline-flex;align-items:center;gap:clamp(3px,.4vw,6px);color:var(--acc);font-size:var(--t-xs);text-decoration:none;font-weight:500;margin-top:clamp(2px,.3vw,4px);}
 .no-link{color:var(--mute);font-size:var(--t-xs);margin-top:clamp(2px,.3vw,4px);font-style:italic;}
-.cat.hidden,.card.hidden{display:none;}
+.cat.hidden,.card.hidden,.cats.hidden,.flat-view.hidden{display:none;}
 .nores{text-align:center;padding:clamp(40px,6vw,80px) 20px;color:var(--mute);font-size:var(--t-base);display:none;}
 .nores.show{display:block;}
 .nores em{display:block;font-size:clamp(32px,5vw,52px);margin-bottom:12px;font-style:normal;}
