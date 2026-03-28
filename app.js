@@ -1,17 +1,32 @@
 (function () {
-  // af is now an array of selected category IDs. Empty = show all.
+
+  // ══════════════════════════════════════════════════════════════
+  // GITHUB CONFIG — edit these to match your repo
+  // ══════════════════════════════════════════════════════════════
+  var GH_OWNER  = 'deepvoidx';
+  var GH_REPO   = 'master-resource';
+  var GH_BRANCH = 'main';
+
+  // SUBMIT TOKEN — create a fine-grained PAT at:
+  // https://github.com/settings/tokens?type=beta
+  // Settings:  Repository access → Only "master-resource"
+  // Permission: Repository permissions → Contents → Read and Write
+  // Paste the token between the quotes below:
+  var SUBMIT_TOKEN = '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';   // ← your fine-grained PAT here
+  // ══════════════════════════════════════════════════════════════
+
   var activeFilters = [], at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
   var NEW_COUNT = 11;
 
-  // ── Logo / content protection ──────────────────────────────
+  // ── Content protection ──────────────────────────────────────
   document.addEventListener('contextmenu', function (e) {
     if (e.target.closest('header') || e.target.tagName === 'IMG') e.preventDefault();
   });
   document.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
-  // ── Load data ──────────────────────────────────────────────
+  // ── Load tools.json ─────────────────────────────────────────
   fetch('./tools.json')
     .then(function (r) { return r.json(); })
     .then(function (data) {
@@ -22,39 +37,31 @@
       buildDOM();
       buildFlatView();
       buildSortControls();
+      buildSubmitBtn();
       apply(false);
     })
     .catch(function () {
       document.getElementById('cats').innerHTML =
-        '<p style="color:#e11d48;padding:40px">Failed to load tools.json — make sure the file is in the same folder as index.html.</p>';
+        '<p style="color:#e11d48;padding:40px">Failed to load tools.json — make sure the file exists.</p>';
     });
 
-  // ── Toast ──────────────────────────────────────────────────
+  // ── Toast ────────────────────────────────────────────────────
   var toastT;
   function toast(msg, icon) {
     var t = document.getElementById('toast');
-    t.innerHTML = (icon ? '<span class="toast-icon">' + icon + '</span>' : '') + '<span>' + msg + '</span>';
+    t.innerHTML = (icon ? '<span class="toast-icon">' + icon + '</span>' : '') + '<span>' + escHtml(msg) + '</span>';
     t.classList.add('show');
     clearTimeout(toastT);
-    toastT = setTimeout(function () { t.classList.remove('show'); }, 2200);
+    toastT = setTimeout(function () { t.classList.remove('show'); }, 2400);
   }
 
-  function fallbackCopy(txt) {
-    var ta = document.createElement('textarea');
-    ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (e) {}
-    document.body.removeChild(ta);
-  }
-
-  // ── Share ──────────────────────────────────────────────────
+  // ── Share ────────────────────────────────────────────────────
   function shareCard(name, description, url) {
-    var text = name + ' — ' + description;
+    var fullText = name + ' — ' + description + (url ? '\n' + url : '');
     if (navigator.share) {
       navigator.share({ title: name, text: description, url: url }).catch(function () {});
       return;
     }
-    var fullText = text + (url ? '\n' + url : '');
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(fullText)
         .then(function () { toast('Copied to clipboard', '📋'); })
@@ -64,29 +71,307 @@
       toast('Copied to clipboard', '📋');
     }
   }
+  function fallbackCopy(txt) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
 
-  // ── Sync "All" button visual state ────────────────────────
-  function syncAllBtn() {
-    var allBtn = document.querySelector('.fb[data-f="all"]');
-    if (!allBtn) return;
-    if (activeFilters.length === 0) {
-      allBtn.classList.add('active');
-    } else {
-      allBtn.classList.remove('active');
+  // ── Security helpers ─────────────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function sanitizeText(str, maxLen) {
+    return String(str).trim().slice(0, maxLen || 200)
+      .replace(/[\x00-\x1F\x7F]/g, ''); // strip control chars
+  }
+
+  function validateURL(raw) {
+    var url = String(raw).trim();
+    if (!url) return { ok: false, msg: 'URL is required.' };
+    if (url.length > 500) return { ok: false, msg: 'URL is too long.' };
+    // Block any dangerous protocol before URL parsing
+    if (/^(javascript|data|vbscript|file|blob|about):/i.test(url)) {
+      return { ok: false, msg: 'This URL type is not allowed.' };
+    }
+    // Must start with http or https
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+    try {
+      var parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return { ok: false, msg: 'Only http:// and https:// URLs are allowed.' };
+      }
+      if (!parsed.hostname || parsed.hostname.length < 3 || !parsed.hostname.includes('.')) {
+        return { ok: false, msg: 'Please enter a valid website URL.' };
+      }
+      // Extra guard: no localhost, no IP-based local URLs
+      if (/^(localhost|127\.|192\.168\.|10\.|0\.0\.0\.0)/i.test(parsed.hostname)) {
+        return { ok: false, msg: 'Local URLs are not allowed.' };
+      }
+      return { ok: true, url: parsed.href };
+    } catch (e) {
+      return { ok: false, msg: 'Please enter a valid URL.' };
     }
   }
 
-  // ── Build category filter buttons ─────────────────────────
+  // ── Rate limiting (3 submissions per hour per browser) ───────
+  function checkRateLimit() {
+    var key = 'mr_submit_rl';
+    var now = Date.now();
+    var data;
+    try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { data = null; }
+    if (!data || now > data.reset) {
+      data = { count: 0, reset: now + 3600000 }; // 1 hour window
+    }
+    if (data.count >= 3) {
+      var mins = Math.ceil((data.reset - now) / 60000);
+      return { ok: false, msg: 'Too many submissions. Try again in ' + mins + ' minute(s).' };
+    }
+    data.count++;
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch (e) {}
+    return { ok: true };
+  }
+
+  // ── GitHub API: read pending.json ────────────────────────────
+  function fetchPending() {
+    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json?ref=' + GH_BRANCH, {
+      headers: {
+        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }).then(function (r) {
+      if (r.status === 404) return { content: { pending: [] }, sha: null };
+      if (!r.ok) throw new Error('GitHub API error: ' + r.status);
+      return r.json().then(function (d) {
+        var content;
+        try { content = JSON.parse(atob(d.content.replace(/\n/g, ''))); } catch (e) { content = { pending: [] }; }
+        return { content: content, sha: d.sha };
+      });
+    });
+  }
+
+  // ── GitHub API: write pending.json ───────────────────────────
+  function writePending(content, sha) {
+    // Enforce schema: only write the 'pending' array, nothing else
+    var safe = { pending: Array.isArray(content.pending) ? content.pending : [] };
+    var body = {
+      message: 'New tool submission',
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(safe, null, 2)))),
+      branch: GH_BRANCH
+    };
+    if (sha) body.sha = sha;
+    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error(t); });
+      return r.json();
+    });
+  }
+
+  // ── Generate unique submission ID ────────────────────────────
+  function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  // ── Build submit floating button ─────────────────────────────
+  function buildSubmitBtn() {
+    if (document.getElementById('submit-btn')) return;
+    var btn = document.createElement('button');
+    btn.id = 'submit-btn';
+    btn.title = 'Suggest a tool';
+    btn.innerHTML = '+';
+    btn.setAttribute('aria-label', 'Suggest a tool');
+    document.body.appendChild(btn);
+    btn.addEventListener('click', openSubmitModal);
+  }
+
+  // ── Build submit modal ───────────────────────────────────────
+  function buildSubmitModal() {
+    if (document.getElementById('submit-overlay')) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'submit-overlay';
+    overlay.className = 'modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Suggest a tool');
+    overlay.innerHTML =
+      '<div class="modal-box" id="submit-modal">' +
+        '<div class="modal-title">Suggest a Tool</div>' +
+        '<div class="modal-sub">Seen something useful? Share it — the developer will review and add it to the list.</div>' +
+        '<div id="submit-form">' +
+          '<div class="modal-field">' +
+            '<label class="modal-label" for="s-name">Tool name</label>' +
+            '<input class="modal-input" type="text" id="s-name" placeholder="e.g. Notion" maxlength="80" autocomplete="off"/>' +
+            '<div class="modal-err" id="s-name-err"></div>' +
+          '</div>' +
+          '<div class="modal-field">' +
+            '<label class="modal-label" for="s-url">Website URL</label>' +
+            '<input class="modal-input" type="url" id="s-url" placeholder="https://example.com" maxlength="500" autocomplete="off" inputmode="url"/>' +
+            '<div class="modal-err" id="s-url-err"></div>' +
+          '</div>' +
+          '<div class="modal-err" id="s-global-err"></div>' +
+          '<div class="modal-actions">' +
+            '<button class="modal-submit" id="s-submit">Submit</button>' +
+            '<button class="modal-cancel" id="s-cancel">Cancel</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="modal-success" id="submit-success">' +
+          '<div class="modal-success-icon">✓</div>' +
+          '<div class="modal-success-text">Thank you! Your suggestion has been submitted and will be reviewed before being added to the site.</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    // Close on backdrop click
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeSubmitModal();
+    });
+    document.getElementById('s-cancel').addEventListener('click', closeSubmitModal);
+    document.getElementById('s-submit').addEventListener('click', handleSubmit);
+
+    // Keyboard: Escape closes, Enter submits
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSubmitModal();
+      if (e.key === 'Enter' && e.target.closest('.modal-box')) handleSubmit();
+    });
+  }
+
+  function openSubmitModal() {
+    buildSubmitModal();
+    var overlay = document.getElementById('submit-overlay');
+    var form = document.getElementById('submit-form');
+    var success = document.getElementById('submit-success');
+    // Reset state
+    form.style.display = '';
+    success.style.display = 'none';
+    document.getElementById('s-name').value = '';
+    document.getElementById('s-url').value = '';
+    clearModalErrors();
+    overlay.classList.add('open');
+    // Focus first input
+    setTimeout(function () {
+      var inp = document.getElementById('s-name');
+      if (inp) inp.focus();
+    }, 60);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSubmitModal() {
+    var overlay = document.getElementById('submit-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function clearModalErrors() {
+    ['s-name-err', 's-url-err', 's-global-err'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+    ['s-name', 's-url'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('error');
+    });
+  }
+
+  function handleSubmit() {
+    clearModalErrors();
+    var nameInput = document.getElementById('s-name');
+    var urlInput  = document.getElementById('s-url');
+    var submitBtn = document.getElementById('s-submit');
+
+    var name = sanitizeText(nameInput.value, 80);
+    var rawUrl = urlInput.value.trim();
+
+    var valid = true;
+
+    if (!name) {
+      document.getElementById('s-name-err').textContent = 'Tool name is required.';
+      nameInput.classList.add('error');
+      valid = false;
+    }
+
+    var urlCheck = validateURL(rawUrl);
+    if (!urlCheck.ok) {
+      document.getElementById('s-url-err').textContent = urlCheck.msg;
+      urlInput.classList.add('error');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    var rlCheck = checkRateLimit();
+    if (!rlCheck.ok) {
+      document.getElementById('s-global-err').textContent = rlCheck.msg;
+      return;
+    }
+
+    if (!SUBMIT_TOKEN) {
+      document.getElementById('s-global-err').textContent = 'Submission is not configured yet.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    var entry = {
+      id: genId(),
+      name: name,
+      url: urlCheck.url,
+      submittedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+
+    fetchPending()
+      .then(function (result) {
+        var data = result.content;
+        var sha  = result.sha;
+        if (!Array.isArray(data.pending)) data.pending = [];
+        data.pending.push(entry);
+        return writePending(data, sha);
+      })
+      .then(function () {
+        document.getElementById('submit-form').style.display = 'none';
+        document.getElementById('submit-success').style.display = '';
+        setTimeout(closeSubmitModal, 3000);
+      })
+      .catch(function (err) {
+        console.error('Submit error:', err);
+        document.getElementById('s-global-err').textContent = 'Submission failed. Please try again later.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      });
+  }
+
+  // ── Sync "All" button visual state ──────────────────────────
+  function syncAllBtn() {
+    var allBtn = document.querySelector('.fb[data-f="all"]');
+    if (!allBtn) return;
+    allBtn.classList[activeFilters.length === 0 ? 'add' : 'remove']('active');
+  }
+
+  // ── Build category filter buttons ────────────────────────────
   function buildFilterButtons() {
     var fwrap = document.getElementById('fwrap');
     fwrap.innerHTML = '';
-
     var all = document.createElement('button');
     all.className = 'fb active';
     all.setAttribute('data-f', 'all');
     all.textContent = 'All';
     fwrap.appendChild(all);
-
     allCategories.forEach(function (cat) {
       var btn = document.createElement('button');
       btn.className = 'fb';
@@ -97,13 +382,13 @@
     });
   }
 
-  // ── Build grouped category view ────────────────────────────
+  // ── Build grouped category view ──────────────────────────────
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
-    var statsEl = document.getElementById('stat-tools');
-    var statCatEl = document.getElementById('stat-cats');
-    if (statsEl) statsEl.textContent = TOTAL;
+    var statsEl    = document.getElementById('stat-tools');
+    var statCatEl  = document.getElementById('stat-cats');
+    if (statsEl)   statsEl.textContent   = TOTAL;
     if (statCatEl) statCatEl.textContent = allCategories.length;
 
     allCategories.forEach(function (cat) {
@@ -117,8 +402,8 @@
       var hdr = document.createElement('div');
       hdr.className = 'cat-hdr';
       hdr.innerHTML =
-        '<div class="cat-ico" style="background:' + cat.color + '22;border:1px solid ' + cat.color + '55">' + cat.icon + '</div>' +
-        '<div class="cat-title">' + cat.label + '</div>' +
+        '<div class="cat-ico" style="background:' + cat.color + '20;border:1px solid ' + cat.color + '50">' + cat.icon + '</div>' +
+        '<div class="cat-title">' + escHtml(cat.label) + '</div>' +
         '<div class="cat-cnt">' + tools.length + '</div>';
       section.appendChild(hdr);
 
@@ -130,7 +415,7 @@
     });
   }
 
-  // ── Build flat view container ──────────────────────────────
+  // ── Build flat view container ────────────────────────────────
   function buildFlatView() {
     var flatView = document.createElement('div');
     flatView.id = 'flat-view';
@@ -143,7 +428,7 @@
     cats.parentNode.insertBefore(flatView, cats.nextSibling);
   }
 
-  // ── Build sort controls (injected BELOW ctrl-meta) ─────────
+  // ── Build sort controls ──────────────────────────────────────
   function buildSortControls() {
     if (document.getElementById('sort-wrap')) return;
     var sortWrap = document.createElement('div');
@@ -154,15 +439,13 @@
       '<button class="sort-btn active" data-sort="default">Default</button>' +
       '<button class="sort-btn" data-sort="az">A \u2192 Z</button>' +
       '<button class="sort-btn" data-sort="recent">Recently Added</button>';
-
-    // Insert after ctrl-meta, not inside it
     var ctrlMeta = document.getElementById('lc').parentNode;
     ctrlMeta.parentNode.insertBefore(sortWrap, ctrlMeta.nextSibling);
 
     sortWrap.addEventListener('click', function (e) {
       var b = e.target.closest('.sort-btn'); if (!b) return;
       var isActive = b.classList.contains('active');
-      var clicked = b.getAttribute('data-sort');
+      var clicked  = b.getAttribute('data-sort');
       document.querySelectorAll('.sort-btn').forEach(function (x) { x.classList.remove('active'); });
       if (isActive && clicked !== 'default') {
         document.querySelector('.sort-btn[data-sort="default"]').classList.add('active');
@@ -175,7 +458,7 @@
     });
   }
 
-  // ── Build a single card ────────────────────────────────────
+  // ── Build a single card ──────────────────────────────────────
   function buildCard(tool, color) {
     var toolIndex = allTools.indexOf(tool);
     var isNew = toolIndex >= allTools.length - NEW_COUNT;
@@ -200,7 +483,6 @@
     var nameEl = document.createElement('div');
     nameEl.className = 'tool-name';
     nameEl.textContent = tool.name;
-
     if (isNew) {
       var badge = document.createElement('span');
       badge.className = 'new-badge';
@@ -227,20 +509,15 @@
 
       var actions = document.createElement('div');
       actions.className = 'card-actions';
-
       var shareBtn = document.createElement('button');
       shareBtn.className = 'ca-btn share-btn';
       shareBtn.title = 'Share';
       shareBtn.innerHTML = '\u2197\uFE0E Share';
-
       (function (n, d, u) {
         shareBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-          shareCard(n, d, u);
+          e.stopPropagation(); e.preventDefault(); shareCard(n, d, u);
         });
       })(tool.name, tool.description, tool.url);
-
       actions.appendChild(shareBtn);
       card.appendChild(actions);
     } else {
@@ -249,15 +526,13 @@
       noLink.textContent = 'Search on Google';
       card.appendChild(noLink);
     }
-
     return card;
   }
 
-  // ── Card click to open URL ─────────────────────────────────
+  // ── Card click / keyboard ─────────────────────────────────────
   document.addEventListener('click', function (e) {
     if (e.target.closest('button') || e.target.closest('a')) return;
-    var card = e.target.closest('.card[data-url]');
-    if (!card) return;
+    var card = e.target.closest('.card[data-url]'); if (!card) return;
     var url = card.getAttribute('data-url');
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
   });
@@ -274,18 +549,16 @@
     if (e.key === 'Escape') document.activeElement.blur();
   });
 
-  // ── Count ──────────────────────────────────────────────────
+  // ── Count ────────────────────────────────────────────────────
   function updateCount(n) {
-    var lc = document.getElementById('lc');
-    if (!lc) return;
+    var lc = document.getElementById('lc'); if (!lc) return;
     lc.innerHTML = n === TOTAL
       ? '<em>' + TOTAL + '</em> tools'
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
-  // ── Helper: does this tool pass current filters? ───────────
+  // ── toolMatches ──────────────────────────────────────────────
   function toolMatches(tool, q) {
-    // Multi-category filter
     if (activeFilters.length > 0 && activeFilters.indexOf(tool.category) === -1) return false;
     var s = [
       tool.name, tool.description, tool.category, tool.url,
@@ -296,52 +569,42 @@
     return true;
   }
 
-  // ── Core apply ─────────────────────────────────────────────
+  // ── Core apply ───────────────────────────────────────────────
   function apply(flash) {
-    var q = document.getElementById('srch').value.toLowerCase().trim();
+    var q        = document.getElementById('srch').value.toLowerCase().trim();
     var catsEl   = document.getElementById('cats');
     var flatView = document.getElementById('flat-view');
     var flatGrid = document.getElementById('flat-grid');
 
-    // ── FLAT MODE: A-Z or Recently Added ──────────────────
     if (sortMode === 'az' || sortMode === 'recent') {
       catsEl.classList.add('hidden');
       flatView.classList.remove('hidden');
       flatGrid.innerHTML = '';
 
       var matched = allTools.filter(function (tool) { return toolMatches(tool, q); });
-
       if (sortMode === 'az') {
-        matched.sort(function (a, b) {
-          return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-        });
+        matched.sort(function (a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
       } else {
-        matched.sort(function (a, b) {
-          return allTools.indexOf(b) - allTools.indexOf(a);
-        });
+        matched.sort(function (a, b) { return allTools.indexOf(b) - allTools.indexOf(a); });
       }
-
       matched.forEach(function (tool) {
-        var cat = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
+        var cat  = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
         var card = buildCard(tool, cat.color || '#6c63ff');
         if (flash) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
         flatGrid.appendChild(card);
       });
-
       var hasAny = matched.length > 0;
       document.getElementById('nores').classList[hasAny ? 'remove' : 'add']('show');
       updateCount(matched.length);
       return;
     }
 
-    // ── DEFAULT MODE: grouped by category ─────────────────
     catsEl.classList.remove('hidden');
     flatView.classList.add('hidden');
 
     var any = false, vis = 0;
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
-      // Hide section if it's not in active filters
       if (activeFilters.length > 0 && activeFilters.indexOf(cid) === -1) {
         sec.classList.add('hidden'); return;
       }
@@ -364,33 +627,24 @@
 
   document.getElementById('srch').addEventListener('input', function () { apply(false); });
 
-  // ── Multi-select category filter ───────────────────────────
+  // ── Multi-select category filter ─────────────────────────────
   document.getElementById('fwrap').addEventListener('click', function (e) {
     var b = e.target.closest('.fb'); if (!b) return;
     var fid = b.getAttribute('data-f');
-
     if (fid === 'all') {
-      // All: clear all selections
       activeFilters = [];
       document.querySelectorAll('.fb').forEach(function (x) { x.classList.remove('active'); });
       b.classList.add('active');
     } else {
       var idx = activeFilters.indexOf(fid);
-      if (idx === -1) {
-        // Add to selection
-        activeFilters.push(fid);
-        b.classList.add('active');
-      } else {
-        // Remove from selection
-        activeFilters.splice(idx, 1);
-        b.classList.remove('active');
-      }
+      if (idx === -1) { activeFilters.push(fid); b.classList.add('active'); }
+      else { activeFilters.splice(idx, 1); b.classList.remove('active'); }
       syncAllBtn();
     }
     apply(true);
   });
 
-  // ── Tag pill toggle ────────────────────────────────────────
+  // ── Tag pill toggle ──────────────────────────────────────────
   document.getElementById('tags-row').addEventListener('click', function (e) {
     var b = e.target.closest('.tag-pill'); if (!b) return;
     var tag = b.getAttribute('data-tag');
@@ -402,7 +656,7 @@
     apply(true);
   });
 
-  // ── Scroll to top ──────────────────────────────────────────
+  // ── Scroll to top ────────────────────────────────────────────
   window.addEventListener('scroll', function () {
     document.getElementById('topbtn').classList[window.scrollY > 300 ? 'add' : 'remove']('vis');
   }, { passive: true });
