@@ -12,7 +12,7 @@
   // Settings:  Repository access → Only "master-resource"
   // Permission: Repository permissions → Contents → Read and Write
   // Paste the token between the quotes below:
-  var SUBMIT_TOKEN = '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';   // ← your fine-grained PAT here
+  var SUBMIT_TOKEN = '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';   // ← your fine-grained PAT here
   // ══════════════════════════════════════════════════════════════
 
   var activeFilters = [], at = 'all', sortMode = 'default';
