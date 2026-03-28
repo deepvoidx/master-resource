@@ -3,8 +3,8 @@
   --bg:#08080f;
   --acc:#6c63ff;--txt:#e2e2f0;--mute:#7878a0;
   /* glass tokens */
-  --g-card:rgba(18,18,28,0.92);      /* ← solid fallback — no backdrop-filter on cards */
-  --g-surf:rgba(14,14,22,0.96);
+  --g-card:rgba(18,18,28,0.58);
+  --g-surf:rgba(14,14,22,0.52);
   --g-btn:rgba(255,255,255,0.042);
   --g-bdr:rgba(255,255,255,0.075);
   --g-bdr-act:rgba(108,99,255,0.58);
@@ -35,8 +35,6 @@ body{
   font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;
   font-size:var(--t-base);line-height:1.55;min-height:100vh;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  /* Android: prevent overscroll rubber-band on body */
-  overscroll-behavior-y:none;
 }
 
 /* ── Ambient background ── */
@@ -52,15 +50,14 @@ body{
     100% 100%, 100% 100%, 100% 100%,
     clamp(28px,4vw,58px) clamp(28px,4vw,58px),
     clamp(28px,4vw,58px) clamp(28px,4vw,58px);
-  /* Single composited layer — don't animate on Android */
-  will-change:auto;
 }
 
+/* Slow ambient blob drift — disabled with prefers-reduced-motion */
 @media (prefers-reduced-motion: no-preference) {
   .gbg{animation:blobDrift 28s ease-in-out infinite alternate;}
   @keyframes blobDrift{
-    0%  {background-position:0% 0%,100% 100%,50% 50%,0 0,0 0;}
-    100%{background-position:3% 5%,97%  96%,52% 53%,0 0,0 0;}
+    0%{background-position:0% 0%,100% 100%,50% 50%,0 0,0 0;}
+    100%{background-position:3% 5%,97% 96%,52% 53%,0 0,0 0;}
   }
 }
 
@@ -99,13 +96,12 @@ h1 span{color:var(--acc);}
   display:flex;flex-wrap:wrap;gap:clamp(8px,1vw,14px);align-items:flex-start;
   position:sticky;top:0;z-index:50;
   padding:clamp(10px,1.2vw,16px) 0;
-  background:rgba(6,6,12,0.90);
+  background:rgba(6,6,12,0.75);
   backdrop-filter:var(--blur-lg);
   -webkit-backdrop-filter:var(--blur-lg);
   border-bottom:1px solid var(--g-bdr);
-  /* Promote to own GPU layer so scrolling below it stays smooth */
-  -webkit-transform:translate3d(0,0,0);
-  transform:translate3d(0,0,0);
+  /* GPU layer */
+  transform:translateZ(0);will-change:backdrop-filter;
 }
 
 /* ── Search box ── */
@@ -119,12 +115,12 @@ h1 span{color:var(--acc);}
 input[type=search]{
   width:100%;
   background:rgba(255,255,255,0.042);
+  backdrop-filter:var(--blur-md);-webkit-backdrop-filter:var(--blur-md);
   border:1px solid var(--g-bdr);color:var(--txt);
   padding:clamp(10px,1.1vw,15px) clamp(12px,1.5vw,20px) clamp(10px,1.1vw,15px) clamp(36px,3.8vw,52px);
   border-radius:clamp(10px,1.2vw,16px);
   font-family:'DM Sans',-apple-system,sans-serif;
-  font-size:16px; /* ← 16px prevents iOS/Android auto-zoom */
-  outline:none;-webkit-appearance:none;appearance:none;
+  font-size:16px;outline:none;-webkit-appearance:none;appearance:none;
   transition:border-color .22s,box-shadow .22s,background .22s;
   box-shadow:
     inset 0 1.5px 0 var(--g-shine),
@@ -138,7 +134,7 @@ input[type=search]:focus{
     inset 0 1.5px 0 var(--g-shine),
     inset 0 -1px 0 rgba(0,0,0,0.12);
 }
-input[type=search]:focus + svg,.sw:focus-within svg{color:var(--acc);}
+input[type=search]:focus + svg, .sw:focus-within svg{color:var(--acc);}
 input[type=search]::placeholder{color:#44446a;}
 input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 
@@ -146,21 +142,26 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 .fwrap{display:flex;flex-wrap:wrap;gap:clamp(4px,.6vw,8px);}
 .fb{
   background:var(--g-btn);
+  backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
   border:1px solid var(--g-bdr);color:var(--mute);
   padding:clamp(5px,.7vw,10px) clamp(10px,1.3vw,20px);
   border-radius:var(--radius-btn);font-size:var(--t-xs);
   font-family:'DM Sans',-apple-system,sans-serif;
   cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;
-  transition:background .18s,border-color .18s,color .18s,box-shadow .18s;
+  transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .12s var(--ease);
   box-shadow:
     inset 0 1px 0 var(--g-shine-sm),
     inset 0 -1px 0 rgba(0,0,0,0.1),
     0 1px 3px rgba(0,0,0,0.22);
 }
-.fb:hover{border-color:rgba(108,99,255,0.38);color:#b0b0d8;background:rgba(108,99,255,0.08);}
+.fb:hover{
+  border-color:rgba(108,99,255,0.38);color:#b0b0d8;
+  background:rgba(108,99,255,0.08);
+}
 .fb:active{transform:scale(0.97);}
 .fb.active{
-  background:rgba(108,99,255,0.20);border-color:rgba(108,99,255,0.58);
+  background:rgba(108,99,255,0.20);
+  border-color:rgba(108,99,255,0.58);
   color:#d4d0ff;font-weight:600;
   box-shadow:
     0 0 18px rgba(108,99,255,0.20),
@@ -188,12 +189,12 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   flex:1;overflow-x:auto;flex-wrap:nowrap;
   -webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;
   padding-bottom:2px;
-  overscroll-behavior-x:contain; /* ← prevent page navigation on swipe */
 }
 .tags-row::-webkit-scrollbar{display:none;}
 .tags-label{font-size:var(--t-xs);color:var(--mute);white-space:nowrap;flex-shrink:0;}
 .tag-pill{
   background:var(--g-btn);
+  backdrop-filter:var(--blur-xs);-webkit-backdrop-filter:var(--blur-xs);
   border:1px solid var(--g-bdr);color:var(--mute);
   padding:clamp(3px,.4vw,5px) clamp(8px,.9vw,12px);
   border-radius:var(--radius-btn);font-size:var(--t-xs);cursor:pointer;
@@ -220,6 +221,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 .sort-label{font-size:var(--t-xs);color:var(--mute);white-space:nowrap;margin-right:2px;}
 .sort-btn{
   background:var(--g-btn);
+  backdrop-filter:var(--blur-xs);-webkit-backdrop-filter:var(--blur-xs);
   border:1px solid var(--g-bdr);color:var(--mute);
   padding:clamp(3px,.4vw,5px) clamp(8px,.9vw,12px);
   border-radius:var(--radius-btn);font-size:var(--t-xs);cursor:pointer;
@@ -242,6 +244,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   padding:clamp(8px,.9vw,12px) clamp(10px,1.2vw,16px);
   margin-bottom:clamp(10px,1.2vw,18px);
   background:rgba(255,255,255,0.022);
+  backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
   border:1px solid var(--g-bdr);border-radius:10px;
   box-shadow:inset 0 1px 0 var(--g-shine-sm),0 1px 4px rgba(0,0,0,0.2);
 }
@@ -267,24 +270,17 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);}
 @media(min-width:500px){.grid{grid-template-columns:repeat(auto-fill,minmax(var(--card-min),1fr));}}
 
-/* ── Cards ── */
+/* ── Cards — liquid glass ── */
 .card{
   position:relative;overflow:hidden;
-  /* Solid semi-opaque background — NO backdrop-filter on cards.
-     backdrop-filter on 100+ elements is the #1 Android jank cause.
-     The subtle transparency still gives depth without GPU thrash.   */
   background:var(--g-card);
+  backdrop-filter:var(--blur-md);-webkit-backdrop-filter:var(--blur-md);
   border:1px solid var(--g-bdr);
   border-radius:var(--radius-card);
   padding:clamp(12px,1.4vw,22px) clamp(12px,1.5vw,22px);
   display:flex;flex-direction:column;gap:clamp(5px,.6vw,8px);
-  /* contain prevents layout recalc spreading to siblings */
-  contain:layout style;
-  /* DO NOT set will-change:transform on every card —
-     it forces a GPU layer per card (massive memory on Android).
-     We only set it on hover (see below).                      */
-  -webkit-backface-visibility:hidden;
-  backface-visibility:hidden;
+  /* GPU compositing */
+  transform:translateZ(0);will-change:transform;
   transition:transform .22s var(--ease),border-color .22s,box-shadow .22s,background .22s;
   box-shadow:
     0 2px 12px rgba(0,0,0,0.32),
@@ -308,24 +304,19 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   pointer-events:none;border-radius:var(--radius-card) var(--radius-card) 0 0;
 }
 
-/* Only promote to GPU layer on hover — not for every card at rest */
-.card[data-url]:hover{
-  will-change:transform;
-  -webkit-transform:translateY(-4px) translate3d(0,0,0);
-  transform:translateY(-4px) translate3d(0,0,0);
+.card:hover{
+  transform:translateY(-4px) translateZ(0);
   border-color:rgba(108,99,255,0.30);
-  background:rgba(24,24,36,0.96);
+  background:rgba(24,24,36,0.68);
   box-shadow:
     0 12px 40px rgba(0,0,0,0.42),
     0 0 0 1px rgba(108,99,255,0.10),
     inset 0 1.5px 0 rgba(255,255,255,0.072),
     inset 0 -1px 0 rgba(0,0,0,0.10);
 }
-.card[data-url]:hover::before{opacity:1;}
+.card:hover::before{opacity:1;}
 .card[data-url]:active{
-  will-change:auto;
-  -webkit-transform:translateY(0) scale(0.975);
-  transform:translateY(0) scale(0.975);
+  transform:translateY(0) scale(0.975) translateZ(0);
   border-color:rgba(108,99,255,0.42);
   transition:transform .07s,border-color .07s;
 }
@@ -381,7 +372,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 
 /* ── Flash animation ── */
 @keyframes flash-in{
-  0%  {box-shadow:0 0 0 3px rgba(108,99,255,0.48),0 2px 12px rgba(0,0,0,0.32);border-color:rgba(108,99,255,0.68);}
+  0%{box-shadow:0 0 0 3px rgba(108,99,255,0.48),0 2px 12px rgba(0,0,0,0.32);border-color:rgba(108,99,255,0.68);}
   100%{box-shadow:0 2px 12px rgba(0,0,0,0.32);border-color:var(--g-bdr);}
 }
 .card.flash{animation:flash-in .65s var(--ease-out) forwards;}
@@ -397,13 +388,12 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   transition:opacity .22s,transform .22s var(--ease);
   box-shadow:0 4px 20px rgba(108,99,255,0.22),inset 0 1px 0 rgba(255,255,255,0.14);
   display:flex;align-items:center;justify-content:center;
-  -webkit-transform:translate3d(0,0,0);
-  transform:translate3d(0,0,0);
+  transform:translateZ(0);
 }
 #topbtn.vis{opacity:1;}
-#topbtn:hover{-webkit-transform:translateY(-2px) translate3d(0,0,0);transform:translateY(-2px) translate3d(0,0,0);}
+#topbtn:hover{transform:translateY(-2px) translateZ(0);}
 
-/* ── Submit (+) floating button ── */
+/* ── Submit (+ ) floating button ── */
 #submit-btn{
   position:fixed;bottom:clamp(60px,8vw,82px);right:clamp(14px,2vw,28px);z-index:90;
   width:clamp(40px,4vw,52px);height:clamp(40px,4vw,52px);border-radius:50%;
@@ -414,62 +404,57 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   display:flex;align-items:center;justify-content:center;
   transition:transform .22s var(--ease),background .18s,box-shadow .18s;
   box-shadow:0 4px 20px rgba(108,99,255,0.22),inset 0 1px 0 rgba(255,255,255,0.12);
-  -webkit-transform:translate3d(0,0,0);
-  transform:translate3d(0,0,0);
+  transform:translateZ(0);
 }
 #submit-btn:hover{
-  background:rgba(108,99,255,0.40);
-  -webkit-transform:translateY(-2px) translate3d(0,0,0);
-  transform:translateY(-2px) translate3d(0,0,0);
+  background:rgba(108,99,255,0.40);transform:translateY(-2px) translateZ(0);
   box-shadow:0 8px 28px rgba(108,99,255,0.30),inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 /* ── Submit modal overlay ── */
 .modal-overlay{
   position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,0.68);
-  /* Backdrop blur only on the overlay — not on every card */
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  background:rgba(0,0,0,0.62);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;
   padding:20px;
   opacity:0;pointer-events:none;
-  transition:opacity .2s var(--ease-out);
-  overscroll-behavior:contain; /* prevent scroll chaining on Android */
+  transition:opacity .22s var(--ease-out);
 }
 .modal-overlay.open{opacity:1;pointer-events:all;}
 
 .modal-box{
   width:min(420px,100%);
-  background:rgba(12,12,20,0.97); /* solid — no backdrop-filter inside modal */
+  background:rgba(12,12,20,0.88);
+  backdrop-filter:var(--blur-lg);-webkit-backdrop-filter:var(--blur-lg);
   border:1px solid rgba(255,255,255,0.10);
   border-radius:20px;padding:28px;
   box-shadow:
     0 24px 64px rgba(0,0,0,0.6),
     inset 0 1.5px 0 rgba(255,255,255,0.07),
     inset 0 -1px 0 rgba(0,0,0,0.18);
-  /* Use translate3d — better than scale+translateY combo on Android */
-  -webkit-transform:translate3d(0,20px,0);
-  transform:translate3d(0,20px,0);
-  transition:transform .24s var(--ease);
+  transform:translateY(16px) scale(0.97);
+  transition:transform .26s var(--ease);
 }
-.modal-overlay.open .modal-box{
-  -webkit-transform:translate3d(0,0,0);
-  transform:translate3d(0,0,0);
-}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
 
 .modal-title{
   font-family:'Syne','Trebuchet MS',system-ui,sans-serif;
-  font-size:var(--t-md);font-weight:700;color:#eaeaf4;margin-bottom:6px;
+  font-size:var(--t-md);font-weight:700;color:#eaeaf4;
+  margin-bottom:6px;
 }
 .modal-sub{font-size:var(--t-xs);color:var(--mute);margin-bottom:20px;line-height:1.55;}
 
 .modal-field{margin-bottom:14px;}
-.modal-label{display:block;font-size:var(--t-xs);color:#8888aa;margin-bottom:5px;letter-spacing:.3px;}
+.modal-label{
+  display:block;font-size:var(--t-xs);color:#8888aa;
+  margin-bottom:5px;letter-spacing:.3px;
+}
 .modal-input{
   width:100%;background:rgba(255,255,255,0.042);
   border:1px solid var(--g-bdr);color:var(--txt);
   padding:10px 14px;border-radius:10px;
-  font-family:'DM Sans',-apple-system,sans-serif;font-size:16px; /* 16px = no zoom on iOS/Android */
+  font-family:'DM Sans',-apple-system,sans-serif;font-size:var(--t-sm);
   outline:none;-webkit-appearance:none;appearance:none;
   transition:border-color .18s,box-shadow .18s,background .18s;
   box-shadow:inset 0 1px 0 var(--g-shine-sm);
@@ -481,7 +466,9 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 .modal-input::placeholder{color:#44446a;}
 .modal-input.error{border-color:rgba(225,29,72,0.6);}
 
-.modal-err{font-size:var(--t-xs);color:#f87171;margin-top:5px;min-height:16px;}
+.modal-err{
+  font-size:var(--t-xs);color:#f87171;margin-top:5px;min-height:16px;
+}
 .modal-actions{display:flex;gap:10px;margin-top:20px;}
 .modal-submit{
   flex:1;background:rgba(108,99,255,0.24);
@@ -503,29 +490,26 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 }
 .modal-cancel:hover{background:rgba(255,255,255,0.07);color:#b0b0d8;}
 
-.modal-success{text-align:center;padding:14px 0 6px;display:none;}
+.modal-success{
+  text-align:center;padding:14px 0 6px;display:none;
+}
 .modal-success-icon{font-size:2.2rem;margin-bottom:10px;}
 .modal-success-text{font-size:var(--t-sm);color:#a5a0ff;line-height:1.55;}
 
 /* ── Toast ── */
 #toast{
   position:fixed;bottom:clamp(70px,8vw,90px);left:50%;
-  -webkit-transform:translateX(-50%) translateY(14px);
   transform:translateX(-50%) translateY(14px);
-  background:rgba(12,12,22,0.96);
-  border:1px solid rgba(108,99,255,0.28);border-radius:12px;
-  color:#d8d8ee;
+  background:rgba(12,12,22,0.88);
+  backdrop-filter:var(--blur-md);-webkit-backdrop-filter:var(--blur-md);
+  color:#d8d8ee;border:1px solid rgba(108,99,255,0.28);border-radius:12px;
   padding:clamp(8px,1vw,12px) clamp(16px,2vw,24px);
   font-size:var(--t-sm);pointer-events:none;opacity:0;
   transition:opacity .22s,transform .22s var(--ease-out);z-index:300;white-space:nowrap;
   display:flex;align-items:center;gap:8px;
   box-shadow:0 6px 28px rgba(0,0,0,0.5),inset 0 1px 0 var(--g-shine-sm);
 }
-#toast.show{
-  opacity:1;
-  -webkit-transform:translateX(-50%) translateY(0);
-  transform:translateX(-50%) translateY(0);
-}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast-icon{font-size:1.1em;flex-shrink:0;}
 
 /* ── Loading ── */
