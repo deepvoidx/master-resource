@@ -1469,6 +1469,13 @@
         "free",
         "ai"
       ]
+    },
+    {
+      "name": "open code",
+      "description": "",
+      "url": "https://opencode.ai/",
+      "category": "dev",
+      "tags": []
     }
   ]
 }
