@@ -1,18 +1,11 @@
 (function () {
 
   // ══════════════════════════════════════════════════════════════
-  // GITHUB CONFIG — edit these to match your repo
+  // WORKER URL — paste your Cloudflare Worker URL here after deploying
+  // e.g. 'https://master-resource-submit.yourname.workers.dev'
+  // The token NEVER goes here — it lives in the Worker environment.
   // ══════════════════════════════════════════════════════════════
-  var GH_OWNER  = 'deepvoidx';
-  var GH_REPO   = 'master-resource';
-  var GH_BRANCH = 'main';
-
-  // SUBMIT TOKEN — create a fine-grained PAT at:
-  // https://github.com/settings/tokens?type=beta
-  // Settings:  Repository access → Only "master-resource"
-  // Permission: Repository permissions → Contents → Read and Write
-  // Paste the token between the quotes below:
-  var SUBMIT_TOKEN = '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';   // ← your fine-grained PAT here
+  var WORKER_URL = 'https://winter-art-8e2b.anshtripathi872.workers.dev/';   // ← paste your Cloudflare Worker URL here
   // ══════════════════════════════════════════════════════════════
 
   var activeFilters = [], at = 'all', sortMode = 'default';
@@ -42,7 +35,7 @@
     })
     .catch(function () {
       document.getElementById('cats').innerHTML =
-        '<p style="color:#e11d48;padding:40px">Failed to load tools.json — make sure the file exists.</p>';
+        '<p style="color:#e11d48;padding:40px">Failed to load tools.json</p>';
     });
 
   // ── Toast ────────────────────────────────────────────────────
@@ -86,274 +79,46 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
-
   function sanitizeText(str, maxLen) {
-    return String(str).trim().slice(0, maxLen || 200)
-      .replace(/[\x00-\x1F\x7F]/g, ''); // strip control chars
+    return String(str).trim().slice(0, maxLen || 200).replace(/[\x00-\x1F\x7F]/g, '');
   }
-
   function validateURL(raw) {
     var url = String(raw).trim();
     if (!url) return { ok: false, msg: 'URL is required.' };
     if (url.length > 500) return { ok: false, msg: 'URL is too long.' };
-    // Block any dangerous protocol before URL parsing
-    if (/^(javascript|data|vbscript|file|blob|about):/i.test(url)) {
+    if (/^(javascript|data|vbscript|file|blob|about):/i.test(url))
       return { ok: false, msg: 'This URL type is not allowed.' };
-    }
-    // Must start with http or https
-    if (!/^https?:\/\//i.test(url)) {
-      url = 'https://' + url;
-    }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     try {
-      var parsed = new URL(url);
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        return { ok: false, msg: 'Only http:// and https:// URLs are allowed.' };
-      }
-      if (!parsed.hostname || parsed.hostname.length < 3 || !parsed.hostname.includes('.')) {
+      var p = new URL(url);
+      if (!['http:', 'https:'].includes(p.protocol))
+        return { ok: false, msg: 'Only http/https URLs are allowed.' };
+      if (!p.hostname || !p.hostname.includes('.'))
         return { ok: false, msg: 'Please enter a valid website URL.' };
-      }
-      // Extra guard: no localhost, no IP-based local URLs
-      if (/^(localhost|127\.|192\.168\.|10\.|0\.0\.0\.0)/i.test(parsed.hostname)) {
+      if (/^(localhost|127\.|192\.168\.|10\.|0\.0\.0\.0)/i.test(p.hostname))
         return { ok: false, msg: 'Local URLs are not allowed.' };
-      }
-      return { ok: true, url: parsed.href };
+      return { ok: true, url: p.href };
     } catch (e) {
       return { ok: false, msg: 'Please enter a valid URL.' };
     }
   }
 
-  // ── Rate limiting (3 submissions per hour per browser) ───────
+  // ── Rate limiting — 2 per minute ────────────────────────────
   function checkRateLimit() {
     var key = 'mr_submit_rl';
     var now = Date.now();
     var data;
     try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { data = null; }
     if (!data || now > data.reset) {
-      data = { count: 0, reset: now + 3600000 }; // 1 hour window
+      data = { count: 0, reset: now + 60000 }; // 1 minute window
     }
-    if (data.count >= 3) {
-      var mins = Math.ceil((data.reset - now) / 60000);
-      return { ok: false, msg: 'Too many submissions. Try again in ' + mins + ' minute(s).' };
+    if (data.count >= 2) {
+      var secs = Math.ceil((data.reset - now) / 1000);
+      return { ok: false, msg: 'Please wait ' + secs + ' second(s) before submitting again.' };
     }
     data.count++;
     try { localStorage.setItem(key, JSON.stringify(data)); } catch (e) {}
     return { ok: true };
-  }
-
-  // ── GitHub API: read pending.json ────────────────────────────
-  function fetchPending() {
-    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json?ref=' + GH_BRANCH, {
-      headers: {
-        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    }).then(function (r) {
-      if (r.status === 404) return { content: { pending: [] }, sha: null };
-      if (!r.ok) throw new Error('GitHub API error: ' + r.status);
-      return r.json().then(function (d) {
-        var content;
-        try { content = JSON.parse(atob(d.content.replace(/\n/g, ''))); } catch (e) { content = { pending: [] }; }
-        return { content: content, sha: d.sha };
-      });
-    });
-  }
-
-  // ── GitHub API: write pending.json ───────────────────────────
-  function writePending(content, sha) {
-    // Enforce schema: only write the 'pending' array, nothing else
-    var safe = { pending: Array.isArray(content.pending) ? content.pending : [] };
-    var body = {
-      message: 'New tool submission',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(safe, null, 2)))),
-      branch: GH_BRANCH
-    };
-    if (sha) body.sha = sha;
-    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
-      },
-      body: JSON.stringify(body)
-    }).then(function (r) {
-      if (!r.ok) return r.text().then(function (t) { throw new Error(t); });
-      return r.json();
-    });
-  }
-
-  // ── Generate unique submission ID ────────────────────────────
-  function genId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  }
-
-  // ── Build submit floating button ─────────────────────────────
-  function buildSubmitBtn() {
-    if (document.getElementById('submit-btn')) return;
-    var btn = document.createElement('button');
-    btn.id = 'submit-btn';
-    btn.title = 'Suggest a tool';
-    btn.innerHTML = '+';
-    btn.setAttribute('aria-label', 'Suggest a tool');
-    document.body.appendChild(btn);
-    btn.addEventListener('click', openSubmitModal);
-  }
-
-  // ── Build submit modal ───────────────────────────────────────
-  function buildSubmitModal() {
-    if (document.getElementById('submit-overlay')) return;
-    var overlay = document.createElement('div');
-    overlay.id = 'submit-overlay';
-    overlay.className = 'modal-overlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', 'Suggest a tool');
-    overlay.innerHTML =
-      '<div class="modal-box" id="submit-modal">' +
-        '<div class="modal-title">Suggest a Tool</div>' +
-        '<div class="modal-sub">Seen something useful? Share it — the developer will review and add it to the list.</div>' +
-        '<div id="submit-form">' +
-          '<div class="modal-field">' +
-            '<label class="modal-label" for="s-name">Tool name</label>' +
-            '<input class="modal-input" type="text" id="s-name" placeholder="e.g. Notion" maxlength="80" autocomplete="off"/>' +
-            '<div class="modal-err" id="s-name-err"></div>' +
-          '</div>' +
-          '<div class="modal-field">' +
-            '<label class="modal-label" for="s-url">Website URL</label>' +
-            '<input class="modal-input" type="url" id="s-url" placeholder="https://example.com" maxlength="500" autocomplete="off" inputmode="url"/>' +
-            '<div class="modal-err" id="s-url-err"></div>' +
-          '</div>' +
-          '<div class="modal-err" id="s-global-err"></div>' +
-          '<div class="modal-actions">' +
-            '<button class="modal-submit" id="s-submit">Submit</button>' +
-            '<button class="modal-cancel" id="s-cancel">Cancel</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="modal-success" id="submit-success">' +
-          '<div class="modal-success-icon">✓</div>' +
-          '<div class="modal-success-text">Thank you! Your suggestion has been submitted and will be reviewed before being added to the site.</div>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(overlay);
-
-    // Close on backdrop click
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) closeSubmitModal();
-    });
-    document.getElementById('s-cancel').addEventListener('click', closeSubmitModal);
-    document.getElementById('s-submit').addEventListener('click', handleSubmit);
-
-    // Keyboard: Escape closes, Enter submits
-    overlay.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeSubmitModal();
-      if (e.key === 'Enter' && e.target.closest('.modal-box')) handleSubmit();
-    });
-  }
-
-  function openSubmitModal() {
-    buildSubmitModal();
-    var overlay = document.getElementById('submit-overlay');
-    var form = document.getElementById('submit-form');
-    var success = document.getElementById('submit-success');
-    // Reset state
-    form.style.display = '';
-    success.style.display = 'none';
-    document.getElementById('s-name').value = '';
-    document.getElementById('s-url').value = '';
-    clearModalErrors();
-    overlay.classList.add('open');
-    // Focus first input
-    setTimeout(function () {
-      var inp = document.getElementById('s-name');
-      if (inp) inp.focus();
-    }, 60);
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeSubmitModal() {
-    var overlay = document.getElementById('submit-overlay');
-    if (overlay) overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function clearModalErrors() {
-    ['s-name-err', 's-url-err', 's-global-err'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = '';
-    });
-    ['s-name', 's-url'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.remove('error');
-    });
-  }
-
-  function handleSubmit() {
-    clearModalErrors();
-    var nameInput = document.getElementById('s-name');
-    var urlInput  = document.getElementById('s-url');
-    var submitBtn = document.getElementById('s-submit');
-
-    var name = sanitizeText(nameInput.value, 80);
-    var rawUrl = urlInput.value.trim();
-
-    var valid = true;
-
-    if (!name) {
-      document.getElementById('s-name-err').textContent = 'Tool name is required.';
-      nameInput.classList.add('error');
-      valid = false;
-    }
-
-    var urlCheck = validateURL(rawUrl);
-    if (!urlCheck.ok) {
-      document.getElementById('s-url-err').textContent = urlCheck.msg;
-      urlInput.classList.add('error');
-      valid = false;
-    }
-
-    if (!valid) return;
-
-    var rlCheck = checkRateLimit();
-    if (!rlCheck.ok) {
-      document.getElementById('s-global-err').textContent = rlCheck.msg;
-      return;
-    }
-
-    if (!SUBMIT_TOKEN) {
-      document.getElementById('s-global-err').textContent = 'Submission is not configured yet.';
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting…';
-
-    var entry = {
-      id: genId(),
-      name: name,
-      url: urlCheck.url,
-      submittedAt: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    fetchPending()
-      .then(function (result) {
-        var data = result.content;
-        var sha  = result.sha;
-        if (!Array.isArray(data.pending)) data.pending = [];
-        data.pending.push(entry);
-        return writePending(data, sha);
-      })
-      .then(function () {
-        document.getElementById('submit-form').style.display = 'none';
-        document.getElementById('submit-success').style.display = '';
-        setTimeout(closeSubmitModal, 3000);
-      })
-      .catch(function (err) {
-        console.error('Submit error:', err);
-        document.getElementById('s-global-err').textContent = 'Submission failed. Please try again later.';
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit';
-      });
   }
 
   // ── Sync "All" button visual state ──────────────────────────
@@ -361,6 +126,19 @@
     var allBtn = document.querySelector('.fb[data-f="all"]');
     if (!allBtn) return;
     allBtn.classList[activeFilters.length === 0 ? 'add' : 'remove']('active');
+  }
+
+  // ── Multi-category helper ────────────────────────────────────
+  // A tool may have tool.categories = ['cat1','cat2'] or tool.category = 'cat1'
+  function getCatIds(tool) {
+    if (Array.isArray(tool.categories) && tool.categories.length) return tool.categories;
+    return tool.category ? [tool.category] : [];
+  }
+
+  // Primary category (for card color etc.)
+  function getPrimaryCat(tool) {
+    var ids = getCatIds(tool);
+    return allCategories.find(function (c) { return c.id === ids[0]; }) || {};
   }
 
   // ── Build category filter buttons ────────────────────────────
@@ -376,7 +154,9 @@
       var btn = document.createElement('button');
       btn.className = 'fb';
       btn.setAttribute('data-f', cat.id);
-      var count = allTools.filter(function (t) { return t.category === cat.id; }).length;
+      var count = allTools.filter(function (t) {
+        return getCatIds(t).indexOf(cat.id) !== -1;
+      }).length;
       btn.textContent = cat.icon + ' ' + (cat.short || cat.label) + ' · ' + count;
       fwrap.appendChild(btn);
     });
@@ -386,13 +166,16 @@
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
-    var statsEl    = document.getElementById('stat-tools');
-    var statCatEl  = document.getElementById('stat-cats');
-    if (statsEl)   statsEl.textContent   = TOTAL;
+    var statsEl   = document.getElementById('stat-tools');
+    var statCatEl = document.getElementById('stat-cats');
+    if (statsEl)   statsEl.textContent = TOTAL;
     if (statCatEl) statCatEl.textContent = allCategories.length;
 
     allCategories.forEach(function (cat) {
-      var tools = allTools.filter(function (t) { return t.category === cat.id; });
+      // Include tools that have this category in their categories list
+      var tools = allTools.filter(function (t) {
+        return getCatIds(t).indexOf(cat.id) !== -1;
+      });
       if (!tools.length) return;
 
       var section = document.createElement('section');
@@ -458,14 +241,163 @@
     });
   }
 
+  // ── Build submit floating button ─────────────────────────────
+  function buildSubmitBtn() {
+    if (document.getElementById('submit-btn')) return;
+    var btn = document.createElement('button');
+    btn.id = 'submit-btn';
+    btn.title = 'Suggest a tool';
+    btn.innerHTML = '+';
+    btn.setAttribute('aria-label', 'Suggest a tool');
+    document.body.appendChild(btn);
+    btn.addEventListener('click', openSubmitModal);
+  }
+
+  // ── Submit modal ─────────────────────────────────────────────
+  function buildSubmitModal() {
+    if (document.getElementById('submit-overlay')) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'submit-overlay';
+    overlay.className = 'modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Suggest a tool');
+    overlay.innerHTML =
+      '<div class="modal-box" id="submit-modal">' +
+        '<div class="modal-title">Suggest a Tool</div>' +
+        '<div class="modal-sub">Seen something useful? Share it — the developer will review it before adding.</div>' +
+        '<div id="submit-form">' +
+          '<div class="modal-field">' +
+            '<label class="modal-label" for="s-name">Tool name</label>' +
+            '<input class="modal-input" type="text" id="s-name" placeholder="e.g. Notion" maxlength="80" autocomplete="off"/>' +
+            '<div class="modal-err" id="s-name-err"></div>' +
+          '</div>' +
+          '<div class="modal-field">' +
+            '<label class="modal-label" for="s-url">Website URL</label>' +
+            '<input class="modal-input" type="url" id="s-url" placeholder="https://example.com" maxlength="500" autocomplete="off" inputmode="url"/>' +
+            '<div class="modal-err" id="s-url-err"></div>' +
+          '</div>' +
+          '<div class="modal-err" id="s-global-err"></div>' +
+          '<div class="modal-actions">' +
+            '<button class="modal-submit" id="s-submit">Submit</button>' +
+            '<button class="modal-cancel" id="s-cancel">Cancel</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="modal-success" id="submit-success">' +
+          '<div class="modal-success-icon">✓</div>' +
+          '<div class="modal-success-text">Thank you! Your suggestion is under review.</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeSubmitModal();
+    });
+    document.getElementById('s-cancel').addEventListener('click', closeSubmitModal);
+    document.getElementById('s-submit').addEventListener('click', handleSubmit);
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSubmitModal();
+      if (e.key === 'Enter' && e.target.closest('.modal-box')) handleSubmit();
+    });
+  }
+
+  function openSubmitModal() {
+    buildSubmitModal();
+    var overlay = document.getElementById('submit-overlay');
+    document.getElementById('submit-form').style.display = '';
+    document.getElementById('submit-success').style.display = 'none';
+    document.getElementById('s-name').value = '';
+    document.getElementById('s-url').value = '';
+    clearModalErrors();
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () {
+      var inp = document.getElementById('s-name');
+      if (inp) inp.focus();
+    }, 80);
+  }
+
+  function closeSubmitModal() {
+    var overlay = document.getElementById('submit-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function clearModalErrors() {
+    ['s-name-err', 's-url-err', 's-global-err'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+    ['s-name', 's-url'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove('error');
+    });
+  }
+
+  function handleSubmit() {
+    clearModalErrors();
+    var nameInput  = document.getElementById('s-name');
+    var urlInput   = document.getElementById('s-url');
+    var submitBtn  = document.getElementById('s-submit');
+    var globalErr  = document.getElementById('s-global-err');
+
+    var name   = sanitizeText(nameInput.value, 80);
+    var rawUrl = urlInput.value.trim();
+    var valid  = true;
+
+    if (!name) {
+      document.getElementById('s-name-err').textContent = 'Tool name is required.';
+      nameInput.classList.add('error'); valid = false;
+    }
+    var urlCheck = validateURL(rawUrl);
+    if (!urlCheck.ok) {
+      document.getElementById('s-url-err').textContent = urlCheck.msg;
+      urlInput.classList.add('error'); valid = false;
+    }
+    if (!valid) return;
+
+    var rlCheck = checkRateLimit();
+    if (!rlCheck.ok) { globalErr.textContent = rlCheck.msg; return; }
+
+    if (!WORKER_URL) {
+      globalErr.textContent = 'Submission is not yet configured. Try again soon.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, url: urlCheck.url })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (result) {
+        if (!result.ok) {
+          throw new Error(result.data.error || 'Submission failed.');
+        }
+        document.getElementById('submit-form').style.display = 'none';
+        document.getElementById('submit-success').style.display = '';
+        setTimeout(closeSubmitModal, 3000);
+      })
+      .catch(function (err) {
+        globalErr.textContent = err.message || 'Submission failed. Please try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      });
+  }
+
   // ── Build a single card ──────────────────────────────────────
   function buildCard(tool, color) {
     var toolIndex = allTools.indexOf(tool);
     var isNew = toolIndex >= allTools.length - NEW_COUNT;
 
     var searchStr = [
-      tool.name, tool.description, tool.category, tool.url,
-      tool.tags.map(function (t) { return '#' + t; }).join(' ')
+      tool.name, tool.description,
+      getCatIds(tool).join(' '),
+      tool.url,
+      (tool.tags || []).map(function (t) { return '#' + t; }).join(' ')
     ].join(' ').toLowerCase();
 
     var card = document.createElement('div');
@@ -492,7 +424,7 @@
 
     var descEl = document.createElement('div');
     descEl.className = 'tool-desc';
-    descEl.textContent = tool.description;
+    descEl.textContent = tool.description || '';
 
     card.appendChild(nameEl);
     card.appendChild(descEl);
@@ -529,12 +461,11 @@
     return card;
   }
 
-  // ── Card click / keyboard ─────────────────────────────────────
+  // ── Card click / keyboard ────────────────────────────────────
   document.addEventListener('click', function (e) {
     if (e.target.closest('button') || e.target.closest('a')) return;
     var card = e.target.closest('.card[data-url]'); if (!card) return;
-    var url = card.getAttribute('data-url');
-    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(card.getAttribute('data-url'), '_blank', 'noopener,noreferrer');
   });
 
   document.addEventListener('keydown', function (e) {
@@ -557,12 +488,18 @@
       : 'Showing <em>' + n + '</em> of <em>' + TOTAL + '</em> tools';
   }
 
-  // ── toolMatches ──────────────────────────────────────────────
+  // ── toolMatches — supports multi-category ────────────────────
   function toolMatches(tool, q) {
-    if (activeFilters.length > 0 && activeFilters.indexOf(tool.category) === -1) return false;
+    if (activeFilters.length > 0) {
+      var catIds = getCatIds(tool);
+      var hit = activeFilters.some(function (af) { return catIds.indexOf(af) !== -1; });
+      if (!hit) return false;
+    }
     var s = [
-      tool.name, tool.description, tool.category, tool.url,
-      tool.tags.map(function (t) { return '#' + t; }).join(' ')
+      tool.name, tool.description,
+      getCatIds(tool).join(' '),
+      tool.url,
+      (tool.tags || []).map(function (t) { return '#' + t; }).join(' ')
     ].join(' ').toLowerCase();
     if (q && s.indexOf(q) === -1) return false;
     if (at !== 'all' && s.indexOf(at) === -1) return false;
@@ -588,7 +525,7 @@
         matched.sort(function (a, b) { return allTools.indexOf(b) - allTools.indexOf(a); });
       }
       matched.forEach(function (tool) {
-        var cat  = allCategories.filter(function (c) { return c.id === tool.category; })[0] || {};
+        var cat  = getPrimaryCat(tool);
         var card = buildCard(tool, cat.color || '#6c63ff');
         if (flash) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
         flatGrid.appendChild(card);
