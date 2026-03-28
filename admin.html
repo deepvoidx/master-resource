@@ -381,8 +381,9 @@ textarea{resize:vertical;min-height:70px;}
       <div><label>URL *</label><input id="tm-url" type="url" maxlength="500" placeholder="https://example.com"/></div>
       <div><label>Description</label><input id="tm-desc" type="text" maxlength="200" placeholder="Short description of the tool"/></div>
       <div>
-        <label>Categories (select one or more)</label>
+        <label>Categories (select one or more) *</label>
         <div id="tm-cats" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
+        <small style="color:#555580;margin-top:4px;display:block;">Tap multiple to add to several categories at once</small>
       </div>
       <div><label>Tags (comma separated, no #)</label><input id="tm-tags" type="text" placeholder="ai, free, creative"/></div>
       <div id="tm-err" style="color:#f87171;font-size:.78rem;min-height:16px;"></div>
@@ -711,23 +712,33 @@ function approvePending(item, card) {
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase(); }).filter(Boolean);
 
+  // ── Duplicate URL check ──────────────────────────────────────
+  var norm = urlRes.url.toLowerCase().replace(/\/$/, '');
+  var dupe = (S.toolsData.tools || []).find(function(t){
+    return (t.url || '').toLowerCase().replace(/\/$/, '') === norm;
+  });
+  if (dupe) {
+    errEl.textContent = 'Duplicate: "' + dupe.name + '" already uses this URL. Edit the existing tool if needed.';
+    return;
+  }
+
   var btn = card.querySelector('.pf-approve');
   btn.disabled = true; btn.textContent = 'Saving…';
   errEl.textContent = '';
 
-  var newTool = { name:nameVal, description:desc, url:urlRes.url, category:cats[0], tags:tags };
-  // If multiple categories, we store the first as primary (tools.json structure uses single category)
-  // Duplicate tool for each additional category if needed:
-  var toolsToAdd = cats.map(function(cid, i){
-    return { name: i===0 ? nameVal : nameVal + ' (' + cid + ')',
-             description:desc, url:urlRes.url, category:cid, tags:tags };
-  });
-  // In practice just use the first category (most tools have one)
-  // Add all selected categories as separate entries only if user wants
-  // Let's keep it simple: use first selected category
-  var toolEntry = { name:nameVal, description:desc, url:urlRes.url, category:cats[0], tags:tags };
+  // ── Store with multi-category support ───────────────────────
+  // category  = primary (for backward compat)
+  // categories = full array (used by app.js for multi-cat display)
+  var toolEntry = {
+    name: nameVal,
+    description: desc,
+    url: urlRes.url,
+    category: cats[0],
+    categories: cats.length > 1 ? cats : undefined,
+    tags: tags
+  };
+  if (!toolEntry.categories) delete toolEntry.categories; // keep JSON clean if single cat
 
-  // Add to tools.json
   var tools = S.toolsData;
   tools.tools.push(toolEntry);
 
@@ -822,26 +833,33 @@ function openToolModal(idx) {
   document.getElementById('tool-modal-title').textContent = isNew ? 'Add New Tool' : 'Edit Tool';
   document.getElementById('tm-err').textContent = '';
 
-  var tool = isNew ? { name:'', url:'', description:'', category:'', tags:[] }
+  var tool = isNew ? { name:'', url:'', description:'', category:'', categories:[], tags:[] }
                    : S.toolsData.tools[idx];
   document.getElementById('tm-name').value = tool.name || '';
   document.getElementById('tm-url').value  = tool.url  || '';
   document.getElementById('tm-desc').value = tool.description || '';
   document.getElementById('tm-tags').value = (tool.tags||[]).join(', ');
 
+  // Determine which categories are already selected
+  var selectedCats = Array.isArray(tool.categories) && tool.categories.length
+    ? tool.categories
+    : (tool.category ? [tool.category] : []);
+
   var catsEl = document.getElementById('tm-cats');
   catsEl.innerHTML = '';
   var categories = S.toolsData.categories || [];
   categories.forEach(function(cat){
+    var isChecked = selectedCats.indexOf(cat.id) !== -1;
     var lbl = document.createElement('label');
-    lbl.className = 'cat-check' + (tool.category === cat.id ? ' checked':'');
+    lbl.className = 'cat-check' + (isChecked ? ' checked' : '');
     lbl.dataset.cid = cat.id;
-    lbl.innerHTML = '<input type="checkbox" value="'+esc(cat.id)+'"'+(tool.category===cat.id?' checked':'')+'/>'
-                  + esc(cat.icon)+' '+esc(cat.short||cat.label);
-    lbl.addEventListener('click', function(){
-      // single select for category (tool.category is a single string)
-      catsEl.querySelectorAll('.cat-check').forEach(function(l){ l.classList.remove('checked'); l.querySelector('input').checked=false; });
-      lbl.classList.add('checked'); lbl.querySelector('input').checked=true;
+    lbl.innerHTML = '<input type="checkbox" value="'+esc(cat.id)+'"'+(isChecked?' checked':'')+'/>'+
+                    esc(cat.icon)+' '+esc(cat.short||cat.label);
+    // MULTI-SELECT — toggle individual, allow many checked at once
+    lbl.addEventListener('click', function(e){
+      e.preventDefault();
+      lbl.classList.toggle('checked');
+      lbl.querySelector('input').checked = lbl.classList.contains('checked');
     });
     catsEl.appendChild(lbl);
   });
@@ -867,12 +885,30 @@ document.getElementById('tm-save').addEventListener('click', function(){
   if (!nameVal){ errEl.textContent='Name required.'; return; }
   if (!urlRes.ok){ errEl.textContent=urlRes.msg; return; }
 
-  var catEl = document.querySelector('#tm-cats .cat-check.checked input');
-  if (!catEl){ errEl.textContent='Select a category.'; return; }
-  var catId = catEl.value;
+  // Collect ALL checked categories (multi-select)
+  var cats = [];
+  document.querySelectorAll('#tm-cats .cat-check.checked input').forEach(function(inp){ cats.push(inp.value); });
+  if (!cats.length){ errEl.textContent='Select at least one category.'; return; }
+
+  // Duplicate URL check (skip if editing the same tool)
+  var norm = urlRes.url.toLowerCase().replace(/\/$/, '');
+  var dupe = (S.toolsData.tools || []).find(function(t, i){
+    if (S.editToolIdx !== -1 && i === S.editToolIdx) return false; // skip self
+    return (t.url || '').toLowerCase().replace(/\/$/, '') === norm;
+  });
+  if (dupe) { errEl.textContent='Duplicate: "'+dupe.name+'" already uses this URL.'; return; }
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase(); }).filter(Boolean);
-  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catId, tags:tags };
+
+  // Store category (primary) + categories (full array for multi-cat)
+  var tool = {
+    name: nameVal,
+    description: desc,
+    url: urlRes.url,
+    category: cats[0],
+    tags: tags
+  };
+  if (cats.length > 1) tool.categories = cats;
 
   var btn = document.getElementById('tm-save');
   btn.disabled=true; btn.textContent='Saving…'; errEl.textContent='';
@@ -891,6 +927,7 @@ document.getElementById('tm-save').addEventListener('click', function(){
     .catch(function(e){
       btn.disabled=false; btn.textContent='Save Tool';
       errEl.textContent='Error: '+e.message;
+      if(isNew) tools.tools.pop();
     });
 });
 
