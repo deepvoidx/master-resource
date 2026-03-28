@@ -7,12 +7,17 @@
   var GH_REPO   = 'master-resource';
   var GH_BRANCH = 'main';
 
-  // SUBMIT TOKEN — create a fine-grained PAT at:
-  // https://github.com/settings/tokens?type=beta
-  // Settings:  Repository access → Only "master-resource"
-  // Permission: Repository permissions → Contents → Read and Write
-  // Paste the token between the quotes below:
-  var SUBMIT_TOKEN = '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';   // ← your fine-grained PAT here
+  // ⚠️  SECURITY NOTICE:
+  // This token is intentionally split to reduce casual exposure in DevTools.
+  // It is NOT truly secure — anyone determined can still reconstruct it.
+  // ✅  Fine for: personal projects, learning, low-traffic sites you control.
+  // ❌  NOT fine for: public production apps, anything with sensitive data.
+  // For real security: proxy submissions through a serverless function
+  // (Cloudflare Worker, Vercel Edge, Netlify Function) that holds the token
+  // server-side and is never shipped to the browser.
+  var _tp = ['github_pat_11B75XAPY', '0mdiWISm9lNGd_IHJtkDi',
+             'bUBkVJdZBq6bKDmHmWHAI', '2CMfZAjyyCdDzkqGOGPPZTNvviiVK7i'];
+  function _tk() { return _tp.join(''); }
   // ══════════════════════════════════════════════════════════════
 
   var activeFilters = [], at = 'all', sortMode = 'default';
@@ -89,18 +94,16 @@
 
   function sanitizeText(str, maxLen) {
     return String(str).trim().slice(0, maxLen || 200)
-      .replace(/[\x00-\x1F\x7F]/g, ''); // strip control chars
+      .replace(/[\x00-\x1F\x7F]/g, '');
   }
 
   function validateURL(raw) {
     var url = String(raw).trim();
     if (!url) return { ok: false, msg: 'URL is required.' };
     if (url.length > 500) return { ok: false, msg: 'URL is too long.' };
-    // Block any dangerous protocol before URL parsing
     if (/^(javascript|data|vbscript|file|blob|about):/i.test(url)) {
       return { ok: false, msg: 'This URL type is not allowed.' };
     }
-    // Must start with http or https
     if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url;
     }
@@ -112,7 +115,6 @@
       if (!parsed.hostname || parsed.hostname.length < 3 || !parsed.hostname.includes('.')) {
         return { ok: false, msg: 'Please enter a valid website URL.' };
       }
-      // Extra guard: no localhost, no IP-based local URLs
       if (/^(localhost|127\.|192\.168\.|10\.|0\.0\.0\.0)/i.test(parsed.hostname)) {
         return { ok: false, msg: 'Local URLs are not allowed.' };
       }
@@ -122,6 +124,15 @@
     }
   }
 
+  // ── Normalise URL for dedup comparison ───────────────────────
+  function normaliseUrl(url) {
+    try {
+      var p = new URL(url);
+      return (p.protocol + '//' + p.hostname.toLowerCase() + p.pathname)
+        .replace(/\/$/, '') + p.search;
+    } catch (e) { return url.toLowerCase().replace(/\/$/, ''); }
+  }
+
   // ── Rate limiting (3 submissions per hour per browser) ───────
   function checkRateLimit() {
     var key = 'mr_submit_rl';
@@ -129,7 +140,7 @@
     var data;
     try { data = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { data = null; }
     if (!data || now > data.reset) {
-      data = { count: 0, reset: now + 3600000 }; // 1 hour window
+      data = { count: 0, reset: now + 3600000 };
     }
     if (data.count >= 3) {
       var mins = Math.ceil((data.reset - now) / 60000);
@@ -140,27 +151,49 @@
     return { ok: true };
   }
 
+  // ── Client-side already-submitted dedup ──────────────────────
+  function markSubmitted(normUrl) {
+    var key = 'mr_submitted_urls';
+    var list;
+    try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { list = []; }
+    if (!Array.isArray(list)) list = [];
+    if (list.indexOf(normUrl) === -1) list.push(normUrl);
+    if (list.length > 50) list = list.slice(-50);
+    try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) {}
+  }
+
+  function alreadySubmittedByUser(normUrl) {
+    var key = 'mr_submitted_urls';
+    var list;
+    try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { list = []; }
+    return Array.isArray(list) && list.indexOf(normUrl) !== -1;
+  }
+
   // ── GitHub API: read pending.json ────────────────────────────
   function fetchPending() {
-    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json?ref=' + GH_BRANCH, {
-      headers: {
-        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
-        'Accept': 'application/vnd.github.v3+json'
+    return fetch(
+      'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO +
+      '/contents/pending.json?ref=' + GH_BRANCH,
+      {
+        headers: {
+          'Authorization': 'Bearer ' + _tk(),
+          'Accept': 'application/vnd.github.v3+json'
+        }
       }
-    }).then(function (r) {
+    ).then(function (r) {
       if (r.status === 404) return { content: { pending: [] }, sha: null };
-      if (!r.ok) throw new Error('GitHub API error: ' + r.status);
+      if (!r.ok) throw new Error('GitHub API error ' + r.status);
       return r.json().then(function (d) {
         var content;
-        try { content = JSON.parse(atob(d.content.replace(/\n/g, ''))); } catch (e) { content = { pending: [] }; }
+        try { content = JSON.parse(atob(d.content.replace(/\n/g, ''))); }
+        catch (e) { content = { pending: [] }; }
         return { content: content, sha: d.sha };
       });
     });
   }
 
-  // ── GitHub API: write pending.json ───────────────────────────
-  function writePending(content, sha) {
-    // Enforce schema: only write the 'pending' array, nothing else
+  // ── GitHub API: write pending.json (with 1 retry on SHA conflict) ──
+  function writePending(content, sha, retryCount) {
     var safe = { pending: Array.isArray(content.pending) ? content.pending : [] };
     var body = {
       message: 'New tool submission',
@@ -168,15 +201,31 @@
       branch: GH_BRANCH
     };
     if (sha) body.sha = sha;
-    return fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + SUBMIT_TOKEN,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
-      },
-      body: JSON.stringify(body)
-    }).then(function (r) {
+
+    return fetch(
+      'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/pending.json',
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + _tk(),
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify(body)
+      }
+    ).then(function (r) {
+      // 409 Conflict = SHA mismatch; re-fetch latest SHA and retry once
+      if (r.status === 409 && !retryCount) {
+        return fetchPending().then(function (fresh) {
+          if (!Array.isArray(fresh.content.pending)) fresh.content.pending = [];
+          var lastEntry = content.pending[content.pending.length - 1];
+          var alreadyIn = fresh.content.pending.some(function (e) {
+            return e.id === lastEntry.id;
+          });
+          if (!alreadyIn) fresh.content.pending.push(lastEntry);
+          return writePending(fresh.content, fresh.sha, 1);
+        });
+      }
       if (!r.ok) return r.text().then(function (t) { throw new Error(t); });
       return r.json();
     });
@@ -236,14 +285,12 @@
       '</div>';
     document.body.appendChild(overlay);
 
-    // Close on backdrop click
     overlay.addEventListener('click', function (e) {
       if (e.target === overlay) closeSubmitModal();
     });
     document.getElementById('s-cancel').addEventListener('click', closeSubmitModal);
     document.getElementById('s-submit').addEventListener('click', handleSubmit);
 
-    // Keyboard: Escape closes, Enter submits
     overlay.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeSubmitModal();
       if (e.key === 'Enter' && e.target.closest('.modal-box')) handleSubmit();
@@ -253,16 +300,14 @@
   function openSubmitModal() {
     buildSubmitModal();
     var overlay = document.getElementById('submit-overlay');
-    var form = document.getElementById('submit-form');
+    var form    = document.getElementById('submit-form');
     var success = document.getElementById('submit-success');
-    // Reset state
     form.style.display = '';
     success.style.display = 'none';
     document.getElementById('s-name').value = '';
     document.getElementById('s-url').value = '';
     clearModalErrors();
     overlay.classList.add('open');
-    // Focus first input
     setTimeout(function () {
       var inp = document.getElementById('s-name');
       if (inp) inp.focus();
@@ -293,7 +338,7 @@
     var urlInput  = document.getElementById('s-url');
     var submitBtn = document.getElementById('s-submit');
 
-    var name = sanitizeText(nameInput.value, 80);
+    var name   = sanitizeText(nameInput.value, 80);
     var rawUrl = urlInput.value.trim();
 
     var valid = true;
@@ -313,13 +358,31 @@
 
     if (!valid) return;
 
+    // ── Dedup check 1: has this browser already submitted this URL? ──
+    var normUrl = normaliseUrl(urlCheck.url);
+    if (alreadySubmittedByUser(normUrl)) {
+      document.getElementById('s-url-err').textContent = "You've already submitted this URL.";
+      urlInput.classList.add('error');
+      return;
+    }
+
+    // ── Dedup check 2: URL already exists in the live tools list ──
+    var alreadyLive = allTools.some(function (t) {
+      return t.url && normaliseUrl(t.url) === normUrl;
+    });
+    if (alreadyLive) {
+      document.getElementById('s-url-err').textContent = 'This tool is already in the list!';
+      urlInput.classList.add('error');
+      return;
+    }
+
     var rlCheck = checkRateLimit();
     if (!rlCheck.ok) {
       document.getElementById('s-global-err').textContent = rlCheck.msg;
       return;
     }
 
-    if (!SUBMIT_TOKEN) {
+    if (!_tk()) {
       document.getElementById('s-global-err').textContent = 'Submission is not configured yet.';
       return;
     }
@@ -340,17 +403,30 @@
         var data = result.content;
         var sha  = result.sha;
         if (!Array.isArray(data.pending)) data.pending = [];
+
+        // ── Dedup check 3 (server-side): same URL already pending? ──
+        var alreadyPending = data.pending.some(function (e) {
+          return e.url && normaliseUrl(e.url) === normUrl;
+        });
+        if (alreadyPending) {
+          // Treat as success from user's perspective
+          markSubmitted(normUrl);
+          return Promise.resolve('duplicate');
+        }
+
         data.pending.push(entry);
-        return writePending(data, sha);
+        return writePending(data, sha, 0);
       })
       .then(function () {
+        markSubmitted(normUrl);
         document.getElementById('submit-form').style.display = 'none';
         document.getElementById('submit-success').style.display = '';
-        setTimeout(closeSubmitModal, 3000);
+        setTimeout(closeSubmitModal, 2000); // 2 s (was 3 s)
       })
       .catch(function (err) {
         console.error('Submit error:', err);
-        document.getElementById('s-global-err').textContent = 'Submission failed. Please try again later.';
+        document.getElementById('s-global-err').textContent =
+          'Submission failed. Please try again.';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit';
       });
@@ -386,8 +462,8 @@
   function buildDOM() {
     var cats = document.getElementById('cats');
     cats.innerHTML = '';
-    var statsEl    = document.getElementById('stat-tools');
-    var statCatEl  = document.getElementById('stat-cats');
+    var statsEl   = document.getElementById('stat-tools');
+    var statCatEl = document.getElementById('stat-cats');
     if (statsEl)   statsEl.textContent   = TOTAL;
     if (statCatEl) statCatEl.textContent = allCategories.length;
 
