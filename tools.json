@@ -154,9 +154,9 @@
       ]
     },
     {
-      "name": "ChatGPT Pro",
+      "name": "ChatGPT Pro (Unofficial)",
       "description": "Unofficial mirror site for ChatGPT Pro access",
-      "url": "https://chatgptplus.cn",
+      "url": "https://chatgptplus.cn/",
       "category": "ai-assistants",
       "tags": [
         "ai",
