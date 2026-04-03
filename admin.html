@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="robots" content="noindex,nofollow"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.github.com; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.github.com; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self';"/>
 <title>Admin — Master Resource</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -288,10 +288,11 @@ textarea{resize:vertical;min-height:70px;}
     <div class="lockout-msg" id="lockout-msg"></div>
     <div style="margin-bottom:10px;">
       <label for="pat-input">Password</label>
-      <input type="password" id="pat-input" placeholder="Enter password" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off"/>
+      <input type="password" id="pat-input" placeholder="Enter your password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <div class="login-err" id="login-err"></div>
     </div>
     <button class="btn btn-primary w100" id="login-btn" style="margin-top:4px;">Sign In</button>
+    <div id="lockout-clear" style="display:none;text-align:center;margin-top:10px;"><button class="btn btn-ghost btn-sm" id="clear-lockout-btn" style="font-size:.72rem;">Reset lockout</button></div>
   </div>
 </div>
 
@@ -446,6 +447,8 @@ function checkLockout() {
     document.getElementById('lockout-msg').style.display = 'block';
     document.getElementById('lockout-msg').textContent = 'Too many failed attempts. Try again in ' + mins + ' min.';
     document.getElementById('login-btn').disabled = true;
+    var clrEl = document.getElementById('lockout-clear');
+    if (clrEl) clrEl.style.display = 'block';
     return true;
   }
   if (ls.locked && Date.now() >= ls.lockedUntil) {
@@ -556,17 +559,17 @@ function esc(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// safeHref — validates protocol before using any URL in an href.
-// esc() alone cannot stop javascript: because it has no HTML special chars.
+// safeHref — always use this when putting a user URL into href.
+// esc() alone cannot block javascript: because it has no HTML special chars.
 function safeHref(raw) {
-  var url = String(raw||'').trim().replace(/^[\s -­]+/,'');
-  // Block every dangerous protocol including encoded variants
-  if (!url || /^(javascript|data|vbscript|file|blob|about|ws|wss|\w+script):/i.test(url)) return '#blocked';
+  var url = String(raw||'').trim().replace(/^[\s\u0000-\u001F\u00AD]+/, '');
+  if (!url) return '#';
+  if (/^(javascript|data|vbscript|file|blob|about|ws|wss)/i.test(url.replace(/[\s\u0000-\u001F]/g,''))) return '#blocked';
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   try {
     var p = new URL(url);
     return (['http:','https:'].includes(p.protocol)) ? p.href : '#blocked';
-  } catch(e){ return '#blocked'; }
+  } catch(e) { return '#blocked'; }
 }
 
 function sanitize(str, max) {
@@ -675,15 +678,15 @@ function renderPending() {
 
     list.appendChild(card);
 
-    // Wire category checkboxes — multi-select
+    // Wire category checkboxes — multi-select, fixed event conflict
     card.querySelectorAll('.cat-check').forEach(function(lbl){
       lbl.addEventListener('click', function(e){
-        // If user clicked the checkbox input itself, sync the label class
         if (e.target.tagName === 'INPUT') {
+          // Native checkbox was clicked — sync the visual class
           lbl.classList.toggle('checked', e.target.checked);
           return;
         }
-        // Otherwise toggle manually and keep input in sync
+        // Label area clicked — toggle manually
         e.preventDefault();
         var cb = lbl.querySelector('input');
         cb.checked = !cb.checked;
@@ -866,9 +869,14 @@ function openToolModal(idx) {
                     esc(cat.icon)+' '+esc(cat.short||cat.label);
     // MULTI-SELECT — toggle individual, allow many checked at once
     lbl.addEventListener('click', function(e){
+      if (e.target.tagName === 'INPUT') {
+        lbl.classList.toggle('checked', e.target.checked);
+        return;
+      }
       e.preventDefault();
-      lbl.classList.toggle('checked');
-      lbl.querySelector('input').checked = lbl.classList.contains('checked');
+      var cb = lbl.querySelector('input');
+      cb.checked = !cb.checked;
+      lbl.classList.toggle('checked', cb.checked);
     });
     catsEl.appendChild(lbl);
   });
@@ -950,7 +958,6 @@ function deleteTool(idx) {
 
 document.getElementById('add-tool-btn').addEventListener('click', function(){ openToolModal(-1); });
 document.getElementById('tools-search').addEventListener('input', function(){
-  // Sanitize: strip control chars, limit length — pure in-memory filter, no DOM injection possible
   var q = String(this.value).replace(/[\x00-\x1F\x7F]/g,'').slice(0,200);
   renderTools(q);
 });
@@ -1097,28 +1104,43 @@ function doLogin() {
 
   if (!pat) { errEl.textContent='Password is required.'; return; }
 
-  btn.disabled=true; btn.textContent='Verifying…'; errEl.textContent='';
+  // Strip control characters from password field
+  pat = pat.replace(/[\x00-\x1F\x7F]/g, '');
+  if (!pat) { errEl.textContent='Password is required.'; return; }
 
-  validateGHToken(pat)
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  errEl.textContent = '';
+
+  // Race the API call against a 10s timeout so it never hangs forever
+  var timeoutId;
+  var timeoutPromise = new Promise(function(_, reject){
+    timeoutId = setTimeout(function(){ reject(new Error('Connection timed out. Check your internet and try again.')); }, 10000);
+  });
+
+  Promise.race([validateGHToken(pat), timeoutPromise])
     .then(function(ok){
+      clearTimeout(timeoutId);
       if (!ok) {
         recordFailedAttempt();
-        errEl.textContent='Incorrect password. Please try again.';
-        btn.disabled=false; btn.textContent='Sign In';
+        errEl.textContent = 'Incorrect password. Please try again.';
+        btn.disabled = false; btn.textContent = 'Sign In';
         return;
       }
       return getGHUser(pat).then(function(user){
         clearLoginState();
         startSession(pat, user ? user.login : 'admin');
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('admin-panel').style.display='flex';
-        document.getElementById('gh-user').textContent = 'Signed in as @'+(user?user.login:'admin');
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'flex';
+        document.getElementById('gh-user').textContent = 'Signed in as @'+(user ? user.login : 'admin');
         return loadData();
       });
     })
     .catch(function(e){
-      errEl.textContent='Error: '+e.message;
-      btn.disabled=false; btn.textContent='Sign In';
+      clearTimeout(timeoutId);
+      recordFailedAttempt();
+      errEl.textContent = e.message || 'Connection failed. Check your internet and try again.';
+      btn.disabled = false; btn.textContent = 'Sign In';
     });
 }
 
@@ -1126,9 +1148,9 @@ document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pat-input').addEventListener('keydown', function(e){
   if (e.key==='Enter') doLogin();
 });
-// Strip any injected content from password field (defence-in-depth)
+// Strip control chars from password field in real time
 document.getElementById('pat-input').addEventListener('input', function(){
-  this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'').slice(0,500);
+  this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'');
 });
 
 document.getElementById('logout-btn').addEventListener('click', function(){
@@ -1146,6 +1168,18 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
 // ═══════════════════════════════════════════════════════
 (function init(){
   checkLockout();
+  // Show the reset button if locked out
+  var ls = getLoginState();
+  if (ls && ls.locked) {
+    document.getElementById('lockout-clear').style.display = 'block';
+  }
+  document.getElementById('clear-lockout-btn').addEventListener('click', function(){
+    sessionStorage.removeItem('a_ls');
+    document.getElementById('lockout-msg').style.display = 'none';
+    document.getElementById('lockout-clear').style.display = 'none';
+    document.getElementById('login-btn').disabled = false;
+    document.getElementById('login-err').textContent = '';
+  });
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
   if (tok) {
