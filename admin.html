@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="robots" content="noindex,nofollow"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://api.github.com; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';"/>
 <title>Admin — Master Resource</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -145,12 +146,7 @@ textarea{resize:vertical;min-height:70px;}
   border-radius:8px;padding:10px 14px;color:#fca5a5;font-size:.8rem;
   margin-bottom:14px;display:none;
 }
-.pat-help{
-  margin-top:14px;padding:12px;
-  background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.18);
-  border-radius:9px;font-size:.75rem;color:var(--mute);line-height:1.6;
-}
-.pat-help strong{color:#a0a0c8;}
+
 
 /* ═══════════════════════════ ADMIN PANEL ════════════════════ */
 #admin-panel{display:none;min-height:100vh;flex-direction:column;}
@@ -291,19 +287,11 @@ textarea{resize:vertical;min-height:70px;}
     <div class="login-sub">Admin Panel</div>
     <div class="lockout-msg" id="lockout-msg"></div>
     <div style="margin-bottom:10px;">
-      <label for="pat-input">GitHub Personal Access Token</label>
-      <input type="password" id="pat-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false"/>
+      <label for="pat-input">Password</label>
+      <input type="password" id="pat-input" placeholder="Enter password" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off"/>
       <div class="login-err" id="login-err"></div>
     </div>
-    <button class="btn btn-primary w100" id="login-btn" style="margin-top:4px;">
-      Sign In
-    </button>
-    <div class="pat-help">
-      <strong>How to get a token:</strong><br>
-      GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens<br>
-      Repository: <strong>master-resource</strong> only<br>
-      Permissions: <strong>Contents</strong> — Read &amp; Write, <strong>Metadata</strong> — Read
-    </div>
+    <button class="btn btn-primary w100" id="login-btn" style="margin-top:4px;">Sign In</button>
   </div>
 </div>
 
@@ -568,6 +556,19 @@ function esc(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// safeHref — validates protocol before using any URL in an href.
+// esc() alone cannot stop javascript: because it has no HTML special chars.
+function safeHref(raw) {
+  var url = String(raw||'').trim().replace(/^[\s -­]+/,'');
+  // Block every dangerous protocol including encoded variants
+  if (!url || /^(javascript|data|vbscript|file|blob|about|ws|wss|\w+script):/i.test(url)) return '#blocked';
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  try {
+    var p = new URL(url);
+    return (['http:','https:'].includes(p.protocol)) ? p.href : '#blocked';
+  } catch(e){ return '#blocked'; }
+}
+
 function sanitize(str, max) {
   return String(str||'').trim().slice(0, max||300).replace(/[\x00-\x1F\x7F]/g,'');
 }
@@ -654,7 +655,7 @@ function renderPending() {
       '<div class="pend-header">' +
         '<div style="flex:1;">' +
           '<div class="pend-name">'+esc(item.name)+'</div>' +
-          '<div class="pend-url"><a href="'+esc(item.url)+'" target="_blank" rel="noopener noreferrer">'+esc(item.url)+'</a></div>' +
+          '<div class="pend-url"><a href="'+safeHref(item.url)+'" target="_blank" rel="noopener noreferrer">'+esc(item.url)+'</a></div>' +
           '<div class="pend-meta">Submitted: '+esc(date)+' &nbsp;·&nbsp; ID: '+esc(item.id)+'</div>' +
         '</div>' +
         '<span class="badge badge-pending">Pending</span>' +
@@ -674,11 +675,19 @@ function renderPending() {
 
     list.appendChild(card);
 
-    // Wire category checkboxes
+    // Wire category checkboxes — multi-select
     card.querySelectorAll('.cat-check').forEach(function(lbl){
-      lbl.addEventListener('click', function(){
-        lbl.classList.toggle('checked');
-        lbl.querySelector('input').checked = lbl.classList.contains('checked');
+      lbl.addEventListener('click', function(e){
+        // If user clicked the checkbox input itself, sync the label class
+        if (e.target.tagName === 'INPUT') {
+          lbl.classList.toggle('checked', e.target.checked);
+          return;
+        }
+        // Otherwise toggle manually and keep input in sync
+        e.preventDefault();
+        var cb = lbl.querySelector('input');
+        cb.checked = !cb.checked;
+        lbl.classList.toggle('checked', cb.checked);
       });
     });
 
@@ -940,7 +949,11 @@ function deleteTool(idx) {
 }
 
 document.getElementById('add-tool-btn').addEventListener('click', function(){ openToolModal(-1); });
-document.getElementById('tools-search').addEventListener('input', function(){ renderTools(this.value); });
+document.getElementById('tools-search').addEventListener('input', function(){
+  // Sanitize: strip control chars, limit length — pure in-memory filter, no DOM injection possible
+  var q = String(this.value).replace(/[\x00-\x1F\x7F]/g,'').slice(0,200);
+  renderTools(q);
+});
 
 // ═══════════════════════════════════════════════════════
 // ── CATEGORIES TAB ──
@@ -1082,8 +1095,7 @@ function doLogin() {
   var errEl = document.getElementById('login-err');
   var btn = document.getElementById('login-btn');
 
-  if (!pat) { errEl.textContent='Please enter your token.'; return; }
-  if (pat.length < 10) { errEl.textContent='Token looks too short.'; return; }
+  if (!pat) { errEl.textContent='Password is required.'; return; }
 
   btn.disabled=true; btn.textContent='Verifying…'; errEl.textContent='';
 
@@ -1091,7 +1103,7 @@ function doLogin() {
     .then(function(ok){
       if (!ok) {
         recordFailedAttempt();
-        errEl.textContent='Invalid token or no access to this repository.';
+        errEl.textContent='Incorrect password. Please try again.';
         btn.disabled=false; btn.textContent='Sign In';
         return;
       }
@@ -1113,6 +1125,10 @@ function doLogin() {
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pat-input').addEventListener('keydown', function(e){
   if (e.key==='Enter') doLogin();
+});
+// Strip any injected content from password field (defence-in-depth)
+document.getElementById('pat-input').addEventListener('input', function(){
+  this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'').slice(0,500);
 });
 
 document.getElementById('logout-btn').addEventListener('click', function(){
