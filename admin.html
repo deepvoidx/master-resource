@@ -297,6 +297,8 @@ textarea{resize:vertical;min-height:70px;}
 #undo-toast .ut-close{color:var(--mute);cursor:pointer;font-size:1rem;line-height:1;padding:2px 4px;flex-shrink:0;}
 #undo-toast .ut-close:hover{color:var(--txt);}
 /* ── preview card ── */
+/* active state for preview toggle btn */
+.pf-preview-btn.active{background:rgba(108,99,255,.15);border-color:rgba(108,99,255,.4);color:#c4bfff;}
 .preview-wrap{margin-bottom:12px;}
 .preview-label{font-size:.7rem;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
 .preview-card{border:1px solid rgba(108,99,255,.3);border-radius:12px;padding:14px;
@@ -767,13 +769,21 @@ function loadData() {
 // ═══════════════════════════════════════════════════════
 function scheduleWithUndo(msg, actionFn, onSuccess, onRevert) {
   cancelUndo();
-  var el = document.getElementById('undo-toast');
+  var el   = document.getElementById('undo-toast');
   var prog = document.getElementById('ut-progress');
-  document.getElementById('ut-msg').textContent = msg;
+  var msgEl = document.getElementById('ut-msg');
+  if (!el || !prog || !msgEl) {
+    // Elements missing — just run action immediately
+    actionFn().then(onSuccess).catch(function(e){ toast('Error: '+e.message,'❌'); if(onRevert) onRevert(); });
+    return;
+  }
+  msgEl.textContent = msg;
   el.classList.add('show');
-  prog.style.transition = 'none'; prog.style.width = '100%';
+  prog.style.transition = 'none';
+  prog.style.width = '100%';
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    prog.style.transition = 'width '+UNDO_MS+'ms linear'; prog.style.width = '0%';
+    prog.style.transition = 'width '+UNDO_MS+'ms linear';
+    prog.style.width = '0%';
   }); });
   S.undoTimer = setTimeout(function(){
     el.classList.remove('show'); S.undoTimer = null;
@@ -786,15 +796,16 @@ function scheduleWithUndo(msg, actionFn, onSuccess, onRevert) {
 function cancelUndo() {
   if (S.undoTimer) {
     clearTimeout(S.undoTimer); S.undoTimer = null;
-    document.getElementById('undo-toast').classList.remove('show');
+    var el = document.getElementById('undo-toast');
+    if (el) el.classList.remove('show');
   }
 }
-document.getElementById('ut-undo').addEventListener('click', function(){
-  cancelUndo(); toast('Action cancelled', '↩️');
-});
-document.getElementById('ut-close').addEventListener('click', function(){
-  cancelUndo(); toast('Action cancelled', '↩️');
-});
+function wireUndoListeners() {
+  var undoBtn  = document.getElementById('ut-undo');
+  var closeBtn = document.getElementById('ut-close');
+  if (undoBtn)  undoBtn.addEventListener('click', function(){ cancelUndo(); toast('Action cancelled', '↩️'); });
+  if (closeBtn) closeBtn.addEventListener('click', function(){ cancelUndo(); toast('Action cancelled', '↩️'); });
+}
 
 // ═══════════════════════════════════════════════════════
 // PREVIEW CARD
@@ -911,16 +922,26 @@ function renderPending() {
       card.classList.toggle('sel', this.checked);
       updateBulkBar();
     });
-    // Preview button
+    // Preview button — toggle open/close
     card.querySelector('.pf-preview-btn').addEventListener('click', function(){
-      var name = sanitize(card.querySelector('.pf-name').value, 100);
-      var desc = sanitize(card.querySelector('.pf-desc').value, 200);
-      var url  = card.querySelector('.pf-url').value;
-      var catEl= card.querySelector('.cat-check.checked input');
-      var catId= catEl ? catEl.value : '';
       var prev = card.querySelector('.pf-preview');
-      prev.innerHTML = '';
+      var btn  = this;
+      // If preview is visible, hide it (toggle off)
+      if (prev.children.length > 0) {
+        prev.innerHTML = '';
+        btn.textContent = '👁 Preview';
+        btn.classList.remove('active');
+        return;
+      }
+      // Show preview
+      var name  = sanitize(card.querySelector('.pf-name').value, 100);
+      var desc  = sanitize(card.querySelector('.pf-desc').value, 200);
+      var url   = card.querySelector('.pf-url').value;
+      var catEl = card.querySelector('.cat-check.checked input');
+      var catId = catEl ? catEl.value : '';
       prev.appendChild(buildPreviewCard(name, desc, url, catId));
+      btn.textContent = '👁 Hide Preview';
+      btn.classList.add('active');
     });
     // Approve
     card.querySelector('.pf-approve').addEventListener('click', function(){
@@ -1258,9 +1279,17 @@ function deleteTool(idx) {
 document.getElementById('add-tool-btn').addEventListener('click', function(){ openToolModal(-1); });
 document.querySelectorAll('.sort-btn-sm').forEach(function(btn){
   btn.addEventListener('click', function(){
-    document.querySelectorAll('.sort-btn-sm').forEach(function(b){b.classList.remove('active');});
-    btn.classList.add('active');
-    S.toolsSortMode = btn.getAttribute('data-sort');
+    var isActive  = btn.classList.contains('active');
+    var clicked   = btn.getAttribute('data-sort');
+    document.querySelectorAll('.sort-btn-sm').forEach(function(b){ b.classList.remove('active'); });
+    // Toggle: clicking the active non-default sort resets to Default
+    if (isActive && clicked !== 'default') {
+      document.querySelector('.sort-btn-sm[data-sort="default"]').classList.add('active');
+      S.toolsSortMode = 'default';
+    } else {
+      btn.classList.add('active');
+      S.toolsSortMode = clicked;
+    }
     renderTools(toolsSearchQ);
   });
 });
@@ -1561,6 +1590,7 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
 // INIT — restore session if tab still open
 // ═══════════════════════════════════════════════════════
 (function init(){
+  wireUndoListeners();
   checkLockout();
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
@@ -1574,5 +1604,12 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   }
 })();
 </script>
+
+<div id="undo-toast">
+  <span class="ut-msg" id="ut-msg"></span>
+  <button class="ut-undo" id="ut-undo">Undo</button>
+  <span class="ut-close" id="ut-close">&#10005;</span>
+  <div class="ut-progress" id="ut-progress"></div>
+</div>
 </body>
 </html>
