@@ -171,6 +171,11 @@
       "tags": [
         "ai",
         "chatbot"
+      ],
+      "categories": [
+        "ai-assistants",
+        "research",
+        "ai-directories"
       ]
     },
     {
@@ -202,6 +207,10 @@
       "tags": [
         "ai",
         "chatbot"
+      ],
+      "categories": [
+        "ai-assistants",
+        "dev"
       ]
     },
     {
@@ -243,6 +252,10 @@
       "tags": [
         "ai",
         "directory"
+      ],
+      "categories": [
+        "ai-directories",
+        "ai-assistants"
       ]
     },
     {
@@ -263,6 +276,10 @@
       "tags": [
         "ai",
         "directory"
+      ],
+      "categories": [
+        "ai-directories",
+        "dev"
       ]
     },
     {
@@ -273,6 +290,10 @@
       "tags": [
         "ai",
         "directory"
+      ],
+      "categories": [
+        "ai-directories",
+        "content"
       ]
     },
     {
@@ -283,6 +304,10 @@
       "tags": [
         "ai",
         "directory"
+      ],
+      "categories": [
+        "ai-directories",
+        "ai-assistants"
       ]
     },
     {
@@ -414,6 +439,11 @@
         "ai",
         "creative",
         "video"
+      ],
+      "categories": [
+        "video-gen",
+        "design",
+        "content"
       ]
     },
     {
@@ -425,6 +455,10 @@
         "ai",
         "creative",
         "video"
+      ],
+      "categories": [
+        "video-gen",
+        "ai-assistants"
       ]
     },
     {
@@ -469,6 +503,10 @@
         "ai",
         "creative",
         "video"
+      ],
+      "categories": [
+        "video-gen",
+        "design"
       ]
     },
     {
@@ -480,6 +518,11 @@
         "ai",
         "audio",
         "creative"
+      ],
+      "categories": [
+        "audio",
+        "ai-assistants",
+        "content"
       ]
     },
     {
@@ -491,6 +534,10 @@
         "ai",
         "audio",
         "creative"
+      ],
+      "categories": [
+        "audio",
+        "ai-assistants"
       ]
     },
     {
@@ -502,6 +549,11 @@
         "ai",
         "audio",
         "creative"
+      ],
+      "categories": [
+        "audio",
+        "content",
+        "design"
       ]
     },
     {
@@ -612,6 +664,11 @@
         "free",
         "creative",
         "design"
+      ],
+      "categories": [
+        "design",
+        "ai-assistants",
+        "research"
       ]
     },
     {
@@ -623,6 +680,10 @@
         "free",
         "creative",
         "design"
+      ],
+      "categories": [
+        "design",
+        "content"
       ]
     },
     {
@@ -645,6 +706,11 @@
         "free",
         "creative",
         "design"
+      ],
+      "categories": [
+        "design",
+        "free-audio",
+        "content"
       ]
     },
     {
@@ -689,6 +755,10 @@
         "free",
         "creative",
         "design"
+      ],
+      "categories": [
+        "design",
+        "video-gen"
       ]
     },
     {
@@ -700,6 +770,10 @@
         "free",
         "creative",
         "design"
+      ],
+      "categories": [
+        "design",
+        "research"
       ]
     },
     {
@@ -732,6 +806,10 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study"
       ]
     },
     {
@@ -742,6 +820,10 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study"
       ]
     },
     {
@@ -752,6 +834,11 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study",
+        "ai-assistants"
       ]
     },
     {
@@ -762,16 +849,25 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study"
       ]
     },
     {
       "name": "Perplexity AI",
       "description": "AI search with cited real-time answers",
       "url": "https://perplexity.ai",
-      "category": "research",
+      "category": "ai-assistants",
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "ai-assistants",
+        "research",
+        "ai-directories"
       ]
     },
     {
@@ -782,6 +878,11 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study",
+        "books"
       ]
     },
     {
@@ -792,6 +893,10 @@
       "tags": [
         "study",
         "free"
+      ],
+      "categories": [
+        "study",
+        "ai-assistants"
       ]
     },
     {
@@ -802,6 +907,10 @@
       "tags": [
         "study",
         "free"
+      ],
+      "categories": [
+        "study",
+        "ai-assistants"
       ]
     },
     {
@@ -812,6 +921,10 @@
       "tags": [
         "study",
         "free"
+      ],
+      "categories": [
+        "study",
+        "ai-assistants"
       ]
     },
     {
@@ -822,6 +935,10 @@
       "tags": [
         "ai",
         "detection"
+      ],
+      "categories": [
+        "ai-detection",
+        "security"
       ]
     },
     {
@@ -852,6 +969,11 @@
       "tags": [
         "ai",
         "detection"
+      ],
+      "categories": [
+        "ai-detection",
+        "research",
+        "study"
       ]
     },
     {
@@ -872,6 +994,10 @@
       "tags": [
         "ai",
         "detection"
+      ],
+      "categories": [
+        "ai-detection",
+        "ai-assistants"
       ]
     },
     {
@@ -882,6 +1008,10 @@
       "tags": [
         "ai",
         "detection"
+      ],
+      "categories": [
+        "ai-detection",
+        "ai-assistants"
       ]
     },
     {
@@ -891,6 +1021,11 @@
       "category": "linkedin",
       "tags": [
         "professional"
+      ],
+      "categories": [
+        "linkedin",
+        "ai-assistants",
+        "content"
       ]
     },
     {
@@ -900,6 +1035,10 @@
       "category": "linkedin",
       "tags": [
         "professional"
+      ],
+      "categories": [
+        "linkedin",
+        "dev"
       ]
     },
     {
@@ -911,6 +1050,10 @@
         "x27",
         "dev",
         "code"
+      ],
+      "categories": [
+        "dev",
+        "security"
       ]
     },
     {
@@ -937,10 +1080,14 @@
       "name": "Blackbox AI",
       "description": "AI-powered code assistant with chat and autocomplete",
       "url": "https://www.blackbox.ai",
-      "category": "dev",
+      "category": "ai-assistants",
       "tags": [
         "dev",
         "code"
+      ],
+      "categories": [
+        "ai-assistants",
+        "dev"
       ]
     },
     {
@@ -961,6 +1108,10 @@
       "tags": [
         "creative",
         "content"
+      ],
+      "categories": [
+        "content",
+        "ai-assistants"
       ]
     },
     {
@@ -991,6 +1142,11 @@
       "tags": [
         "creative",
         "content"
+      ],
+      "categories": [
+        "content",
+        "ai-assistants",
+        "research"
       ]
     },
     {
@@ -1001,6 +1157,10 @@
       "tags": [
         "creative",
         "content"
+      ],
+      "categories": [
+        "content",
+        "fun"
       ]
     },
     {
@@ -1021,6 +1181,11 @@
       "tags": [
         "creative",
         "content"
+      ],
+      "categories": [
+        "content",
+        "design",
+        "fun"
       ]
     },
     {
@@ -1082,6 +1247,11 @@
         "x27",
         "free",
         "books"
+      ],
+      "categories": [
+        "books",
+        "research",
+        "study"
       ]
     },
     {
@@ -1092,6 +1262,10 @@
       "tags": [
         "free",
         "books"
+      ],
+      "categories": [
+        "books",
+        "research"
       ]
     },
     {
@@ -1102,6 +1276,10 @@
       "tags": [
         "fun",
         "free"
+      ],
+      "categories": [
+        "fun",
+        "study"
       ]
     },
     {
@@ -1152,6 +1330,10 @@
       "tags": [
         "fun",
         "free"
+      ],
+      "categories": [
+        "fun",
+        "study"
       ]
     },
     {
@@ -1163,6 +1345,10 @@
         "free",
         "creative",
         "image"
+      ],
+      "categories": [
+        "png",
+        "design"
       ]
     },
     {
@@ -1174,6 +1360,10 @@
         "free",
         "creative",
         "image"
+      ],
+      "categories": [
+        "png",
+        "design"
       ]
     },
     {
@@ -1185,6 +1375,10 @@
         "free",
         "creative",
         "image"
+      ],
+      "categories": [
+        "png",
+        "design"
       ]
     },
     {
@@ -1196,6 +1390,10 @@
         "free",
         "creative",
         "image"
+      ],
+      "categories": [
+        "png",
+        "design"
       ]
     },
     {
@@ -1207,6 +1405,10 @@
         "free",
         "creative",
         "image"
+      ],
+      "categories": [
+        "png",
+        "design"
       ]
     },
     {
@@ -1252,6 +1454,10 @@
       "category": "security",
       "tags": [
         "security"
+      ],
+      "categories": [
+        "security",
+        "ai-detection"
       ]
     },
     {
@@ -1261,6 +1467,10 @@
       "category": "security",
       "tags": [
         "security"
+      ],
+      "categories": [
+        "security",
+        "ai-detection"
       ]
     },
     {
@@ -1280,6 +1490,10 @@
       "tags": [
         "free",
         "tools"
+      ],
+      "categories": [
+        "pdf",
+        "design"
       ]
     },
     {
@@ -1287,7 +1501,11 @@
       "description": "Free platform for online hangout rooms and watch parties",
       "url": "https://kosmi.io",
       "category": "misc",
-      "tags": []
+      "tags": [],
+      "categories": [
+        "misc",
+        "fun"
+      ]
     },
     {
       "name": "ChatGPT",
@@ -1307,6 +1525,10 @@
       "tags": [
         "ai",
         "professional"
+      ],
+      "categories": [
+        "ai-assistants",
+        "linkedin"
       ]
     },
     {
@@ -1318,6 +1540,10 @@
         "ai",
         "dev",
         "code"
+      ],
+      "categories": [
+        "dev",
+        "ai-assistants"
       ]
     },
     {
@@ -1340,6 +1566,11 @@
         "ai",
         "security",
         "image"
+      ],
+      "categories": [
+        "security",
+        "ai-detection",
+        "image-gen"
       ]
     },
     {
@@ -1352,6 +1583,10 @@
         "creative",
         "content",
         "video"
+      ],
+      "categories": [
+        "content",
+        "video-gen"
       ]
     },
     {
@@ -1362,6 +1597,10 @@
       "tags": [
         "dev",
         "free"
+      ],
+      "categories": [
+        "dev",
+        "security"
       ]
     },
     {
@@ -1372,6 +1611,10 @@
       "tags": [
         "dev",
         "free"
+      ],
+      "categories": [
+        "dev",
+        "security"
       ]
     },
     {
@@ -1383,6 +1626,10 @@
         "ai",
         "dev",
         "free"
+      ],
+      "categories": [
+        "dev",
+        "ai-assistants"
       ]
     },
     {
@@ -1394,6 +1641,11 @@
         "ai",
         "dev",
         "creative"
+      ],
+      "categories": [
+        "dev",
+        "design",
+        "ai-assistants"
       ]
     },
     {
@@ -1425,6 +1677,10 @@
         "fun",
         "free",
         "creative"
+      ],
+      "categories": [
+        "fun",
+        "design"
       ]
     },
     {
@@ -1446,6 +1702,11 @@
         "free",
         "books",
         "research"
+      ],
+      "categories": [
+        "books",
+        "research",
+        "study"
       ]
     },
     {
@@ -1457,6 +1718,10 @@
         "research",
         "free",
         "ai"
+      ],
+      "categories": [
+        "research",
+        "security"
       ]
     },
     {
@@ -1468,6 +1733,83 @@
         "research",
         "free",
         "ai"
+      ],
+      "categories": [
+        "research",
+        "security"
+      ]
+    },
+    {
+      "name": "TheGeoView",
+      "description": "Interactive geographic data visualisation and mapping explorer",
+      "url": "https://thegeoview.com/",
+      "category": "research",
+      "categories": [
+        "research",
+        "fun"
+      ],
+      "tags": [
+        "research",
+        "free",
+        "creative"
+      ]
+    },
+    {
+      "name": "Iran Cost Ticker",
+      "description": "Real-time cost and economic data tracker for Iran",
+      "url": "https://iran-cost-ticker.com/",
+      "category": "research",
+      "tags": [
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Alison",
+      "description": "Free online courses and professional certifications across hundreds of subjects",
+      "url": "https://alison.com/",
+      "category": "study",
+      "categories": [
+        "study",
+        "research"
+      ],
+      "tags": [
+        "study",
+        "free",
+        "research"
+      ]
+    },
+    {
+      "name": "Open Culture",
+      "description": "Free cultural and educational media — courses, films, audiobooks, textbooks",
+      "url": "https://www.openculture.com/",
+      "category": "study",
+      "categories": [
+        "study",
+        "books",
+        "research"
+      ],
+      "tags": [
+        "study",
+        "free",
+        "books",
+        "research"
+      ]
+    },
+    {
+      "name": "QuillBot Grammar Check",
+      "description": "Free AI-powered grammar, spelling and punctuation checker",
+      "url": "https://quillbot.com/grammar-check",
+      "category": "ai-detection",
+      "categories": [
+        "ai-detection",
+        "ai-assistants",
+        "study"
+      ],
+      "tags": [
+        "ai",
+        "free",
+        "study"
       ]
     }
   ]
