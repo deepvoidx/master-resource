@@ -1894,6 +1894,22 @@
         "research",
         "study"
       ]
+    },
+    {
+      "name": "Duolingo",
+      "description": "Free gamified learning app for languages and other subjects through short daily lessons.",
+      "url": "https://www.duolingo.com/",
+      "category": "study",
+      "tags": [
+        "language-learning",
+        "education",
+        "study",
+        "gamified-learning",
+        "math",
+        "music",
+        "chess",
+        "free"
+      ]
     }
   ]
 }
