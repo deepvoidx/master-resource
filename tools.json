@@ -93,10 +93,10 @@
     },
     {
       "id": "streaming",
-      "label": "Movies & Streaming",
+      "label": "Cinema",
       "icon": "🍿",
       "color": "#f43f5e",
-      "short": "Streaming"
+      "short": "Cinema"
     },
     {
       "id": "books",
