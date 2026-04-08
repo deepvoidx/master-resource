@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="robots" content="noindex,nofollow"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.github.com; img-src 'self' data:; frame-src 'none'; object-src 'none'; base-uri 'self';"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://api.github.com; img-src 'self' data: https:; frame-src https://deepvoidx.github.io; object-src 'none'; base-uri 'self';"/>
 <title>Admin — Master Resource</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -405,6 +405,7 @@ textarea{resize:vertical;min-height:70px;}
     <button class="tab-btn active" data-tab="pending">⏳ Pending <span id="pending-count"></span></button>
     <button class="tab-btn" data-tab="tools">🛠 Tools <span id="tools-tab-count"></span></button>
     <button class="tab-btn" data-tab="categories">🗂 Categories <span id="cats-tab-count"></span></button>
+    <button class="tab-btn" data-tab="preview">🌐 Site Preview</button>
     <button class="tab-btn" data-tab="history">📋 History</button>
     <button class="tab-btn" data-tab="stats">📊 Stats</button>
   </div>
@@ -468,6 +469,22 @@ textarea{resize:vertical;min-height:70px;}
     <div id="cats-list" class="hidden"></div>
   </div>
 </div>
+
+  <!-- ── SITE PREVIEW TAB ── -->
+  <div class="tab-content" id="tab-preview">
+    <div class="sec-hdr" style="margin-bottom:10px;">
+      <h2>Site Preview</h2>
+      <small style="color:var(--mute);">Your live site — as users see it</small>
+      <a href="https://deepvoidx.github.io/master-resource/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm ml-auto">Open in new tab ↗</a>
+    </div>
+    <iframe
+      id="site-preview-frame"
+      src="https://deepvoidx.github.io/master-resource/"
+      style="width:100%;height:calc(100vh - 160px);min-height:500px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#08080f;"
+      loading="lazy"
+      title="Site Preview"
+    ></iframe>
+  </div>
 
   <!-- ── HISTORY TAB ── -->
   <div class="tab-content" id="tab-history">
@@ -907,11 +924,17 @@ function renderPending() {
 
     list.appendChild(card);
 
-    // Wire category checkboxes
+    // Wire category checkboxes — multi-select
     card.querySelectorAll('.cat-check').forEach(function(lbl){
-      lbl.addEventListener('click', function(){
-        lbl.classList.toggle('checked');
-        lbl.querySelector('input').checked = lbl.classList.contains('checked');
+      lbl.addEventListener('click', function(e){
+        if (e.target.tagName === 'INPUT') {
+          lbl.classList.toggle('checked', e.target.checked);
+          return;
+        }
+        e.preventDefault();
+        var cb = lbl.querySelector('input');
+        cb.checked = !cb.checked;
+        lbl.classList.toggle('checked', cb.checked);
       });
     });
 
@@ -977,17 +1000,9 @@ function approvePending(item, card) {
   btn.disabled = true; btn.textContent = 'Saving…';
   errEl.textContent = '';
 
-  var newTool = { name:nameVal, description:desc, url:urlRes.url, category:cats[0], tags:tags };
-  // If multiple categories, we store the first as primary (tools.json structure uses single category)
-  // Duplicate tool for each additional category if needed:
-  var toolsToAdd = cats.map(function(cid, i){
-    return { name: i===0 ? nameVal : nameVal + ' (' + cid + ')',
-             description:desc, url:urlRes.url, category:cid, tags:tags };
-  });
-  // In practice just use the first category (most tools have one)
-  // Add all selected categories as separate entries only if user wants
-  // Let's keep it simple: use first selected category
+  // Store primary category + categories array for multi-cat support
   var toolEntry = { name:nameVal, description:desc, url:urlRes.url, category:cats[0], tags:tags };
+  if (cats.length > 1) toolEntry.categories = cats;
 
   // Add to tools.json
   var tools = S.toolsData;
@@ -1203,14 +1218,18 @@ function openToolModal(idx) {
   var categories = S.toolsData.categories || [];
   categories.forEach(function(cat){
     var lbl = document.createElement('label');
-    lbl.className = 'cat-check' + (tool.category === cat.id ? ' checked':'');
+    // Multi-select: check if this cat is in tool.categories or tool.category
+    var selCats = Array.isArray(tool.categories) && tool.categories.length
+      ? tool.categories : (tool.category ? [tool.category] : []);
+    var isChk = selCats.indexOf(cat.id) !== -1;
+    lbl.className = 'cat-check' + (isChk ? ' checked' : '');
     lbl.dataset.cid = cat.id;
-    lbl.innerHTML = '<input type="checkbox" value="'+esc(cat.id)+'"'+(tool.category===cat.id?' checked':'')+'/>'
-                  + esc(cat.icon)+' '+esc(cat.short||cat.label);
-    lbl.addEventListener('click', function(){
-      // single select for category (tool.category is a single string)
-      catsEl.querySelectorAll('.cat-check').forEach(function(l){ l.classList.remove('checked'); l.querySelector('input').checked=false; });
-      lbl.classList.add('checked'); lbl.querySelector('input').checked=true;
+    lbl.innerHTML = '<input type="checkbox" value="'+esc(cat.id)+'"'+(isChk?' checked':'')+'/>'+esc(cat.icon)+' '+esc(cat.short||cat.label);
+    lbl.addEventListener('click', function(e){
+      if (e.target.tagName === 'INPUT') { lbl.classList.toggle('checked', e.target.checked); return; }
+      e.preventDefault();
+      var cb = lbl.querySelector('input'); cb.checked = !cb.checked;
+      lbl.classList.toggle('checked', cb.checked);
     });
     catsEl.appendChild(lbl);
   });
@@ -1236,12 +1255,13 @@ document.getElementById('tm-save').addEventListener('click', function(){
   if (!nameVal){ errEl.textContent='Name required.'; return; }
   if (!urlRes.ok){ errEl.textContent=urlRes.msg; return; }
 
-  var catEl = document.querySelector('#tm-cats .cat-check.checked input');
-  if (!catEl){ errEl.textContent='Select a category.'; return; }
-  var catId = catEl.value;
+  var catEls = document.querySelectorAll('#tm-cats .cat-check.checked input');
+  if (!catEls.length){ errEl.textContent='Select at least one category.'; return; }
+  var catIds = Array.from(catEls).map(function(el){ return el.value; });
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase(); }).filter(Boolean);
-  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catId, tags:tags };
+  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catIds[0], tags:tags };
+  if (catIds.length > 1) tool.categories = catIds;
 
   var btn = document.getElementById('tm-save');
   btn.disabled=true; btn.textContent='Saving…'; errEl.textContent='';
@@ -1430,6 +1450,12 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     S.activeTab = tab;
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
+    if (tab === 'preview') {
+      var frame = document.getElementById('site-preview-frame');
+      if (frame && !frame.getAttribute('data-loaded')) {
+        frame.setAttribute('data-loaded','1');
+      }
+    }
   });
 });
 
@@ -1445,10 +1471,11 @@ function apiGetCommits() {
 }
 
 function fetchHistory() {
-  if (historyLoaded) return;
+  if (historyLoaded) return; // already loaded this session
   var loading = document.getElementById('history-loading');
   var list    = document.getElementById('history-list');
   loading.classList.remove('hidden'); list.classList.add('hidden');
+  if (!S.token) { list.innerHTML='<div class="empty-state"><div>Sign in first.</div></div>'; loading.classList.add('hidden'); list.classList.remove('hidden'); return; }
   apiGetCommits()
     .then(function(commits){
       historyLoaded = true;
@@ -1479,7 +1506,11 @@ function fetchHistory() {
 // ═══════════════════════════════════════════════════════
 function renderStats() {
   var el = document.getElementById('stats-content');
-  if (!S.toolsData) { el.innerHTML='<div class="empty-state"><div>Load data first.</div></div>'; return; }
+  if (!S.toolsData) {
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">⏳</div><div>Loading data…</div></div>';
+    loadData().then(function(){ renderStats(); });
+    return;
+  }
   var tools = S.toolsData.tools || [];
   var cats  = S.toolsData.categories || [];
   var pending = (S.pendingData&&S.pendingData.pending) ? S.pendingData.pending.filter(function(i){return i.status==='pending';}).length : 0;
