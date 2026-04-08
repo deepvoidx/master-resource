@@ -1854,6 +1854,26 @@
         "fun",
         "misc"
       ]
+    },
+    {
+      "name": "Omegle",
+      "description": "Free random video chat platform for anonymous 1-on-1 conversations with strangers through live cam chat, text chat, and interest-based matching.",
+      "url": "https://omegle.fun/",
+      "category": "fun",
+      "tags": [
+        "random-video-chat",
+        "stranger-chat",
+        "anonymous-chat",
+        "cam-chat",
+        "text-chat",
+        "meet-people",
+        "omegle-alternative",
+        "free"
+      ],
+      "categories": [
+        "fun",
+        "misc"
+      ]
     }
   ]
 }
