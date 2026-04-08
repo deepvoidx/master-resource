@@ -1910,6 +1910,26 @@
         "chess",
         "free"
       ]
+    },
+    {
+      "name": "Emergent",
+      "description": "AI app builder for creating and deploying full-stack web and mobile apps from prompts.",
+      "url": "https://app.emergent.sh/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai-app-builder",
+        "no-code",
+        "full-stack",
+        "web-apps",
+        "mobile-apps",
+        "developer-tools",
+        "deployment",
+        "ai-coding"
+      ],
+      "categories": [
+        "ai-assistants",
+        "dev"
+      ]
     }
   ]
 }
