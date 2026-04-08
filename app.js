@@ -185,7 +185,7 @@
       var hdr = document.createElement('div');
       hdr.className = 'cat-hdr';
       hdr.innerHTML =
-        '<div class="cat-ico" style="background:' + escHtml(cat.color) + '20;border:1px solid ' + escHtml(cat.color) + '50">' + escHtml(cat.icon) + '</div>' +
+        '<div class="cat-ico" style="background:' + cat.color + '20;border:1px solid ' + cat.color + '50">' + cat.icon + '</div>' +
         '<div class="cat-title">' + escHtml(cat.label) + '</div>' +
         '<div class="cat-cnt">' + tools.length + '</div>';
       section.appendChild(hdr);
@@ -308,9 +308,6 @@
     document.getElementById('submit-success').style.display = 'none';
     document.getElementById('s-name').value = '';
     document.getElementById('s-url').value = '';
-    // Always re-enable button when modal opens (in case previous submit left it disabled)
-    var sb = document.getElementById('s-submit');
-    if (sb) { sb.disabled = false; sb.textContent = 'Submit'; }
     clearModalErrors();
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -495,14 +492,7 @@
   function toolMatches(tool, q) {
     if (activeFilters.length > 0) {
       var catIds = getCatIds(tool);
-      // 1 filter = union (show all tools in that cat)
-      // 2+ filters = intersection (only tools in ALL selected cats)
-      var hit;
-      if (activeFilters.length === 1) {
-        hit = catIds.indexOf(activeFilters[0]) !== -1;
-      } else {
-        hit = activeFilters.every(function (af) { return catIds.indexOf(af) !== -1; });
-      }
+      var hit = activeFilters.some(function (af) { return catIds.indexOf(af) !== -1; });
       if (!hit) return false;
     }
     var s = [
@@ -552,15 +542,8 @@
     var any = false, vis = 0;
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
-      if (activeFilters.length > 0) {
-        if (activeFilters.length === 1) {
-          // Single filter: hide sections not matching
-          if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
-        } else {
-          // Multiple filters: only show this section if it HAS tools matching ALL filters
-          // (the cards themselves will be filtered by data-s intersection check below)
-          if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
-        }
+      if (activeFilters.length > 0 && activeFilters.indexOf(cid) === -1) {
+        sec.classList.add('hidden'); return;
       }
       var hasVis = false;
       sec.querySelectorAll('.card').forEach(function (c) {
