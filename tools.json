@@ -1814,6 +1814,26 @@
         "ai-assistants",
         "dev"
       ]
+    },
+    {
+      "name": "Monkey",
+      "description": "Free live video chat app for meeting new people through random matching, short calls, text chat, and social discovery features.",
+      "url": "https://monkey.app/",
+      "category": "fun",
+      "tags": [
+        "video-chat",
+        "random-chat",
+        "social",
+        "live-chat",
+        "meet-people",
+        "streaming",
+        "mobile-app",
+        "free"
+      ],
+      "categories": [
+        "fun",
+        "misc"
+      ]
     }
   ]
 }
