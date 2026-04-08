@@ -1834,6 +1834,26 @@
         "fun",
         "misc"
       ]
+    },
+    {
+      "name": "Ome TV",
+      "description": "Random video chat platform to meet strangers worldwide through live cam chat, text chat, and social discovery features",
+      "url": "https://ome.tv/",
+      "category": "fun",
+      "tags": [
+        "random-video-chat",
+        "cam-chat",
+        "stranger-chat",
+        "social",
+        "text-chat",
+        "meet-people",
+        "free",
+        "omegle-alternative"
+      ],
+      "categories": [
+        "fun",
+        "misc"
+      ]
     }
   ]
 }
