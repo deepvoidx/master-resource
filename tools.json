@@ -166,16 +166,17 @@
     {
       "name": "Perplexity AI",
       "description": "AI-powered search with cited real-time answers",
-      "url": "https://perplexity.ai",
+      "url": "https://perplexity.ai/",
       "category": "ai-assistants",
       "tags": [
         "ai",
-        "chatbot"
+        "chatbot",
+        "research"
       ],
       "categories": [
         "ai-assistants",
-        "research",
-        "ai-directories"
+        "ai-directories",
+        "research"
       ]
     },
     {
