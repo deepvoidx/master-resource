@@ -857,21 +857,6 @@
       ]
     },
     {
-      "name": "Perplexity AI",
-      "description": "AI search with cited real-time answers",
-      "url": "https://perplexity.ai",
-      "category": "ai-assistants",
-      "tags": [
-        "research",
-        "free"
-      ],
-      "categories": [
-        "ai-assistants",
-        "research",
-        "ai-directories"
-      ]
-    },
-    {
       "name": "Wikipedia",
       "description": "Free encyclopedia with 60M+ articles in 300+ languages",
       "url": "https://www.wikipedia.org/",
