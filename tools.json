@@ -1874,6 +1874,26 @@
         "fun",
         "misc"
       ]
+    },
+    {
+      "name": "My Stylus",
+      "description": "AI academic writing assistant that helps with research, sources, outlining, citations, paraphrasing, summarizing, grading, and draft improvement.",
+      "url": "https://mystylus.com/",
+      "category": "research",
+      "tags": [
+        "ai-writing",
+        "academic-writing",
+        "essay-helper",
+        "citations",
+        "paraphraser",
+        "summarizer",
+        "research",
+        "students"
+      ],
+      "categories": [
+        "research",
+        "study"
+      ]
     }
   ]
 }
