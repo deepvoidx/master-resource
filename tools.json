@@ -1794,6 +1794,26 @@
         "free",
         "study"
       ]
+    },
+    {
+      "name": "Opencode",
+      "description": "Open-source AI coding agent for terminal, desktop, and IDE workflows with multi-model support, LSP context, parallel sessions, and shareable links.",
+      "url": "https://opencode.ai/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "open-source",
+        "coding-agent",
+        "dev tools",
+        "terminal",
+        "ide",
+        "llm",
+        "productivity"
+      ],
+      "categories": [
+        "ai-assistants",
+        "dev"
+      ]
     }
   ]
 }
