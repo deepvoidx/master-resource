@@ -186,6 +186,11 @@ function updateTabCounts() {
   if (el2) el2.innerHTML = cc ? '<span class="badge-count">'+cc+'</span>' : '';
 }
 
+// ── Call after any data mutation to keep stats current ──
+function maybeRefreshStats() {
+  if (S.activeTab === 'stats') renderStats();
+}
+
 // ═══════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════
@@ -457,7 +462,7 @@ function approvePending(item, card) {
     .then(function(){
       toast('✓ "'+nameVal+'" added to the site!', '✅');
       btn.disabled=false; btn.textContent='✓ Approve';
-      renderPending(); renderTools(); updateTabCounts();
+      renderPending(); renderTools(); updateTabCounts(); maybeRefreshStats();
     })
     .catch(function(e){
       btn.disabled=false; btn.textContent='✓ Approve';
@@ -469,7 +474,7 @@ function rejectPending(item, card) {
   var btn = card.querySelector('.pf-reject');
   btn.disabled=true; btn.textContent='Removing…';
   removePendingItem(item.id)
-    .then(function(){ toast('Submission rejected.', '🗑️'); renderPending(); })
+    .then(function(){ toast('Submission rejected.', '🗑️'); renderPending(); maybeRefreshStats(); })
     .catch(function(e){ btn.disabled=false; btn.textContent='✗ Reject'; toast('Error: '+e.message,'❌'); });
 }
 
@@ -503,7 +508,7 @@ document.getElementById('bulk-reject-btn').addEventListener('click', function(){
   data.pending = data.pending.filter(function(i){ return !ids.includes(i.id); });
   apiPut('pending.json', data, S.pendingSha, 'Bulk reject '+ids.length+' submissions')
     .then(function(res){ S.pendingSha=res.content.sha; S.pendingData=data;
-      toast('Rejected '+ids.length+' submission(s)','🗑️'); S.bulkSelected.clear(); renderPending(); })
+      toast('Rejected '+ids.length+' submission(s)','🗑️'); S.bulkSelected.clear(); renderPending(); maybeRefreshStats(); })
     .catch(function(e){ toast('Error: '+e.message,'❌'); S.pendingData=snap; });
 });
 
@@ -626,7 +631,7 @@ function renderTools(q) {
       var original=S.toolsData.tools[idx];
       S.toolsData.tools[idx]=updated;
       apiPut('tools.json',S.toolsData,S.toolsSha,'Edit tool: '+nv)
-        .then(function(res){S.toolsSha=res.content.sha;toast('Updated "'+nv+'"','✅');renderTools(toolsSearchQ);})
+        .then(function(res){S.toolsSha=res.content.sha;toast('Updated "'+nv+'"','✅');renderTools(toolsSearchQ);maybeRefreshStats();})
         .catch(function(e){S.toolsData.tools[idx]=original;saveBtn.disabled=false;saveBtn.textContent='Save';ee.textContent='Error: '+e.message;});
     });
     inlineEdit.querySelector('.ie-cancel').addEventListener('click', function(){
@@ -727,7 +732,7 @@ document.getElementById('tm-save').addEventListener('click', function(){
       S.toolsSha = res.content.sha;
       toast((isNew?'Added':'Updated')+' "'+nameVal+'"','✅');
       btn.disabled=false; btn.textContent='Save Tool';
-      closeToolModal(); renderTools(); updateTabCounts();
+      closeToolModal(); renderTools(); updateTabCounts(); maybeRefreshStats();
     })
     .catch(function(e){
       btn.disabled=false; btn.textContent='Save Tool';
@@ -739,12 +744,12 @@ function deleteTool(idx) {
   var tool = S.toolsData.tools[idx];
   var snap = JSON.parse(JSON.stringify(S.toolsData));
   S.toolsData.tools.splice(idx,1);
-  renderTools(toolsSearchQ); updateTabCounts();
+  renderTools(toolsSearchQ); updateTabCounts(); maybeRefreshStats();
   scheduleWithUndo(
     '"'+tool.name+'" will be deleted in 10s…',
     function(){ return apiPut('tools.json',S.toolsData,S.toolsSha,'Delete tool: '+tool.name).then(function(r){S.toolsSha=r.content.sha;}); },
-    function(){ toast('Deleted "'+tool.name+'"','🗑️'); },
-    function(){ S.toolsData=snap; renderTools(toolsSearchQ); updateTabCounts(); }
+    function(){ toast('Deleted "'+tool.name+'"','🗑️'); maybeRefreshStats(); },
+    function(){ S.toolsData=snap; renderTools(toolsSearchQ); updateTabCounts(); maybeRefreshStats(); }
   );
 }
 
@@ -957,7 +962,7 @@ document.getElementById('cm-save').addEventListener('click', function(){
       S.toolsSha=res.content.sha;
       toast((isNew?'Added':'Updated')+' category "'+label+'"','✅');
       btn.disabled=false; btn.textContent='Save Category';
-      closeCatModal(); renderCategories();
+      closeCatModal(); renderCategories(); maybeRefreshStats();
     })
     .catch(function(e){
       btn.disabled=false; btn.textContent='Save Category';
@@ -969,12 +974,12 @@ document.getElementById('cm-save').addEventListener('click', function(){
 function deleteCat(idx) {
   var cat = S.toolsData.categories[idx];
   var snap = JSON.parse(JSON.stringify(S.toolsData));
-  S.toolsData.categories.splice(idx,1); renderCategories();
+  S.toolsData.categories.splice(idx,1); renderCategories(); maybeRefreshStats();
   scheduleWithUndo(
     'Category "'+cat.label+'" will be deleted in 10s…',
     function(){ return apiPut('tools.json',S.toolsData,S.toolsSha,'Delete category: '+cat.label).then(function(r){S.toolsSha=r.content.sha;}); },
-    function(){ toast('Deleted category','🗑️'); },
-    function(){ S.toolsData=snap; renderCategories(); }
+    function(){ toast('Deleted category','🗑️'); maybeRefreshStats(); },
+    function(){ S.toolsData=snap; renderCategories(); maybeRefreshStats(); }
   );
 }
 
@@ -1059,7 +1064,11 @@ function renderStats() {
   var pending = (S.pendingData&&S.pendingData.pending) ? S.pendingData.pending.filter(function(i){return i.status==='pending';}).length : 0;
   var catCounts = {};
   cats.forEach(function(c){ catCounts[c.id]=0; });
-  tools.forEach(function(t){ if(catCounts[t.category]!==undefined) catCounts[t.category]++; });
+  tools.forEach(function(t){
+    // Use full categories array if present, else fall back to primary category
+    var tCats = Array.isArray(t.categories) && t.categories.length ? t.categories : (t.category ? [t.category] : []);
+    tCats.forEach(function(cid){ if(catCounts[cid]!==undefined) catCounts[cid]++; });
+  });
   var maxC = Math.max.apply(null, cats.map(function(c){return catCounts[c.id]||0;})) || 1;
   var sorted = cats.slice().sort(function(a,b){return (catCounts[b.id]||0)-(catCounts[a.id]||0);});
   var recent = tools.slice(-6).reverse();
