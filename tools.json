@@ -1930,16 +1930,6 @@
         "ai-assistants",
         "dev"
       ]
-    },
-    {
-      "name": "chatgpt",
-      "description": "it is a tool",
-      "url": "https://chatgpt.com/",
-      "tags": [
-        "lora",
-        "lora2"
-      ],
-      "category": "ai-assistants"
     }
   ]
 }
