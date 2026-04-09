@@ -550,24 +550,34 @@
     flatView.classList.add('hidden');
 
     var any = false, vis = 0;
+    var visIndices = new Set();
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
       if (activeFilters.length > 0) {
         if (activeFilters.length === 1) {
-          // Single filter: hide sections not matching
+          // Single filter: hide sections not in the selected category
           if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
         } else {
-          // Multiple filters: only show this section if it HAS tools matching ALL filters
-          // (the cards themselves will be filtered by data-s intersection check below)
+          // Multi-filter (intersection): only show sections that contain at least one
+          // tool belonging to ALL selected categories. If this section's category isn't
+          // in activeFilters at all, hide it immediately.
           if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
+          // Further card-level filtering (intersection check) happens below.
         }
       }
       var hasVis = false;
       sec.querySelectorAll('.card').forEach(function (c) {
         var s = c.getAttribute('data-s') || '';
-        var match = (!q || s.indexOf(q) !== -1) && (at === 'all' || s.indexOf(at) !== -1);
+        var cardIdx = c.getAttribute('data-idx');
+        // Check activeFilters intersection at card level for multi-filter
+        var filterMatch = true;
+        if (activeFilters.length > 1) {
+          filterMatch = activeFilters.every(function (af) { return s.indexOf(af) !== -1; });
+        }
+        var match = filterMatch && (!q || s.indexOf(q) !== -1) && (at === 'all' || s.indexOf(at) !== -1);
         if (match) {
-          c.classList.remove('hidden'); hasVis = true; any = true; vis++;
+          c.classList.remove('hidden'); hasVis = true; any = true;
+          if (cardIdx !== null && !visIndices.has(cardIdx)) { visIndices.add(cardIdx); vis++; }
           if (flash) { c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); }
         } else {
           c.classList.add('hidden');
