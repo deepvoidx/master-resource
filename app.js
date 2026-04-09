@@ -209,6 +209,11 @@
     flatView.appendChild(grid);
     var cats = document.getElementById('cats');
     cats.parentNode.insertBefore(flatView, cats.nextSibling);
+    // Multi-filter merged view container
+    var mfv = document.createElement('div');
+    mfv.id = 'multi-filter-view';
+    mfv.className = 'hidden';
+    cats.parentNode.insertBefore(mfv, flatView.nextSibling);
   }
 
   // ── Build sort controls ──────────────────────────────────────
@@ -522,9 +527,67 @@
     var catsEl   = document.getElementById('cats');
     var flatView = document.getElementById('flat-view');
     var flatGrid = document.getElementById('flat-grid');
+    var mfv      = document.getElementById('multi-filter-view');
 
+    // ── MODE 1: Multi-filter merged view (2+ categories, default sort) ──
+    if (activeFilters.length > 1 && sortMode === 'default') {
+      catsEl.classList.add('hidden');
+      flatView.classList.add('hidden');
+      if (mfv) {
+        mfv.classList.remove('hidden');
+        // Build label for the header from selected category names
+        var filterLabels = activeFilters.map(function (fid) {
+          var c = allCategories.find(function (x) { return x.id === fid; }) || {};
+          return (c.icon ? c.icon + ' ' : '') + (c.short || c.label || fid);
+        });
+        // Find tools that exist in ALL selected categories (intersection)
+        var matched = allTools.filter(function (tool) {
+          var catIds = getCatIds(tool);
+          var allMatch = activeFilters.every(function (af) { return catIds.indexOf(af) !== -1; });
+          if (!allMatch) return false;
+          if (q) {
+            var s = [tool.name, tool.description, catIds.join(' '), tool.url,
+                     (tool.tags || []).map(function (t) { return '#' + t; }).join(' ')].join(' ').toLowerCase();
+            if (s.indexOf(q) === -1) return false;
+          }
+          if (at !== 'all') {
+            var s2 = [tool.name, tool.description, catIds.join(' '), tool.url,
+                      (tool.tags || []).map(function (t) { return '#' + t; }).join(' ')].join(' ').toLowerCase();
+            if (s2.indexOf(at) === -1) return false;
+          }
+          return true;
+        });
+        // Render the single merged section
+        mfv.innerHTML = '';
+        var sec = document.createElement('section');
+        sec.className = 'cat';
+        var hdr = document.createElement('div');
+        hdr.className = 'cat-hdr';
+        hdr.innerHTML =
+          '<div class="cat-title" style="font-size:.95rem;">Tools in: <span style="opacity:.65;font-weight:500;">' +
+          escHtml(filterLabels.join(' \u0026 ')) + '</span></div>' +
+          '<div class="cat-cnt">' + matched.length + '</div>';
+        sec.appendChild(hdr);
+        var grid = document.createElement('div');
+        grid.className = 'grid';
+        matched.forEach(function (tool) {
+          var cat = getPrimaryCat(tool);
+          var card = buildCard(tool, cat.color || '#6c63ff');
+          if (flash) { card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
+          grid.appendChild(card);
+        });
+        sec.appendChild(grid);
+        mfv.appendChild(sec);
+        document.getElementById('nores').classList[matched.length ? 'remove' : 'add']('show');
+        updateCount(matched.length);
+      }
+      return;
+    }
+
+    // ── MODE 2: Flat sorted view (A→Z or Recently Added) ──
     if (sortMode === 'az' || sortMode === 'recent') {
       catsEl.classList.add('hidden');
+      if (mfv) mfv.classList.add('hidden');
       flatView.classList.remove('hidden');
       flatGrid.innerHTML = '';
 
@@ -546,35 +609,23 @@
       return;
     }
 
+    // ── MODE 3: Default grouped-by-category view ──
     catsEl.classList.remove('hidden');
     flatView.classList.add('hidden');
+    if (mfv) mfv.classList.add('hidden');
 
     var any = false, vis = 0;
     var visIndices = new Set();
     document.querySelectorAll('.cat').forEach(function (sec) {
       var cid = sec.getAttribute('data-id');
-      if (activeFilters.length > 0) {
-        if (activeFilters.length === 1) {
-          // Single filter: hide sections not in the selected category
-          if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
-        } else {
-          // Multi-filter (intersection): only show sections that contain at least one
-          // tool belonging to ALL selected categories. If this section's category isn't
-          // in activeFilters at all, hide it immediately.
-          if (activeFilters.indexOf(cid) === -1) { sec.classList.add('hidden'); return; }
-          // Further card-level filtering (intersection check) happens below.
-        }
+      if (activeFilters.length === 1 && activeFilters.indexOf(cid) === -1) {
+        sec.classList.add('hidden'); return;
       }
       var hasVis = false;
       sec.querySelectorAll('.card').forEach(function (c) {
         var s = c.getAttribute('data-s') || '';
         var cardIdx = c.getAttribute('data-idx');
-        // Check activeFilters intersection at card level for multi-filter
-        var filterMatch = true;
-        if (activeFilters.length > 1) {
-          filterMatch = activeFilters.every(function (af) { return s.indexOf(af) !== -1; });
-        }
-        var match = filterMatch && (!q || s.indexOf(q) !== -1) && (at === 'all' || s.indexOf(at) !== -1);
+        var match = (!q || s.indexOf(q) !== -1) && (at === 'all' || s.indexOf(at) !== -1);
         if (match) {
           c.classList.remove('hidden'); hasVis = true; any = true;
           if (cardIdx !== null && !visIndices.has(cardIdx)) { visIndices.add(cardIdx); vis++; }
