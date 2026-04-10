@@ -1949,6 +1949,24 @@
         "research",
         "coding"
       ]
+    },
+    {
+      "name": "Superpowers",
+      "description": "Free AI prompt collection for productivity, writing, research, and coding workflows.",
+      "url": "https://github.com/obra/superpowers",
+      "category": "github",
+      "tags": [
+        "ai",
+        "free",
+        "prompts",
+        "productivity",
+        "writing",
+        "research",
+        "coding",
+        "workflow",
+        "github",
+        "creative"
+      ]
     }
   ]
 }
