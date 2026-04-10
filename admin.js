@@ -83,15 +83,13 @@ function logout() {
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   clearTimeout(S.sessionTimer);
-  cancelUndo(); // cancel any pending undo timers
+  cancelUndo();
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('pat-input').value = '';
-  // Always reset login button — prevents "Verifying…" stuck state after logout
-  var btn = document.getElementById('login-btn');
-  if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+  var lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled = false; lb.textContent = 'Sign In'; }
   document.getElementById('login-err').textContent = '';
-  document.getElementById('lockout-msg').style.display = 'none';
 }
 
 // reset timer on any interaction
@@ -133,10 +131,26 @@ function apiPut(path, content, sha, message) {
   });
 }
 
+// validateGHToken MUST use /user — not /repos — because public repos return 200
+// for any token (including wrong ones). /user returns 401 with a bad token.
 function validateGHToken(token) {
-  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo, {
+  return fetch('https://api.github.com/user', {
     headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github.v3+json' }
   }).then(function(r){ return r.ok; });
+}
+
+// Also verify the token has WRITE access to the specific repo
+// (a valid GitHub token that has no access to this repo would still pass /user)
+function validateRepoAccess(token) {
+  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo, {
+    headers:{ 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github.v3+json' }
+  }).then(function(r){
+    if (!r.ok) return false;
+    return r.json().then(function(d){
+      // Must have push access to manage content
+      return d.permissions && (d.permissions.push || d.permissions.admin);
+    });
+  }).catch(function(){ return false; });
 }
 
 function getGHUser(token) {
@@ -1134,18 +1148,30 @@ function doLogin() {
   var timeoutId;
   var timeoutP = new Promise(function(_,reject){ timeoutId=setTimeout(function(){ reject(new Error('Connection timed out.')); },10000); });
 
-  Promise.race([validateGHToken(pat), timeoutP])
-    .then(function(ok){ clearTimeout(timeoutId);
-      if (!ok) {
+  // Step 1: verify token is valid via /user (public repos return 200 for any token)
+  // Step 2: verify token has write access to this specific repo
+  Promise.race([
+    Promise.all([validateGHToken(pat), validateRepoAccess(pat)]).then(function(results){
+      return { validToken: results[0], hasAccess: results[1] };
+    }),
+    timeoutP
+  ])
+    .then(function(result){ clearTimeout(timeoutId);
+      if (!result.validToken) {
         recordFailedAttempt();
         errEl.textContent='Incorrect password. Please try again.';
+        btn.disabled=false; btn.textContent='Sign In';
+        return;
+      }
+      if (!result.hasAccess) {
+        recordFailedAttempt();
+        errEl.textContent='Token has no write access to this repository.';
         btn.disabled=false; btn.textContent='Sign In';
         return;
       }
       return getGHUser(pat).then(function(user){
         clearLoginState();
         startSession(pat, user ? user.login : 'admin');
-        // Re-enable button before hiding (guards against future logout showing stuck state)
         btn.disabled=false; btn.textContent='Sign In';
         document.getElementById('login-screen').style.display='none';
         document.getElementById('admin-panel').style.display='flex';
@@ -1154,7 +1180,7 @@ function doLogin() {
       });
     })
     .catch(function(e){ clearTimeout(timeoutId); recordFailedAttempt();
-      errEl.textContent=e.message||'Connection failed. Try again.';
+      errEl.textContent=e.message||'Connection failed. Check internet and try again.';
       btn.disabled=false; btn.textContent='Sign In';
     });
 }
@@ -1189,13 +1215,12 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
 // ═══════════════════════════════════════════════════════
 (function init(){
   wireUndoListeners();
+  // Always reset login button on page load — prevents stuck "Verifying…" from previous session
+  var lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled = false; lb.textContent = 'Sign In'; }
   checkLockout();
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
-  // Ensure login button is always clean on page load
-  var loginBtn = document.getElementById('login-btn');
-  if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Sign In'; }
-
   if (tok) {
     S.token=tok; S.ghUser=usr||'admin';
     document.getElementById('login-screen').style.display='none';
