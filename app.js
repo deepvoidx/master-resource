@@ -35,7 +35,18 @@
     })
     .catch(function () {
       document.getElementById('cats').innerHTML =
-        '<p style="color:#e11d48;padding:40px">Failed to load tools.json</p>';
+        '<div style="text-align:center;padding:clamp(40px,8vw,80px) 20px;">' +
+          '<div style="font-size:clamp(2rem,6vw,3.5rem);margin-bottom:16px;">⚡</div>' +
+          '<div style="font-size:clamp(1rem,2.5vw,1.25rem);font-weight:700;color:#e2e2f0;margin-bottom:10px;">Temporarily unavailable</div>' +
+          '<div style="color:#7070a0;font-size:clamp(.8rem,1.4vw,.95rem);max-width:38ch;margin:0 auto 22px;line-height:1.6;">' +
+            'We\'re aware and working on it. Please check back in a few minutes.' +
+          '</div>' +
+          '<button onclick="location.reload()" style="' +
+            'background:rgba(108,99,255,.18);border:1px solid rgba(108,99,255,.5);' +
+            'color:#d4d0ff;padding:10px 24px;border-radius:10px;cursor:pointer;' +
+            'font-size:.88rem;font-weight:600;font-family:inherit;' +
+          '">Try again</button>' +
+        '</div>';
     });
 
   // ── Toast ────────────────────────────────────────────────────
