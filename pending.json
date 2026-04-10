@@ -1,13 +1,6 @@
 {
   "pending": [
     {
-      "id": "mnt2mgfv8e1g3",
-      "name": "Claude skills",
-      "url": "https://github.com/alirezarezvani/claude-skills",
-      "submittedAt": "2026-04-10T15:38:49.915Z",
-      "status": "pending"
-    },
-    {
       "id": "mnt2nihbkvwbn",
       "name": "Superpowers",
       "url": "https://github.com/obra/superpowers",
