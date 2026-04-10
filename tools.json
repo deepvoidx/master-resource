@@ -1937,6 +1937,22 @@
         "ai-assistants",
         "dev"
       ]
+    },
+    {
+      "name": "Claude skills",
+      "description": "A curated Claude prompt-codes collection for writing, reasoning, coding, research, and creative workflows.",
+      "url": "https://github.com/alirezarezvani/claude-skills",
+      "category": "github",
+      "tags": [
+        "ai",
+        "claude",
+        "prompts",
+        "prompt engineering",
+        "productivity",
+        "writing",
+        "research",
+        "coding"
+      ]
     }
   ]
 }
