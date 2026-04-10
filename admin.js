@@ -174,7 +174,6 @@ function validateURL(raw) {
   } catch(e){ return { ok:false, msg:'Invalid URL.' }; }
 }
 
-// Validates color at render time — returns safe fallback if invalid
 function safeColor(raw) {
   var c = String(raw||'').trim();
   return /^#[0-9a-fA-F]{6}$/.test(c) ? c : '#6c63ff';
@@ -446,8 +445,6 @@ function approvePending(item, card) {
   if (!cats.length) { errEl.textContent='Select at least one category.'; return; }
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
-
-  var btn = card.querySelector('.pf-approve');
   btn.disabled = true; btn.textContent = 'Saving…';
   errEl.textContent = '';
 
@@ -722,7 +719,6 @@ document.getElementById('tm-save').addEventListener('click', function(){
   var catIds = Array.from(catEls).map(function(el){ return el.value; });
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
-  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catIds[0], tags:tags };
   if (catIds.length > 1) tool.categories = catIds;
 
   var btn = document.getElementById('tm-save');
@@ -761,86 +757,150 @@ function deleteTool(idx) {
 
 document.getElementById('add-tool-btn').addEventListener('click', function(){ openToolModal(-1); });
 
-// ── BULK ADD ─────────────────────────────────────────────
-function openBulkModal() {
-  var catsEl = document.getElementById('bm-cats');
-  catsEl.innerHTML = '';
-  (S.toolsData.categories||[]).forEach(function(cat){
+// ── BULK ADD UI ───────────────────────────────────────────
+var bmRowCount = 0;
+
+function bmBuildCatChecks(container) {
+  container.innerHTML = '';
+  (S.toolsData.categories || []).forEach(function(cat) {
     var lbl = document.createElement('label');
     lbl.className = 'cat-check';
     lbl.dataset.cid = cat.id;
-    lbl.innerHTML = '<input type="checkbox" value="'+esc(cat.id)+'"/>'+esc(cat.icon)+' '+esc(cat.short||cat.label);
-    lbl.addEventListener('click', function(e){
-      if(e.target.tagName==='INPUT'){lbl.classList.toggle('checked',e.target.checked);return;}
-      e.preventDefault(); var cb=lbl.querySelector('input'); cb.checked=!cb.checked; lbl.classList.toggle('checked',cb.checked);
+    lbl.innerHTML = '<input type="checkbox" value="' + esc(cat.id) + '"/>' + esc(cat.icon) + ' ' + esc(cat.short || cat.label);
+    lbl.addEventListener('click', function(e) {
+      if (e.target.tagName === 'INPUT') { lbl.classList.toggle('checked', e.target.checked); return; }
+      e.preventDefault();
+      var cb = lbl.querySelector('input'); cb.checked = !cb.checked;
+      lbl.classList.toggle('checked', cb.checked);
     });
-    catsEl.appendChild(lbl);
+    container.appendChild(lbl);
   });
-  document.getElementById('bm-input').value = '';
+}
+
+function bmAddRow() {
+  bmRowCount++;
+  var rowEl = document.createElement('div');
+  rowEl.className = 'bm-tool-row';
+  rowEl.dataset.rowid = bmRowCount;
+
+  var hdr = document.createElement('div');
+  hdr.className = 'bm-tool-row-hdr';
+  hdr.innerHTML =
+    '<span class="bm-tool-num">Tool ' + bmRowCount + '</span>' +
+    '<button class="bm-remove-btn" type="button">🗑 Remove</button>';
+  hdr.querySelector('.bm-remove-btn').addEventListener('click', function() {
+    rowEl.remove();
+    renumberRows();
+  });
+  rowEl.appendChild(hdr);
+
+  var grid = document.createElement('div');
+  grid.className = 'bm-tool-grid';
+  grid.innerHTML =
+    '<div><label>Name *</label><input class="bm-name" type="text" maxlength="100" placeholder="Tool name"/></div>' +
+    '<div><label>URL *</label><input class="bm-url" type="url" maxlength="500" placeholder="https://example.com"/></div>' +
+    '<div class="bm-full"><label>Description</label><input class="bm-desc" type="text" maxlength="200" placeholder="Short description…"/></div>' +
+    '<div class="bm-full"><label>Tags (comma separated, no #)</label><input class="bm-tags" type="text" placeholder="ai, free, creative"/></div>';
+  rowEl.appendChild(grid);
+
+  var catLabel = document.createElement('div');
+  catLabel.className = 'bm-cat-label';
+  catLabel.textContent = 'Categories *';
+  rowEl.appendChild(catLabel);
+
+  var catWrap = document.createElement('div');
+  catWrap.className = 'bm-tool-cats';
+  bmBuildCatChecks(catWrap);
+  rowEl.appendChild(catWrap);
+
+  var errEl = document.createElement('div');
+  errEl.className = 'bm-row-err';
+  rowEl.appendChild(errEl);
+
+  document.getElementById('bm-rows').appendChild(rowEl);
+}
+
+function renumberRows() {
+  document.querySelectorAll('#bm-rows .bm-tool-row').forEach(function(row, i) {
+    var numEl = row.querySelector('.bm-tool-num');
+    if (numEl) numEl.textContent = 'Tool ' + (i + 1);
+  });
+}
+
+function openBulkModal() {
+  bmRowCount = 0;
+  document.getElementById('bm-rows').innerHTML = '';
   document.getElementById('bm-err').textContent = '';
-  document.getElementById('bm-preview').textContent = '';
+  bmBuildCatChecks(document.getElementById('bm-global-cats'));
+  bmAddRow();
   document.getElementById('bulk-modal').classList.remove('hidden');
 }
 
-function parseBulkInput() {
-  var lines = document.getElementById('bm-input').value.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-  var defaultCats = [];
-  document.querySelectorAll('#bm-cats .cat-check.checked input').forEach(function(i){ defaultCats.push(i.value); });
-  var results = [], errors = [];
-  lines.forEach(function(line, li){
-    var parts = line.split('|').map(function(p){ return p.trim(); });
-    var name = parts[0]||'';
-    var rawUrl = parts[1]||'';
-    var desc = parts[2]||'';
-    var tagsRaw = parts[3]||'';
-    if (!name) { errors.push('Line '+(li+1)+': name missing'); return; }
-    var urlRes = validateURL(rawUrl);
-    if (!urlRes.ok) { errors.push('Line '+(li+1)+' ('+name+'): '+urlRes.msg); return; }
-    var tags = tagsRaw ? tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase(); }).filter(Boolean) : [];
-    var tool = { name:sanitize(name,100), description:sanitize(desc,200), url:urlRes.url, tags:tags };
-    if (defaultCats.length) { tool.category=defaultCats[0]; if(defaultCats.length>1) tool.categories=defaultCats; }
-    results.push(tool);
+document.getElementById('bm-apply-all').addEventListener('click', function() {
+  var globalIds = [];
+  document.querySelectorAll('#bm-global-cats .cat-check.checked input').forEach(function(i) { globalIds.push(i.value); });
+  if (!globalIds.length) { document.getElementById('bm-err').textContent = 'Select at least one category in the "Apply to all" strip first.'; return; }
+  document.getElementById('bm-err').textContent = '';
+  document.querySelectorAll('#bm-rows .bm-tool-row').forEach(function(row) {
+    row.querySelectorAll('.bm-tool-cats .cat-check').forEach(function(lbl) {
+      var cb = lbl.querySelector('input');
+      if (globalIds.indexOf(cb.value) !== -1) { cb.checked = true; lbl.classList.add('checked'); }
+    });
   });
-  return { tools:results, errors:errors };
-}
-
-document.getElementById('bm-parse').addEventListener('click', function(){
-  var r = parseBulkInput();
-  var prev = document.getElementById('bm-preview');
-  var errEl = document.getElementById('bm-err');
-  errEl.textContent = r.errors.length ? r.errors.join(' | ') : '';
-  prev.textContent = r.tools.length ? '✓ '+r.tools.length+' tool(s) ready to add: '+r.tools.map(function(t){return t.name;}).join(', ') : 'No valid tools parsed.';
 });
 
-document.getElementById('bm-save').addEventListener('click', function(){
-  var r = parseBulkInput();
+document.getElementById('bm-add-row').addEventListener('click', function() { bmAddRow(); });
+
+document.getElementById('bm-save').addEventListener('click', function() {
   var errEl = document.getElementById('bm-err');
-  if (r.errors.length) { errEl.textContent = r.errors.join(' | '); return; }
-  if (!r.tools.length) { errEl.textContent = 'Nothing to add. Check your input.'; return; }
-  var defaultCats = [];
-  document.querySelectorAll('#bm-cats .cat-check.checked input').forEach(function(i){ defaultCats.push(i.value); });
-  if (!defaultCats.length) { errEl.textContent = 'Select at least one default category.'; return; }
+  errEl.textContent = '';
+  document.querySelectorAll('#bm-rows .bm-row-err').forEach(function(e) { e.textContent = ''; });
+
+  var rows = document.querySelectorAll('#bm-rows .bm-tool-row');
+  if (!rows.length) { errEl.textContent = 'Add at least one tool.'; return; }
+
+  var tools = [], hasError = false;
+  rows.forEach(function(row) {
+    var nameVal = sanitize(row.querySelector('.bm-name').value, 100);
+    var rawUrl  = row.querySelector('.bm-url').value;
+    var desc    = sanitize(row.querySelector('.bm-desc').value, 200);
+    var tagsRaw = row.querySelector('.bm-tags').value;
+    var rowErr  = row.querySelector('.bm-row-err');
+    var cats = [];
+    row.querySelectorAll('.bm-tool-cats .cat-check.checked input').forEach(function(cb) { cats.push(cb.value); });
+    var urlRes = validateURL(rawUrl);
+    if (!nameVal)     { rowErr.textContent = 'Name is required.';             hasError = true; return; }
+    if (!urlRes.ok)   { rowErr.textContent = urlRes.msg;                      hasError = true; return; }
+    if (!cats.length) { rowErr.textContent = 'Select at least one category.'; hasError = true; return; }
+    var tags = tagsRaw.split(',').map(function(t) { return t.trim().replace(/^#/, '').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
+    var tool = { name: nameVal, description: desc, url: urlRes.url, category: cats[0], tags: tags };
+    if (cats.length > 1) tool.categories = cats;
+    tools.push(tool);
+  });
+
+  if (hasError) { errEl.textContent = 'Fix the errors above before saving.'; return; }
+
   var btn = document.getElementById('bm-save');
-  btn.disabled=true; btn.textContent='Saving…'; errEl.textContent='';
-  r.tools.forEach(function(t){ S.toolsData.tools.push(t); });
-  apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add '+r.tools.length+' tools')
-    .then(function(res){
-      S.toolsSha=res.content.sha;
-      toast('Added '+r.tools.length+' tool(s)!','✅');
-      btn.disabled=false; btn.textContent='Add All Tools';
+  btn.disabled = true; btn.textContent = 'Saving…';
+  tools.forEach(function(t) { S.toolsData.tools.push(t); });
+
+  apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add ' + tools.length + ' tool(s)')
+    .then(function(res) {
+      S.toolsSha = res.content.sha;
+      toast('Added ' + tools.length + ' tool(s)!', '✅');
+      btn.disabled = false; btn.textContent = 'Save All';
       document.getElementById('bulk-modal').classList.add('hidden');
-      renderTools(); updateTabCounts();
+      renderTools(); updateTabCounts(); maybeRefreshStats();
     })
-    .catch(function(e){
-      // revert
-      S.toolsData.tools.splice(S.toolsData.tools.length - r.tools.length, r.tools.length);
-      btn.disabled=false; btn.textContent='Add All Tools';
-      errEl.textContent='Error: '+e.message;
+    .catch(function(e) {
+      S.toolsData.tools.splice(S.toolsData.tools.length - tools.length, tools.length);
+      btn.disabled = false; btn.textContent = 'Save All';
+      errEl.textContent = 'Error: ' + e.message;
     });
 });
 
-document.getElementById('bm-cancel').addEventListener('click', function(){ document.getElementById('bulk-modal').classList.add('hidden'); });
-document.getElementById('bulk-modal').addEventListener('click', function(e){ if(e.target===this) document.getElementById('bulk-modal').classList.add('hidden'); });
+document.getElementById('bm-cancel').addEventListener('click', function() { document.getElementById('bulk-modal').classList.add('hidden'); });
+document.getElementById('bulk-modal').addEventListener('click', function(e) { if (e.target === this) document.getElementById('bulk-modal').classList.add('hidden'); });
 document.getElementById('bulk-add-btn').addEventListener('click', openBulkModal);
 document.querySelectorAll('.sort-btn-sm').forEach(function(btn){
   btn.addEventListener('click', function(){
@@ -1094,7 +1154,7 @@ function renderStats() {
     var count=catCounts[cat.id]||0;
     var pct=Math.round((count/maxC)*100);
     html+='<div class="bar-row"><div class="bar-label" title="'+esc(cat.label)+'">'+esc(cat.icon||'')+'&nbsp;'+esc(cat.short||cat.label)+'</div>'+
-      '<div class="bar-track"><div class="bar-fill" style="width:0%;background:'+safeColor(cat.color)+'" data-pct="'+pct+'"></div></div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:0%;background:'+safeColor(cat.color||'#6c63ff')+'" data-pct="'+pct+'"></div></div>'+
       '<div class="bar-count">'+count+'</div></div>';
   });
 
