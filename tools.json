@@ -139,6 +139,13 @@
       "icon": "🏠",
       "color": "#94a3b8",
       "short": "Random"
+    },
+    {
+      "id": "github",
+      "label": "Github",
+      "short": "Github",
+      "icon": "📦😸",
+      "color": "#6c63ff"
     }
   ],
   "tools": [
