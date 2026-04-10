@@ -86,6 +86,9 @@ function logout() {
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('pat-input').value = '';
+  var lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled = false; lb.textContent = 'Sign In'; }
+  document.getElementById('login-err').textContent = '';
 }
 
 // reset timer on any interaction
@@ -174,6 +177,7 @@ function validateURL(raw) {
   } catch(e){ return { ok:false, msg:'Invalid URL.' }; }
 }
 
+// Render-time color guard — prevents CSS injection via tampered tools.json
 function safeColor(raw) {
   var c = String(raw||'').trim();
   return /^#[0-9a-fA-F]{6}$/.test(c) ? c : '#6c63ff';
@@ -445,6 +449,8 @@ function approvePending(item, card) {
   if (!cats.length) { errEl.textContent='Select at least one category.'; return; }
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
+
+  var btn = card.querySelector('.pf-approve');
   btn.disabled = true; btn.textContent = 'Saving…';
   errEl.textContent = '';
 
@@ -719,6 +725,7 @@ document.getElementById('tm-save').addEventListener('click', function(){
   var catIds = Array.from(catEls).map(function(el){ return el.value; });
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
+  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catIds[0], tags:tags };
   if (catIds.length > 1) tool.categories = catIds;
 
   var btn = document.getElementById('tm-save');
