@@ -722,6 +722,7 @@ document.getElementById('tm-save').addEventListener('click', function(){
   var catIds = Array.from(catEls).map(function(el){ return el.value; });
 
   var tags = tagsRaw.split(',').map(function(t){ return t.trim().replace(/^#/,'').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
+  var tool = { name:nameVal, description:desc, url:urlRes.url, category:catIds[0], tags:tags };
   if (catIds.length > 1) tool.categories = catIds;
 
   var btn = document.getElementById('tm-save');
