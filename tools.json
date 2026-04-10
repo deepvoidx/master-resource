@@ -294,15 +294,11 @@
     {
       "name": "SEO Studio",
       "description": "AI-powered SEO tools collection",
-      "url": "https://seostudio.tools",
+      "url": "https://seostudio.tools/",
       "category": "ai-directories",
       "tags": [
         "ai",
         "directory"
-      ],
-      "categories": [
-        "ai-directories",
-        "content"
       ]
     },
     {
