@@ -100,7 +100,27 @@ input[type=search]::placeholder{color:#44446a;}
 input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 
 /* ── Category filter buttons — solid, no backdrop-filter ── */
-.fwrap{display:flex;flex-wrap:wrap;gap:clamp(4px,.6vw,8px);}
+.fwrap{
+  display:flex;flex-wrap:wrap;gap:clamp(4px,.6vw,8px);
+  width:100%;
+}
+/* On mobile: single scrollable row instead of wrapping chaos */
+@media(max-width:600px){
+  .fwrap{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    padding-bottom:4px;
+    /* Fade edges to hint scrollability */
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);
+    mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);
+    scroll-snap-type:x proximity;
+  }
+  .fwrap::-webkit-scrollbar{display:none;}
+  .fb{scroll-snap-align:start;flex-shrink:0;}
+}
 .fb{
   background:rgba(22,22,34,0.92);
   border:1px solid var(--g-bdr);color:var(--mute);
@@ -411,6 +431,10 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   .modal-box{padding:20px;}
   .modal-actions{flex-direction:column;}
   .modal-submit,.modal-cancel{width:100%;}
+  /* Search takes full width, filter row below it */
+  .ctrl{flex-direction:column;gap:8px;}
+  .sw{flex:none;width:100%;max-width:100%;}
+  .fwrap{width:100%;}
 }
 
 /* ── Touch targets ── */
