@@ -401,6 +401,15 @@
     var toolIndex = allTools.indexOf(tool);
     var isNew = toolIndex >= allTools.length - NEW_COUNT;
 
+    // Validate URL once at the top — used for both data-url and href
+    var safeToolUrl = (function(raw) {
+      var u = String(raw || '').trim();
+      if (!u || /^(javascript|data|vbscript|file|blob|about):/i.test(u)) return null;
+      if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      try { var p = new URL(u); return ['http:', 'https:'].includes(p.protocol) ? p.href : null; }
+      catch(e) { return null; }
+    })(tool.url);
+
     var searchStr = [
       tool.name, tool.description,
       getCatIds(tool).join(' '),
@@ -414,8 +423,8 @@
     card.setAttribute('data-idx', toolIndex);
     card.style.setProperty('--ca', color);
 
-    if (tool.url) {
-      card.setAttribute('data-url', tool.url);
+    if (safeToolUrl) {
+      card.setAttribute('data-url', safeToolUrl);
       card.setAttribute('role', 'link');
       card.setAttribute('tabindex', '0');
     }
@@ -437,11 +446,11 @@
     card.appendChild(nameEl);
     card.appendChild(descEl);
 
-    if (tool.url) {
-      var domain = tool.url.replace(/https?:\/\//, '').split('/')[0];
+    if (safeToolUrl) {
+      var domain = safeToolUrl.replace(/https?:\/\//, '').split('/')[0];
       var link = document.createElement('a');
       link.className = 'tool-link';
-      link.href = tool.url;
+      link.href = safeToolUrl;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = domain + ' \u2197';
@@ -457,7 +466,7 @@
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation(); e.preventDefault(); shareCard(n, d, u);
         });
-      })(tool.name, tool.description, tool.url);
+      })(tool.name, tool.description, safeToolUrl);
       actions.appendChild(shareBtn);
       card.appendChild(actions);
     } else {
