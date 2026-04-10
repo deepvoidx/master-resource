@@ -1122,16 +1122,16 @@
     {
       "name": "Solidpoint",
       "description": "YouTube video summarizer paste URL get summary",
-      "url": "https://solidpoint.ai",
-      "category": "content",
+      "url": "https://solidpoint.ai/",
+      "category": "ai-assistants",
       "tags": [
         "creative",
         "content"
       ],
       "categories": [
-        "content",
         "ai-assistants",
-        "research"
+        "research",
+        "study"
       ]
     },
     {
