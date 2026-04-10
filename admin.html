@@ -148,24 +148,26 @@
 
 <!-- ── bulk add modal ── -->
 <div class="modal-bg hidden" id="bulk-modal">
-  <div class="modal-box" style="max-width:540px;">
+  <div class="modal-box bm-box">
     <div class="modal-title">⚡ Bulk Add Tools</div>
-    <div style="display:grid;gap:12px;">
-      <div>
-        <label>Paste one tool per line — format: <code style="font-size:.75rem;opacity:.7;">Name | URL | Description | tag1,tag2</code></label>
-        <textarea id="bm-input" rows="10" style="width:100%;margin-top:6px;padding:10px;background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#ddddf0;font-size:.82rem;resize:vertical;font-family:monospace;" placeholder="ChatGPT | https://chat.openai.com | AI chatbot by OpenAI | ai,free&#10;Midjourney | https://midjourney.com | AI image generator | ai,creative&#10;GitHub | https://github.com | Code hosting | dev,free"></textarea>
-      </div>
-      <div>
-        <label>Default Categories (applied to all entries unless overridden)</label>
-        <div id="bm-cats" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
-      </div>
-      <div id="bm-preview" style="font-size:.78rem;color:var(--mute);min-height:16px;"></div>
-      <div id="bm-err" style="color:#f87171;font-size:.78rem;min-height:16px;"></div>
+
+    <!-- Apply to all strip -->
+    <div class="bm-apply-strip">
+      <span class="bm-apply-label">Apply to all rows:</span>
+      <div id="bm-global-cats" class="bm-global-cats"></div>
+      <button class="btn btn-ghost btn-sm" id="bm-apply-all">Apply</button>
     </div>
+
+    <!-- Tool rows -->
+    <div id="bm-rows"></div>
+
+    <!-- Add row + error -->
+    <button class="btn btn-ghost btn-sm bm-add-row-btn" id="bm-add-row">+ Add Another Tool</button>
+    <div id="bm-err" style="color:#f87171;font-size:.78rem;min-height:16px;margin-top:10px;"></div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" id="bm-cancel">Cancel</button>
-      <button class="btn btn-ghost btn-sm" id="bm-parse">Preview Parsed</button>
-      <button class="btn btn-primary" id="bm-save">Add All Tools</button>
+      <button class="btn btn-primary" id="bm-save">Save All</button>
     </div>
   </div>
 </div>
