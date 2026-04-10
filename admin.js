@@ -83,9 +83,15 @@ function logout() {
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   clearTimeout(S.sessionTimer);
+  cancelUndo(); // cancel any pending undo timers
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('pat-input').value = '';
+  // Always reset login button — prevents "Verifying…" stuck state after logout
+  var btn = document.getElementById('login-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('lockout-msg').style.display = 'none';
 }
 
 // reset timer on any interaction
@@ -1139,6 +1145,8 @@ function doLogin() {
       return getGHUser(pat).then(function(user){
         clearLoginState();
         startSession(pat, user ? user.login : 'admin');
+        // Re-enable button before hiding (guards against future logout showing stuck state)
+        btn.disabled=false; btn.textContent='Sign In';
         document.getElementById('login-screen').style.display='none';
         document.getElementById('admin-panel').style.display='flex';
         document.getElementById('gh-user').textContent = 'Signed in as @'+(user?user.login:'admin');
@@ -1184,6 +1192,10 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   checkLockout();
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
+  // Ensure login button is always clean on page load
+  var loginBtn = document.getElementById('login-btn');
+  if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Sign In'; }
+
   if (tok) {
     S.token=tok; S.ghUser=usr||'admin';
     document.getElementById('login-screen').style.display='none';
