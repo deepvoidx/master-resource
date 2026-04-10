@@ -1136,8 +1136,8 @@
     },
     {
       "name": "PlayPhrase",
-      "description": "Search movies and TV shows by spoken phrases",
-      "url": "https://www.playphrase.me",
+      "description": "A smart movie and TV search tool that helps you find scenes by searching spoken dialogue and phrases.",
+      "url": "https://www.playphrase.me/",
       "category": "content",
       "tags": [
         "creative",
