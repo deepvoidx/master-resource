@@ -1253,15 +1253,11 @@
     {
       "name": "Human Benchmark",
       "description": "Test reaction time, memory, typing speed and cognitive skills",
-      "url": "https://humanbenchmark.com",
+      "url": "https://humanbenchmark.com/",
       "category": "fun",
       "tags": [
         "fun",
         "free"
-      ],
-      "categories": [
-        "fun",
-        "study"
       ]
     },
     {
