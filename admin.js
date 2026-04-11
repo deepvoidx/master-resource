@@ -177,7 +177,6 @@ function validateURL(raw) {
   } catch(e){ return { ok:false, msg:'Invalid URL.' }; }
 }
 
-// Render-time color guard — prevents CSS injection via tampered tools.json
 function safeColor(raw) {
   var c = String(raw||'').trim();
   return /^#[0-9a-fA-F]{6}$/.test(c) ? c : '#6c63ff';
@@ -834,6 +833,10 @@ function renumberRows() {
   });
 }
 
+function closeBulkModal() {
+  document.getElementById('bulk-modal').classList.add('hidden');
+}
+
 function openBulkModal() {
   bmRowCount = 0;
   document.getElementById('bm-rows').innerHTML = '';
@@ -896,7 +899,7 @@ document.getElementById('bm-save').addEventListener('click', function() {
       S.toolsSha = res.content.sha;
       toast('Added ' + tools.length + ' tool(s)!', '✅');
       btn.disabled = false; btn.textContent = 'Save All';
-      document.getElementById('bulk-modal').classList.add('hidden');
+      closeBulkModal();
       renderTools(); updateTabCounts(); maybeRefreshStats();
     })
     .catch(function(e) {
@@ -906,8 +909,9 @@ document.getElementById('bm-save').addEventListener('click', function() {
     });
 });
 
-document.getElementById('bm-cancel').addEventListener('click', function() { document.getElementById('bulk-modal').classList.add('hidden'); });
-document.getElementById('bulk-modal').addEventListener('click', function(e) { if (e.target === this) document.getElementById('bulk-modal').classList.add('hidden'); });
+document.getElementById('bm-cancel').addEventListener('click', closeBulkModal);
+document.getElementById('bm-close').addEventListener('click', closeBulkModal);
+document.getElementById('bulk-modal').addEventListener('click', function(e) { if (e.target === this) closeBulkModal(); });
 document.getElementById('bulk-add-btn').addEventListener('click', openBulkModal);
 document.querySelectorAll('.sort-btn-sm').forEach(function(btn){
   btn.addEventListener('click', function(){
@@ -948,6 +952,8 @@ function renderCategories() {
       return t.category===cat.id;
     }).length;
     var sc = safeColor(cat.color);
+    var isFirst = idx === 0;
+    var isLast  = idx === cats.length - 1;
     var row = document.createElement('div');
     row.className = 'cat-row glass';
     row.innerHTML =
@@ -957,10 +963,15 @@ function renderCategories() {
         '<div style="font-size:.72rem;color:var(--mute);">ID: '+esc(cat.id)+'&nbsp;·&nbsp;'+toolCount+' tools</div>' +
       '</div>' +
       '<div style="width:14px;height:14px;border-radius:50%;background:'+sc+';flex-shrink:0;"></div>' +
-      '<button class="btn btn-ghost btn-sm" data-action="expand" style="font-size:.9rem;">⌄</button>' +
+      '<div class="cat-move-btns">' +
+        '<button class="btn btn-ghost btn-sm cat-move-up" title="Move up" '+(isFirst?'disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▲</button>' +
+        '<button class="btn btn-ghost btn-sm cat-move-dn" title="Move down" '+(isLast?'disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▼</button>' +
+      '</div>' +
       '<button class="btn btn-ghost btn-sm" title="Edit">✎</button>' +
       '<button class="btn btn-danger btn-sm" title="Delete">🗑</button>';
 
+    row.querySelector('.cat-move-up').addEventListener('click', function(){ if(!isFirst) moveCat(idx, idx-1); });
+    row.querySelector('.cat-move-dn').addEventListener('click', function(){ if(!isLast)  moveCat(idx, idx+1); });
     row.querySelector('[title=Edit]').addEventListener('click', function(){ openCatModal(idx); });
     row.querySelector('[title=Delete]').addEventListener('click', function(){
       if (toolCount>0 && !confirm(toolCount+' tools use this category. Still delete it?')) return;
@@ -969,6 +980,19 @@ function renderCategories() {
     });
     list.appendChild(row);
   });
+}
+
+function moveCat(fromIdx, toIdx) {
+  var cats = S.toolsData.categories;
+  var snap = JSON.parse(JSON.stringify(S.toolsData));
+  // Swap
+  var tmp = cats[fromIdx];
+  cats[fromIdx] = cats[toIdx];
+  cats[toIdx] = tmp;
+  renderCategories();
+  apiPut('tools.json', S.toolsData, S.toolsSha, 'Reorder categories')
+    .then(function(res){ S.toolsSha = res.content.sha; toast('Category order saved','✅'); })
+    .catch(function(e){ toast('Error: '+e.message,'❌'); S.toolsData = snap; renderCategories(); });
 }
 
 function openCatModal(idx) {
