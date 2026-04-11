@@ -1395,14 +1395,10 @@
     {
       "name": "Facecheck.id",
       "description": "Search the web by face photo",
-      "url": "https://facecheck.id",
+      "url": "https://facecheck.id/",
       "category": "security",
       "tags": [
         "security"
-      ],
-      "categories": [
-        "security",
-        "ai-detection"
       ]
     },
     {
