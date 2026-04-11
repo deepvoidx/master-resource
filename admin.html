@@ -153,13 +153,11 @@
       <div class="modal-title" style="margin-bottom:0;">⚡ Bulk Add Tools</div>
       <button id="bm-close" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:1.3rem;line-height:1;padding:4px 6px;border-radius:6px;transition:color .15s;" title="Close">✕</button>
     </div>
-    <!-- Apply to all strip -->
     <div class="bm-apply-strip">
       <span class="bm-apply-label">Apply to all rows:</span>
       <div id="bm-global-cats" class="bm-global-cats"></div>
       <button class="btn btn-ghost btn-sm" id="bm-apply-all">Apply</button>
     </div>
-    <!-- Tool rows -->
     <div id="bm-rows"></div>
     <button class="btn btn-ghost btn-sm bm-add-row-btn" id="bm-add-row">+ Add Another Tool</button>
     <div id="bm-err" style="color:#f87171;font-size:.78rem;min-height:16px;margin-top:10px;"></div>
@@ -197,7 +195,7 @@
   <div class="modal-box">
     <div class="modal-title" id="cat-modal-title">Edit Category</div>
     <div style="display:grid;gap:12px;">
-      <div><label>ID (slug, no spaces) *</label><input id="cm-id" type="text" maxlength="40" placeholder="ai-assistants"/></div>
+      <div id="cm-id-row"><label>ID (slug, no spaces) *</label><input id="cm-id" type="text" maxlength="40" placeholder="ai-assistants"/></div>
       <div><label>Label (full name) *</label><input id="cm-label" type="text" maxlength="60" placeholder="AI Assistants & Chatbots"/></div>
       <div><label>Short label (for filter button)</label><input id="cm-short" type="text" maxlength="20" placeholder="Assistants"/></div>
       <div><label>Icon (emoji)</label><input id="cm-icon" type="text" maxlength="4" placeholder="🤖"/></div>
