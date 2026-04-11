@@ -847,15 +847,11 @@
     {
       "name": "Mapify",
       "description": "Summarise content into visual mind maps",
-      "url": "https://mapify.so",
-      "category": "research",
+      "url": "https://mapify.so/",
+      "category": "study",
       "tags": [
         "research",
         "free"
-      ],
-      "categories": [
-        "research",
-        "study"
       ]
     },
     {
