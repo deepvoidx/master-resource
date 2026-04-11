@@ -1307,15 +1307,11 @@
     {
       "name": "Darebee",
       "description": "Free science-based workout programs and fitness resources",
-      "url": "https://darebee.com",
+      "url": "https://darebee.com/",
       "category": "fun",
       "tags": [
         "fun",
         "free"
-      ],
-      "categories": [
-        "fun",
-        "study"
       ]
     },
     {
