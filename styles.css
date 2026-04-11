@@ -105,11 +105,17 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   display:flex;flex-wrap:wrap;
   gap:clamp(4px,.6vw,8px);
   overflow:hidden;
-  /* 3 rows: each row = one button height (~34px) + gap */
   max-height:calc(3 * (clamp(26px,2.6vw,36px) + clamp(4px,.6vw,8px)));
   transition:max-height .38s cubic-bezier(.4,0,.2,1);
 }
 .fwrap.expanded{max-height:600px;}
+
+/* On mobile: buttons grow to fill each row evenly — no jagged edges */
+@media(max-width:600px){
+  .fwrap{gap:6px;}
+  .fb{flex-grow:1;justify-content:center;}
+}
+
 .fb-showmore{
   background:rgba(108,99,255,.12);
   border:1px solid rgba(108,99,255,.38);color:#b8b4ff;
@@ -119,7 +125,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   cursor:pointer;white-space:nowrap;
   -webkit-tap-highlight-color:transparent;
   transition:background .15s,border-color .15s,color .15s;
-  flex-shrink:0;align-self:flex-start;
+  flex-shrink:0;
   margin-top:clamp(4px,.6vw,8px);
 }
 .fb-showmore:hover{background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.55);}
@@ -433,12 +439,12 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   .modal-box{padding:20px;}
   .modal-actions{flex-direction:column;}
   .modal-submit,.modal-cancel{width:100%;}
+  /* Search full-width, filter panel below it */
   .ctrl{flex-direction:column;gap:8px;}
   .sw{flex:none;width:100%;max-width:100%;}
-  .fwrap-outer{width:100%;}
-  /* Tighter button sizing on small screens */
-  .fb{padding:5px 10px;font-size:.7rem;}
-  .fb-showmore{padding:5px 10px;font-size:.7rem;}
+  .fwrap-outer,.fwrap{width:100%;}
+  .fb{font-size:.7rem;padding:5px 8px;}
+  .fb-showmore{font-size:.7rem;padding:5px 10px;}
 }
 
 /* ── Touch targets ── */
