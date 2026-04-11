@@ -1970,6 +1970,28 @@
         "study",
         "professional"
       ]
+    },
+    {
+      "name": "Ishahirx",
+      "description": "A personal tech and cybersecurity-focused website featuring portfolio content, beginner-friendly cybersecurity resources, practical projects, and career-oriented learning material.",
+      "url": "https://www.itshahirx.com/",
+      "category": "research",
+      "tags": [
+        "cybersecurity",
+        "portfolio",
+        "tech",
+        "learning",
+        "projects",
+        "security",
+        "education",
+        "professional",
+        "content"
+      ],
+      "categories": [
+        "research",
+        "study",
+        "professional"
+      ]
     }
   ]
 }
