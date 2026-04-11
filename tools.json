@@ -1653,16 +1653,12 @@
     {
       "name": "Draw a Stickman",
       "description": "Draw your own stickman and watch it come to life in an interactive adventure",
-      "url": "https://drawastickman.com",
+      "url": "https://drawastickman.com/",
       "category": "fun",
       "tags": [
         "fun",
         "free",
         "creative"
-      ],
-      "categories": [
-        "fun",
-        "design"
       ]
     },
     {
