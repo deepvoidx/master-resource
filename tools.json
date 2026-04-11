@@ -193,7 +193,7 @@
     {
       "name": "Character AI",
       "description": "Chat with custom AI characters and personas",
-      "url": "https://character.ai",
+      "url": "https://character.ai/",
       "category": "ai-assistants",
       "tags": [
         "ai",
@@ -202,7 +202,7 @@
       ],
       "categories": [
         "ai-assistants",
-        "social"
+        "video-gen"
       ]
     },
     {
