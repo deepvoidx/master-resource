@@ -157,7 +157,7 @@
     fwrap.innerHTML = '';
     fwrap.classList.remove('expanded');
 
-    // Remove existing show-more button if rebuilding
+    // Remove any stale show-more button
     var existing = document.getElementById('fb-showmore-btn');
     if (existing) existing.remove();
 
@@ -178,11 +178,10 @@
       fwrap.appendChild(btn);
     });
 
-    // Inject show more/less after layout is computed
+    // After layout — only add toggle if content overflows 3 rows
     requestAnimationFrame(function () {
       var outerEl = document.getElementById('fwrap-outer');
       if (!outerEl) return;
-      // Only add button if content overflows the 3-row height
       if (fwrap.scrollHeight <= fwrap.offsetHeight + 4) return;
 
       var toggle = document.createElement('button');
