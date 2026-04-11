@@ -1962,6 +1962,29 @@
         "github",
         "creative"
       ]
+    },
+    {
+      "name": "W3 School",
+      "description": "A free learning site for web development tutorials, examples, and reference guides.",
+      "url": "https://www.w3schools.com/",
+      "category": "study",
+      "tags": [
+        "web development",
+        "tutorials",
+        "coding",
+        "html",
+        "css",
+        "javascript",
+        "python",
+        "sql",
+        "free",
+        "learning",
+        "reference"
+      ],
+      "categories": [
+        "study",
+        "dev"
+      ]
     }
   ]
 }
