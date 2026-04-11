@@ -1404,14 +1404,10 @@
     {
       "name": "PimEyes",
       "description": "Powerful facial search engine",
-      "url": "https://pimeyes.com",
+      "url": "https://pimeyes.com/",
       "category": "security",
       "tags": [
         "security"
-      ],
-      "categories": [
-        "security",
-        "ai-detection"
       ]
     },
     {
