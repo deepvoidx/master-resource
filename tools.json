@@ -704,7 +704,7 @@
     {
       "name": "Mixkit",
       "description": "Free video clips, music and motion templates",
-      "url": "https://www.mixkit.co",
+      "url": "https://www.mixkit.co/",
       "category": "design",
       "tags": [
         "free",
@@ -713,7 +713,6 @@
       ],
       "categories": [
         "design",
-        "free-audio",
         "content"
       ]
     },
