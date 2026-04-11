@@ -144,12 +144,23 @@
   // ── Build category filter buttons ────────────────────────────
   function buildFilterButtons() {
     var fwrap = document.getElementById('fwrap');
+    // Wrap fwrap in outer container if not already done
+    if (!document.getElementById('fwrap-outer')) {
+      var outer = document.createElement('div');
+      outer.id = 'fwrap-outer';
+      outer.className = 'fwrap-outer';
+      fwrap.parentNode.insertBefore(outer, fwrap);
+      outer.appendChild(fwrap);
+    }
     fwrap.innerHTML = '';
+    fwrap.classList.remove('expanded');
+
     var all = document.createElement('button');
     all.className = 'fb active';
     all.setAttribute('data-f', 'all');
     all.textContent = 'All';
     fwrap.appendChild(all);
+
     allCategories.forEach(function (cat) {
       var btn = document.createElement('button');
       btn.className = 'fb';
@@ -159,6 +170,30 @@
       }).length;
       btn.textContent = cat.icon + ' ' + (cat.short || cat.label) + ' · ' + count;
       fwrap.appendChild(btn);
+    });
+
+    // Build show more/less button — only if content overflows 3 rows
+    var outer2 = document.getElementById('fwrap-outer');
+    // Remove existing toggle if any
+    var existing = document.getElementById('fb-showmore-btn');
+    if (existing) existing.remove();
+
+    // Use rAF to measure after layout
+    requestAnimationFrame(function () {
+      var fullH = fwrap.scrollHeight;
+      var clampH = fwrap.offsetHeight;
+      if (fullH <= clampH + 4) return; // fits in 3 rows, no button needed
+
+      var btn = document.createElement('button');
+      btn.id = 'fb-showmore-btn';
+      btn.className = 'fb-showmore';
+      btn.textContent = 'Show more ▾';
+      outer2.appendChild(btn);
+
+      btn.addEventListener('click', function () {
+        var expanded = fwrap.classList.toggle('expanded');
+        btn.textContent = expanded ? 'Show less ▴' : 'Show more ▾';
+      });
     });
   }
 
@@ -401,15 +436,6 @@
     var toolIndex = allTools.indexOf(tool);
     var isNew = toolIndex >= allTools.length - NEW_COUNT;
 
-    // Validate URL once at the top — used for both data-url and href
-    var safeToolUrl = (function(raw) {
-      var u = String(raw || '').trim();
-      if (!u || /^(javascript|data|vbscript|file|blob|about):/i.test(u)) return null;
-      if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
-      try { var p = new URL(u); return ['http:', 'https:'].includes(p.protocol) ? p.href : null; }
-      catch(e) { return null; }
-    })(tool.url);
-
     var searchStr = [
       tool.name, tool.description,
       getCatIds(tool).join(' '),
@@ -423,8 +449,8 @@
     card.setAttribute('data-idx', toolIndex);
     card.style.setProperty('--ca', color);
 
-    if (safeToolUrl) {
-      card.setAttribute('data-url', safeToolUrl);
+    if (tool.url) {
+      card.setAttribute('data-url', tool.url);
       card.setAttribute('role', 'link');
       card.setAttribute('tabindex', '0');
     }
@@ -446,11 +472,11 @@
     card.appendChild(nameEl);
     card.appendChild(descEl);
 
-    if (safeToolUrl) {
-      var domain = safeToolUrl.replace(/https?:\/\//, '').split('/')[0];
+    if (tool.url) {
+      var domain = tool.url.replace(/https?:\/\//, '').split('/')[0];
       var link = document.createElement('a');
       link.className = 'tool-link';
-      link.href = safeToolUrl;
+      link.href = tool.url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.textContent = domain + ' \u2197';
@@ -466,7 +492,7 @@
         shareBtn.addEventListener('click', function (e) {
           e.stopPropagation(); e.preventDefault(); shareCard(n, d, u);
         });
-      })(tool.name, tool.description, safeToolUrl);
+      })(tool.name, tool.description, tool.url);
       actions.appendChild(shareBtn);
       card.appendChild(actions);
     } else {
