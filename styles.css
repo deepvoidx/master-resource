@@ -99,28 +99,30 @@ input[type=search]:focus{
 input[type=search]::placeholder{color:#44446a;}
 input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 
-/* ── Category filter buttons — solid, no backdrop-filter ── */
+/* ── Category filter panel ── */
+.fwrap-outer{width:100%;position:relative;}
 .fwrap{
-  display:flex;flex-wrap:wrap;gap:clamp(4px,.6vw,8px);
-  width:100%;
+  display:flex;flex-wrap:wrap;
+  gap:clamp(4px,.6vw,8px);
+  overflow:hidden;
+  /* 3 rows: each row = one button height (~34px) + gap */
+  max-height:calc(3 * (clamp(26px,2.6vw,36px) + clamp(4px,.6vw,8px)));
+  transition:max-height .38s cubic-bezier(.4,0,.2,1);
 }
-/* On mobile: single scrollable row instead of wrapping chaos */
-@media(max-width:600px){
-  .fwrap{
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    -ms-overflow-style:none;
-    padding-bottom:4px;
-    /* Fade edges to hint scrollability */
-    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);
-    mask-image:linear-gradient(to right,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);
-    scroll-snap-type:x proximity;
-  }
-  .fwrap::-webkit-scrollbar{display:none;}
-  .fb{scroll-snap-align:start;flex-shrink:0;}
+.fwrap.expanded{max-height:600px;}
+.fb-showmore{
+  background:rgba(108,99,255,.12);
+  border:1px solid rgba(108,99,255,.38);color:#b8b4ff;
+  padding:clamp(5px,.7vw,10px) clamp(10px,1.3vw,18px);
+  border-radius:100px;font-size:var(--t-xs);
+  font-family:'DM Sans',-apple-system,sans-serif;
+  cursor:pointer;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s,border-color .15s,color .15s;
+  flex-shrink:0;align-self:flex-start;
+  margin-top:clamp(4px,.6vw,8px);
 }
+.fb-showmore:hover{background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.55);}
 .fb{
   background:rgba(22,22,34,0.92);
   border:1px solid var(--g-bdr);color:var(--mute);
@@ -431,10 +433,12 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   .modal-box{padding:20px;}
   .modal-actions{flex-direction:column;}
   .modal-submit,.modal-cancel{width:100%;}
-  /* Search takes full width, filter row below it */
   .ctrl{flex-direction:column;gap:8px;}
   .sw{flex:none;width:100%;max-width:100%;}
-  .fwrap{width:100%;}
+  .fwrap-outer{width:100%;}
+  /* Tighter button sizing on small screens */
+  .fb{padding:5px 10px;font-size:.7rem;}
+  .fb-showmore{padding:5px 10px;font-size:.7rem;}
 }
 
 /* ── Touch targets ── */
