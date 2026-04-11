@@ -1607,16 +1607,15 @@
       "name": "Project Gutenberg",
       "description": "Over 70,000 free public domain e-books — classics, literature & non-fiction",
       "url": "https://www.gutenberg.org/",
-      "category": "books",
+      "category": "research",
       "tags": [
         "free",
         "books",
         "research"
       ],
       "categories": [
-        "books",
         "research",
-        "study"
+        "books"
       ]
     },
     {
