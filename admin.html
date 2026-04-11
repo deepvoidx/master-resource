@@ -149,22 +149,20 @@
 <!-- ── bulk add modal ── -->
 <div class="modal-bg hidden" id="bulk-modal">
   <div class="modal-box bm-box">
-    <div class="modal-title">⚡ Bulk Add Tools</div>
-
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title" style="margin-bottom:0;">⚡ Bulk Add Tools</div>
+      <button id="bm-close" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:1.3rem;line-height:1;padding:4px 6px;border-radius:6px;transition:color .15s;" title="Close">✕</button>
+    </div>
     <!-- Apply to all strip -->
     <div class="bm-apply-strip">
       <span class="bm-apply-label">Apply to all rows:</span>
       <div id="bm-global-cats" class="bm-global-cats"></div>
       <button class="btn btn-ghost btn-sm" id="bm-apply-all">Apply</button>
     </div>
-
     <!-- Tool rows -->
     <div id="bm-rows"></div>
-
-    <!-- Add row + error -->
     <button class="btn btn-ghost btn-sm bm-add-row-btn" id="bm-add-row">+ Add Another Tool</button>
     <div id="bm-err" style="color:#f87171;font-size:.78rem;min-height:16px;margin-top:10px;"></div>
-
     <div class="modal-actions">
       <button class="btn btn-ghost" id="bm-cancel">Cancel</button>
       <button class="btn btn-primary" id="bm-save">Save All</button>
