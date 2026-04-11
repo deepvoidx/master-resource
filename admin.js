@@ -787,7 +787,6 @@ function bmAddRow() {
   bmRowCount++;
   var rowEl = document.createElement('div');
   rowEl.className = 'bm-tool-row';
-  rowEl.dataset.rowid = bmRowCount;
 
   var hdr = document.createElement('div');
   hdr.className = 'bm-tool-row-hdr';
@@ -795,8 +794,7 @@ function bmAddRow() {
     '<span class="bm-tool-num">Tool ' + bmRowCount + '</span>' +
     '<button class="bm-remove-btn" type="button">🗑 Remove</button>';
   hdr.querySelector('.bm-remove-btn').addEventListener('click', function() {
-    rowEl.remove();
-    renumberRows();
+    rowEl.remove(); renumberRows();
   });
   rowEl.appendChild(hdr);
 
@@ -815,7 +813,7 @@ function bmAddRow() {
   rowEl.appendChild(catLabel);
 
   var catWrap = document.createElement('div');
-  catWrap.className = 'bm-tool-cats';
+  catWrap.className = 'bm-tool-cats pend-cats';
   bmBuildCatChecks(catWrap);
   rowEl.appendChild(catWrap);
 
@@ -828,8 +826,8 @@ function bmAddRow() {
 
 function renumberRows() {
   document.querySelectorAll('#bm-rows .bm-tool-row').forEach(function(row, i) {
-    var numEl = row.querySelector('.bm-tool-num');
-    if (numEl) numEl.textContent = 'Tool ' + (i + 1);
+    var n = row.querySelector('.bm-tool-num');
+    if (n) n.textContent = 'Tool ' + (i + 1);
   });
 }
 
@@ -964,8 +962,8 @@ function renderCategories() {
       '</div>' +
       '<div style="width:14px;height:14px;border-radius:50%;background:'+sc+';flex-shrink:0;"></div>' +
       '<div class="cat-move-btns">' +
-        '<button class="btn btn-ghost btn-sm cat-move-up" title="Move up" '+(isFirst?'disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▲</button>' +
-        '<button class="btn btn-ghost btn-sm cat-move-dn" title="Move down" '+(isLast?'disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▼</button>' +
+        '<button class="btn btn-ghost btn-sm cat-move-up" title="Move up"'+(isFirst?' disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▲</button>' +
+        '<button class="btn btn-ghost btn-sm cat-move-dn" title="Move down"'+(isLast?' disabled':'')+' style="padding:4px 7px;font-size:.8rem;">▼</button>' +
       '</div>' +
       '<button class="btn btn-ghost btn-sm" title="Edit">✎</button>' +
       '<button class="btn btn-danger btn-sm" title="Delete">🗑</button>';
@@ -983,16 +981,13 @@ function renderCategories() {
 }
 
 function moveCat(fromIdx, toIdx) {
-  var cats = S.toolsData.categories;
   var snap = JSON.parse(JSON.stringify(S.toolsData));
-  // Swap
-  var tmp = cats[fromIdx];
-  cats[fromIdx] = cats[toIdx];
-  cats[toIdx] = tmp;
+  var cats = S.toolsData.categories;
+  var tmp = cats[fromIdx]; cats[fromIdx] = cats[toIdx]; cats[toIdx] = tmp;
   renderCategories();
   apiPut('tools.json', S.toolsData, S.toolsSha, 'Reorder categories')
-    .then(function(res){ S.toolsSha = res.content.sha; toast('Category order saved','✅'); })
-    .catch(function(e){ toast('Error: '+e.message,'❌'); S.toolsData = snap; renderCategories(); });
+    .then(function(res){ S.toolsSha = res.content.sha; toast('Category order saved', '✅'); })
+    .catch(function(e){ toast('Error: '+e.message, '❌'); S.toolsData = snap; renderCategories(); });
 }
 
 function openCatModal(idx) {
@@ -1002,8 +997,11 @@ function openCatModal(idx) {
   document.getElementById('cm-err').textContent = '';
   var cat = isNew ? { id:'', label:'', short:'', icon:'📦', color:'#6c63ff' }
                   : S.toolsData.categories[idx];
+  // Show ID field only when creating — it's a permanent slug that can't change
+  var idRow = document.getElementById('cm-id-row');
+  if (idRow) idRow.style.display = isNew ? '' : 'none';
   document.getElementById('cm-id').value = cat.id||'';
-  document.getElementById('cm-id').disabled = !isNew; // can't change id after creation
+  document.getElementById('cm-id').disabled = !isNew;
   document.getElementById('cm-label').value = cat.label||'';
   document.getElementById('cm-short').value = cat.short||'';
   document.getElementById('cm-icon').value = cat.icon||'';
