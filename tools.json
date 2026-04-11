@@ -2,143 +2,122 @@
   "categories": [
     {
       "id": "ai-assistants",
-      "label": "AI Assistants & Chatbots",
+      "label": "AI Assistants",
+      "short": "Assistants",
       "icon": "🤖",
-      "color": "#6c63ff",
-      "short": "Assistants"
+      "color": "#6c63ff"
     },
     {
       "id": "ai-directories",
-      "label": "AI Tool Directories",
+      "label": "AI Directories",
+      "short": "Directories",
       "icon": "🗂️",
-      "color": "#f59e0b",
-      "short": "Directories"
+      "color": "#8b5cf6"
     },
     {
       "id": "image-gen",
-      "label": "Image Generation & Editing",
+      "label": "Image Generation",
+      "short": "Image Gen",
       "icon": "🖼️",
-      "color": "#ec4899",
-      "short": "Image Gen"
+      "color": "#ec4899"
     },
     {
       "id": "video-gen",
-      "label": "Video Generation & Editing",
+      "label": "Video Generation",
+      "short": "Video Gen",
       "icon": "🎬",
-      "color": "#ef4444",
-      "short": "Video Gen"
+      "color": "#f59e0b"
     },
     {
       "id": "audio",
-      "label": "Audio, Voice & Music",
+      "label": "Audio & Music",
+      "short": "Audio",
       "icon": "🎵",
-      "color": "#10b981",
-      "short": "Audio"
-    },
-    {
-      "id": "free-audio",
-      "label": "Free Sound, Music & SFX",
-      "icon": "🎞️",
-      "color": "#8b5cf6",
-      "short": "Free SFX"
+      "color": "#10b981"
     },
     {
       "id": "design",
-      "label": "Design, Templates & Assets",
+      "label": "Design & Creative",
+      "short": "Design",
       "icon": "🎨",
-      "color": "#f97316",
-      "short": "Design"
+      "color": "#f97316"
     },
     {
-      "id": "research",
-      "label": "Research & Academic",
-      "icon": "📚",
-      "color": "#06b6d4",
-      "short": "Research"
-    },
-    {
-      "id": "study",
-      "label": "Learning & Study Tools",
-      "icon": "🧑‍🎓",
-      "color": "#84cc16",
-      "short": "Study"
-    },
-    {
-      "id": "ai-detection",
-      "label": "AI Detection & Humanizer",
-      "icon": "🔍",
-      "color": "#e11d48",
-      "short": "Detection"
-    },
-    {
-      "id": "linkedin",
-      "label": "LinkedIn & Professional",
-      "icon": "💼",
-      "color": "#0ea5e9",
-      "short": "LinkedIn"
+      "id": "writing",
+      "label": "Writing & AI Tools",
+      "short": "Writing",
+      "icon": "✍️",
+      "color": "#06b6d4"
     },
     {
       "id": "dev",
-      "label": "Developer & Code Tools",
+      "label": "Developer & Code",
+      "short": "Dev Tools",
       "icon": "💻",
-      "color": "#a78bfa",
-      "short": "Dev Tools"
+      "color": "#3b82f6"
+    },
+    {
+      "id": "research",
+      "label": "Research & Knowledge",
+      "short": "Research",
+      "icon": "📚",
+      "color": "#0ea5e9"
+    },
+    {
+      "id": "study",
+      "label": "Learning & Education",
+      "short": "Education",
+      "icon": "🎓",
+      "color": "#84cc16"
+    },
+    {
+      "id": "ai-detection",
+      "label": "AI Detection",
+      "short": "Detection",
+      "icon": "🔍",
+      "color": "#ef4444"
     },
     {
       "id": "content",
       "label": "Content Creation",
+      "short": "Content",
       "icon": "🎥",
-      "color": "#fb923c",
-      "short": "Content"
+      "color": "#a855f7"
     },
     {
       "id": "streaming",
-      "label": "Movies & Series",
+      "label": "Movies & Streaming",
+      "short": "Streaming",
       "icon": "🍿",
-      "color": "#f43f5e",
-      "short": "Movies & Series"
-    },
-    {
-      "id": "books",
-      "label": "Books & Libraries",
-      "icon": "📖",
-      "color": "#c084fc",
-      "short": "Books"
-    },
-    {
-      "id": "fun",
-      "label": "Fun & Explore",
-      "icon": "🎮",
-      "color": "#f472b6",
-      "short": "Fun"
-    },
-    {
-      "id": "png",
-      "label": "Free PNG & Image Resources",
-      "icon": "🖼",
-      "color": "#22d3ee",
-      "short": "PNG"
+      "color": "#e11d48"
     },
     {
       "id": "security",
-      "label": "Security & Verification",
+      "label": "Security & Privacy",
+      "short": "Security",
       "icon": "🔐",
-      "color": "#34d399",
-      "short": "Security"
+      "color": "#64748b"
     },
     {
-      "id": "pdf",
-      "label": "Toolkit",
-      "icon": "🔧",
-      "color": "#fbbf24",
-      "short": "Toolkit"
+      "id": "professional",
+      "label": "Professional Tools",
+      "short": "Professional",
+      "icon": "💼",
+      "color": "#0f766e"
     },
     {
-      "id": "github",
-      "label": "Github",
-      "short": "Github",
-      "icon": "😸",
-      "color": "#ffffff"
+      "id": "fun",
+      "label": "Fun & Games",
+      "short": "Fun",
+      "icon": "🎮",
+      "color": "#f43f5e"
+    },
+    {
+      "id": "social",
+      "label": "Social & Chat",
+      "short": "Social",
+      "icon": "💬",
+      "color": "#7c3aed"
     }
   ],
   "tools": [
@@ -148,9 +127,9 @@
       "url": "https://claude.ai",
       "category": "ai-assistants",
       "tags": [
-        "x27",
         "ai",
-        "chatbot"
+        "chatbot",
+        "free"
       ]
     },
     {
@@ -160,8 +139,7 @@
       "category": "ai-assistants",
       "tags": [
         "ai",
-        "chatbot",
-        "unofficial"
+        "chatbot"
       ]
     },
     {
@@ -176,8 +154,8 @@
       ],
       "categories": [
         "ai-assistants",
-        "ai-directories",
-        "research"
+        "research",
+        "ai-directories"
       ]
     },
     {
@@ -186,7 +164,6 @@
       "url": "https://grok.com",
       "category": "ai-assistants",
       "tags": [
-        "x27",
         "ai",
         "chatbot"
       ]
@@ -209,7 +186,8 @@
       "tags": [
         "ai",
         "chatbot",
-        "india"
+        "india",
+        "free"
       ]
     },
     {
@@ -219,7 +197,12 @@
       "category": "ai-assistants",
       "tags": [
         "ai",
-        "chatbot"
+        "chatbot",
+        "fun"
+      ],
+      "categories": [
+        "ai-assistants",
+        "social"
       ]
     },
     {
@@ -229,7 +212,8 @@
       "category": "ai-assistants",
       "tags": [
         "ai",
-        "chatbot"
+        "chatbot",
+        "free"
       ]
     },
     {
@@ -239,11 +223,8 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
-      ],
-      "categories": [
-        "ai-directories",
-        "ai-assistants"
+        "directory",
+        "free"
       ]
     },
     {
@@ -253,7 +234,8 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
+        "directory",
+        "free"
       ]
     },
     {
@@ -263,7 +245,13 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
+        "directory",
+        "dev",
+        "free"
+      ],
+      "categories": [
+        "ai-directories",
+        "dev"
       ]
     },
     {
@@ -273,7 +261,12 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
+        "directory",
+        "content"
+      ],
+      "categories": [
+        "ai-directories",
+        "content"
       ]
     },
     {
@@ -283,7 +276,8 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
+        "directory",
+        "free"
       ],
       "categories": [
         "ai-directories",
@@ -297,7 +291,8 @@
       "category": "ai-directories",
       "tags": [
         "ai",
-        "directory"
+        "directory",
+        "free"
       ]
     },
     {
@@ -341,7 +336,8 @@
       "tags": [
         "ai",
         "creative",
-        "image"
+        "image",
+        "free"
       ]
     },
     {
@@ -352,7 +348,12 @@
       "tags": [
         "ai",
         "creative",
-        "image"
+        "image",
+        "design"
+      ],
+      "categories": [
+        "image-gen",
+        "design"
       ]
     },
     {
@@ -363,18 +364,24 @@
       "tags": [
         "ai",
         "creative",
-        "image"
+        "image",
+        "free"
       ]
     },
     {
       "name": "Adobe BG Remover",
       "description": "Remove image backgrounds instantly for free",
       "url": "https://express.adobe.com/tools/remove-background/",
-      "category": "pdf",
+      "category": "image-gen",
       "tags": [
         "ai",
         "creative",
-        "image"
+        "image",
+        "free"
+      ],
+      "categories": [
+        "image-gen",
+        "design"
       ]
     },
     {
@@ -385,7 +392,12 @@
       "tags": [
         "ai",
         "creative",
-        "image"
+        "image",
+        "design"
+      ],
+      "categories": [
+        "image-gen",
+        "design"
       ]
     },
     {
@@ -418,7 +430,8 @@
       "tags": [
         "ai",
         "creative",
-        "video"
+        "video",
+        "design"
       ],
       "categories": [
         "video-gen",
@@ -435,10 +448,6 @@
         "ai",
         "creative",
         "video"
-      ],
-      "categories": [
-        "video-gen",
-        "ai-assistants"
       ]
     },
     {
@@ -482,7 +491,8 @@
       "tags": [
         "ai",
         "creative",
-        "video"
+        "video",
+        "design"
       ],
       "categories": [
         "video-gen",
@@ -501,7 +511,6 @@
       ],
       "categories": [
         "audio",
-        "ai-assistants",
         "content"
       ]
     },
@@ -514,10 +523,6 @@
         "ai",
         "audio",
         "creative"
-      ],
-      "categories": [
-        "audio",
-        "ai-assistants"
       ]
     },
     {
@@ -543,14 +548,15 @@
       "tags": [
         "ai",
         "audio",
-        "creative"
+        "creative",
+        "free"
       ]
     },
     {
       "name": "ZapSplat",
       "description": "Free SFX and music pack downloads",
       "url": "https://www.zapsplat.com",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -561,7 +567,7 @@
       "name": "SoundQ",
       "description": "Professional sound effects library",
       "url": "https://www.prosoundeffects.com/soundq",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -572,18 +578,22 @@
       "name": "MyInstants",
       "description": "Instant sound effects soundboard",
       "url": "https://www.myinstants.com",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
-        "creative"
+        "fun"
+      ],
+      "categories": [
+        "audio",
+        "fun"
       ]
     },
     {
       "name": "Storyblocks",
       "description": "Stock music, SFX and video subscription",
       "url": "https://www.storyblocks.com",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -594,7 +604,7 @@
       "name": "Pixabay SFX",
       "description": "Free sound effects, no attribution required",
       "url": "https://pixabay.com/sound-effects/",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -605,7 +615,7 @@
       "name": "Chosic",
       "description": "Free royalty-free advertising and background music",
       "url": "https://www.chosic.com/free-music/advertising/",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -616,9 +626,8 @@
       "name": "Epidemic Sound",
       "description": "Licensed music for creators subscription",
       "url": "https://www.epidemicsound.com",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
-        "free",
         "audio",
         "creative"
       ]
@@ -627,7 +636,7 @@
       "name": "IG Music Library",
       "description": "Instagram background music collection",
       "url": "https://creator-economy.notion.site/IG-Background-MusicLibrary-492fde9e1dc24f978608c66871789e44",
-      "category": "free-audio",
+      "category": "audio",
       "tags": [
         "free",
         "audio",
@@ -640,13 +649,14 @@
       "url": "https://www.napkin.ai",
       "category": "design",
       "tags": [
-        "free",
+        "ai",
         "creative",
-        "design"
+        "design",
+        "free"
       ],
       "categories": [
         "design",
-        "ai-assistants",
+        "writing",
         "research"
       ]
     },
@@ -658,7 +668,8 @@
       "tags": [
         "free",
         "creative",
-        "design"
+        "design",
+        "animation"
       ],
       "categories": [
         "design",
@@ -684,11 +695,13 @@
       "tags": [
         "free",
         "creative",
-        "design"
+        "design",
+        "video"
       ],
       "categories": [
         "design",
-        "content"
+        "content",
+        "audio"
       ]
     },
     {
@@ -730,9 +743,10 @@
       "url": "https://lumalabs.ai",
       "category": "design",
       "tags": [
-        "free",
+        "ai",
         "creative",
-        "design"
+        "design",
+        "3d"
       ],
       "categories": [
         "design",
@@ -747,7 +761,8 @@
       "tags": [
         "free",
         "creative",
-        "design"
+        "design",
+        "3d"
       ],
       "categories": [
         "design",
@@ -762,7 +777,8 @@
       "tags": [
         "free",
         "creative",
-        "design"
+        "design",
+        "animation"
       ]
     },
     {
@@ -771,9 +787,10 @@
       "url": "https://autoae.online",
       "category": "design",
       "tags": [
-        "free",
+        "ai",
         "creative",
-        "design"
+        "design",
+        "animation"
       ]
     },
     {
@@ -797,7 +814,8 @@
       "category": "research",
       "tags": [
         "research",
-        "free"
+        "free",
+        "ai"
       ],
       "categories": [
         "research",
@@ -810,6 +828,7 @@
       "url": "https://notebooklm.google",
       "category": "research",
       "tags": [
+        "ai",
         "research",
         "free"
       ],
@@ -823,10 +842,17 @@
       "name": "Mapify",
       "description": "Summarise content into visual mind maps",
       "url": "https://mapify.so/",
-      "category": "study",
+      "category": "writing",
       "tags": [
-        "research",
+        "ai",
+        "writing",
+        "mind-map",
         "free"
+      ],
+      "categories": [
+        "writing",
+        "research",
+        "study"
       ]
     },
     {
@@ -837,6 +863,10 @@
       "tags": [
         "research",
         "free"
+      ],
+      "categories": [
+        "research",
+        "study"
       ]
     },
     {
@@ -845,6 +875,7 @@
       "url": "https://youlearn.ai",
       "category": "study",
       "tags": [
+        "ai",
         "study",
         "free"
       ],
@@ -857,14 +888,17 @@
       "name": "MyJotBot",
       "description": "AI note-taking and writing assistant",
       "url": "https://myjotbot.com",
-      "category": "study",
+      "category": "writing",
       "tags": [
+        "ai",
+        "writing",
+        "notes",
         "study",
         "free"
       ],
       "categories": [
-        "study",
-        "ai-assistants"
+        "writing",
+        "study"
       ]
     },
     {
@@ -873,6 +907,7 @@
       "url": "https://www.studyfetch.com",
       "category": "study",
       "tags": [
+        "ai",
         "study",
         "free"
       ],
@@ -888,7 +923,8 @@
       "category": "ai-detection",
       "tags": [
         "ai",
-        "detection"
+        "detection",
+        "free"
       ],
       "categories": [
         "ai-detection",
@@ -912,7 +948,8 @@
       "category": "ai-detection",
       "tags": [
         "ai",
-        "detection"
+        "detection",
+        "humanizer"
       ]
     },
     {
@@ -921,8 +958,9 @@
       "url": "https://app.scribbr.com/plagiarism-checker",
       "category": "study",
       "tags": [
-        "ai",
-        "detection"
+        "study",
+        "plagiarism",
+        "academic"
       ],
       "categories": [
         "study",
@@ -936,60 +974,74 @@
       "category": "ai-detection",
       "tags": [
         "ai",
-        "detection"
+        "detection",
+        "plagiarism"
+      ],
+      "categories": [
+        "ai-detection",
+        "study"
       ]
     },
     {
       "name": "HumanizeAI",
       "description": "Rewrite AI-generated text to sound natural",
       "url": "https://www.humanizeai.pro",
-      "category": "ai-detection",
+      "category": "writing",
       "tags": [
         "ai",
-        "detection"
+        "writing",
+        "humanizer",
+        "free"
       ],
       "categories": [
-        "ai-detection",
-        "ai-assistants"
+        "writing",
+        "ai-detection"
       ]
     },
     {
       "name": "QuillBot Humanizer",
       "description": "Paraphrase and humanize AI content",
       "url": "https://quillbot.com/ai-humanizer",
-      "category": "ai-detection",
+      "category": "writing",
       "tags": [
         "ai",
-        "detection"
+        "writing",
+        "humanizer",
+        "free"
       ],
       "categories": [
-        "ai-detection",
-        "ai-assistants"
+        "writing",
+        "ai-detection"
       ]
     },
     {
       "name": "RedactAI Review",
       "description": "Free AI-powered LinkedIn profile review",
       "url": "https://redactai.io/free-tools/linkedin-profile-review",
-      "category": "ai-assistants",
+      "category": "professional",
       "tags": [
-        "professional"
+        "professional",
+        "linkedin",
+        "ai",
+        "free"
       ],
       "categories": [
-        "ai-assistants",
-        "linkedin"
+        "professional",
+        "ai-assistants"
       ]
     },
     {
       "name": "Self.so",
       "description": "Convert your LinkedIn PDF into a personal website",
       "url": "https://self.so",
-      "category": "linkedin",
+      "category": "professional",
       "tags": [
-        "professional"
+        "professional",
+        "linkedin",
+        "dev"
       ],
       "categories": [
-        "linkedin",
+        "professional",
         "dev"
       ]
     },
@@ -999,9 +1051,9 @@
       "url": "https://github.com/",
       "category": "dev",
       "tags": [
-        "x27",
         "dev",
-        "code"
+        "code",
+        "free"
       ]
     },
     {
@@ -1011,7 +1063,9 @@
       "category": "dev",
       "tags": [
         "dev",
-        "code"
+        "code",
+        "ai",
+        "free"
       ]
     },
     {
@@ -1021,21 +1075,24 @@
       "category": "dev",
       "tags": [
         "dev",
-        "code"
+        "code",
+        "ai",
+        "free"
       ]
     },
     {
       "name": "Blackbox AI",
       "description": "AI-powered code assistant with chat and autocomplete",
       "url": "https://www.blackbox.ai",
-      "category": "ai-assistants",
+      "category": "dev",
       "tags": [
+        "ai",
         "dev",
         "code"
       ],
       "categories": [
-        "ai-assistants",
-        "dev"
+        "dev",
+        "ai-assistants"
       ]
     },
     {
@@ -1045,7 +1102,8 @@
       "category": "dev",
       "tags": [
         "dev",
-        "code"
+        "code",
+        "free"
       ]
     },
     {
@@ -1054,8 +1112,10 @@
       "url": "https://www.captions.ai",
       "category": "content",
       "tags": [
+        "ai",
+        "content",
         "creative",
-        "content"
+        "video"
       ],
       "categories": [
         "content",
@@ -1068,8 +1128,10 @@
       "url": "https://www.hootsuite.com/social-media-tools/ai-caption-generator-social-media",
       "category": "content",
       "tags": [
-        "creative",
-        "content"
+        "content",
+        "social",
+        "ai",
+        "free"
       ]
     },
     {
@@ -1078,23 +1140,26 @@
       "url": "https://planable.io/instagram-caption-generator/",
       "category": "content",
       "tags": [
-        "creative",
-        "content"
+        "content",
+        "social",
+        "ai",
+        "free"
       ]
     },
     {
       "name": "Solidpoint",
       "description": "YouTube video summarizer paste URL get summary",
       "url": "https://solidpoint.ai/",
-      "category": "ai-assistants",
+      "category": "writing",
       "tags": [
-        "creative",
-        "content"
+        "ai",
+        "writing",
+        "summarizer",
+        "free"
       ],
       "categories": [
-        "ai-assistants",
-        "research",
-        "study"
+        "writing",
+        "research"
       ]
     },
     {
@@ -1103,8 +1168,10 @@
       "url": "https://www.playphrase.me/",
       "category": "content",
       "tags": [
-        "creative",
-        "content"
+        "content",
+        "movies",
+        "fun",
+        "free"
       ],
       "categories": [
         "content",
@@ -1117,8 +1184,14 @@
       "url": "https://eyecannndy.com",
       "category": "content",
       "tags": [
+        "content",
         "creative",
-        "content"
+        "movies",
+        "design"
+      ],
+      "categories": [
+        "content",
+        "design"
       ]
     },
     {
@@ -1127,13 +1200,14 @@
       "url": "https://film-grab.com",
       "category": "content",
       "tags": [
-        "creative",
-        "content"
+        "content",
+        "movies",
+        "design",
+        "free"
       ],
       "categories": [
         "content",
-        "design",
-        "fun"
+        "design"
       ]
     },
     {
@@ -1183,31 +1257,38 @@
       "category": "streaming",
       "tags": [
         "movies",
-        "free"
+        "anime",
+        "free",
+        "india"
       ]
     },
     {
       "name": "Z-Library",
       "description": "World's largest free e-book and article library",
       "url": "https://z-lib.id/",
-      "category": "books",
+      "category": "study",
       "tags": [
-        "x27",
-        "free",
-        "books"
+        "study",
+        "books",
+        "free"
+      ],
+      "categories": [
+        "study",
+        "research"
       ]
     },
     {
       "name": "Welib.st",
       "description": "Free online book and document library",
       "url": "https://welib.st",
-      "category": "books",
+      "category": "study",
       "tags": [
-        "free",
-        "books"
+        "study",
+        "books",
+        "free"
       ],
       "categories": [
-        "books",
+        "study",
         "research"
       ]
     },
@@ -1218,7 +1299,8 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "games"
       ]
     },
     {
@@ -1228,7 +1310,9 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "games",
+        "puzzle"
       ]
     },
     {
@@ -1268,82 +1352,68 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "fitness",
+        "exercise"
+      ],
+      "categories": [
+        "fun",
+        "study"
       ]
     },
     {
       "name": "CleanPNG",
       "description": "Transparent PNG downloads large library",
       "url": "https://cleanpng.com",
-      "category": "png",
+      "category": "design",
       "tags": [
         "free",
         "creative",
         "image"
-      ],
-      "categories": [
-        "png",
-        "design"
       ]
     },
     {
       "name": "SimilarPNG",
       "description": "Find visually similar PNG images",
       "url": "https://similarpng.com",
-      "category": "png",
+      "category": "design",
       "tags": [
         "free",
         "creative",
         "image"
-      ],
-      "categories": [
-        "png",
-        "design"
       ]
     },
     {
       "name": "PNGWing",
       "description": "Free PNG clip art millions of images",
       "url": "https://pngwing.com",
-      "category": "png",
+      "category": "design",
       "tags": [
         "free",
         "creative",
         "image"
-      ],
-      "categories": [
-        "png",
-        "design"
       ]
     },
     {
       "name": "PNGEgg",
       "description": "High-quality transparent PNGs",
       "url": "https://pngegg.com",
-      "category": "png",
+      "category": "design",
       "tags": [
         "free",
         "creative",
         "image"
-      ],
-      "categories": [
-        "png",
-        "design"
       ]
     },
     {
       "name": "PNGImg",
       "description": "Large transparent PNG database",
       "url": "https://pngimg.com",
-      "category": "png",
+      "category": "design",
       "tags": [
         "free",
         "creative",
         "image"
-      ],
-      "categories": [
-        "png",
-        "design"
       ]
     },
     {
@@ -1352,7 +1422,8 @@
       "url": "https://www.urlvoid.com",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "free"
       ]
     },
     {
@@ -1361,7 +1432,8 @@
       "url": "https://emailveritas.com",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "free"
       ]
     },
     {
@@ -1370,7 +1442,8 @@
       "url": "",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "faces"
       ]
     },
     {
@@ -1379,7 +1452,8 @@
       "url": "",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "faces"
       ]
     },
     {
@@ -1388,7 +1462,13 @@
       "url": "https://facecheck.id/",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "ai",
+        "faces"
+      ],
+      "categories": [
+        "security",
+        "ai-detection"
       ]
     },
     {
@@ -1397,7 +1477,13 @@
       "url": "https://pimeyes.com/",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "ai",
+        "faces"
+      ],
+      "categories": [
+        "security",
+        "ai-detection"
       ]
     },
     {
@@ -1406,20 +1492,24 @@
       "url": "https://instausername.com/availability",
       "category": "security",
       "tags": [
-        "security"
+        "security",
+        "social",
+        "free"
       ]
     },
     {
       "name": "Sejda PDF Editor",
       "description": "Free online PDF editor annotate fill sign",
       "url": "https://www.sejda.com/pdf-editor",
-      "category": "pdf",
+      "category": "professional",
       "tags": [
+        "professional",
+        "pdf",
         "free",
-        "tools"
+        "design"
       ],
       "categories": [
-        "pdf",
+        "professional",
         "design"
       ]
     },
@@ -1427,10 +1517,14 @@
       "name": "Kosmi.io",
       "description": "Free platform for online hangout rooms and watch parties",
       "url": "https://kosmi.io",
-      "category": "misc",
-      "tags": [],
+      "category": "social",
+      "tags": [
+        "social",
+        "fun",
+        "free"
+      ],
       "categories": [
-        "misc",
+        "social",
         "fun"
       ]
     },
@@ -1448,14 +1542,15 @@
       "name": "Happenstance AI",
       "description": "AI-powered relationship and networking intelligence",
       "url": "https://happenstance.ai/",
-      "category": "ai-assistants",
+      "category": "professional",
       "tags": [
+        "professional",
         "ai",
-        "professional"
+        "networking"
       ],
       "categories": [
-        "ai-assistants",
-        "linkedin"
+        "professional",
+        "ai-assistants"
       ]
     },
     {
@@ -1466,7 +1561,7 @@
       "tags": [
         "ai",
         "dev",
-        "code"
+        "no-code"
       ],
       "categories": [
         "dev",
@@ -1488,11 +1583,15 @@
       "name": "Lenso AI",
       "description": "AI-powered reverse image search engine",
       "url": "https://lenso.ai/en",
-      "category": "security",
+      "category": "image-gen",
       "tags": [
         "ai",
-        "security",
-        "image"
+        "image",
+        "security"
+      ],
+      "categories": [
+        "image-gen",
+        "security"
       ]
     },
     {
@@ -1502,9 +1601,9 @@
       "category": "content",
       "tags": [
         "ai",
-        "creative",
         "content",
-        "video"
+        "video",
+        "creative"
       ],
       "categories": [
         "content",
@@ -1518,6 +1617,7 @@
       "category": "dev",
       "tags": [
         "dev",
+        "code",
         "free"
       ]
     },
@@ -1528,6 +1628,7 @@
       "category": "dev",
       "tags": [
         "dev",
+        "code",
         "free"
       ]
     },
@@ -1554,7 +1655,8 @@
       "tags": [
         "ai",
         "dev",
-        "creative"
+        "design",
+        "free"
       ],
       "categories": [
         "dev",
@@ -1569,7 +1671,8 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "interactive"
       ]
     },
     {
@@ -1579,7 +1682,8 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "games"
       ]
     },
     {
@@ -1590,7 +1694,8 @@
       "tags": [
         "fun",
         "free",
-        "creative"
+        "creative",
+        "games"
       ]
     },
     {
@@ -1600,22 +1705,23 @@
       "category": "fun",
       "tags": [
         "fun",
-        "free"
+        "free",
+        "games"
       ]
     },
     {
       "name": "Project Gutenberg",
       "description": "Over 70,000 free public domain e-books — classics, literature & non-fiction",
       "url": "https://www.gutenberg.org/",
-      "category": "research",
+      "category": "study",
       "tags": [
-        "free",
+        "study",
         "books",
-        "research"
+        "free"
       ],
       "categories": [
-        "research",
-        "books"
+        "study",
+        "research"
       ]
     },
     {
@@ -1625,8 +1731,8 @@
       "category": "research",
       "tags": [
         "research",
-        "free",
-        "ai"
+        "news",
+        "free"
       ]
     },
     {
@@ -1636,8 +1742,8 @@
       "category": "research",
       "tags": [
         "research",
-        "free",
-        "ai"
+        "news",
+        "free"
       ]
     },
     {
@@ -1647,8 +1753,8 @@
       "category": "research",
       "tags": [
         "research",
-        "free",
-        "creative"
+        "geography",
+        "free"
       ]
     },
     {
@@ -1658,6 +1764,7 @@
       "category": "research",
       "tags": [
         "research",
+        "economics",
         "free"
       ]
     },
@@ -1668,8 +1775,8 @@
       "category": "study",
       "tags": [
         "study",
-        "free",
-        "research"
+        "courses",
+        "free"
       ]
     },
     {
@@ -1685,21 +1792,22 @@
       ],
       "categories": [
         "study",
-        "books"
+        "research"
       ]
     },
     {
       "name": "QuillBot Grammar Check",
       "description": "Free AI-powered grammar, spelling and punctuation checker",
       "url": "https://quillbot.com/grammar-check",
-      "category": "ai-assistants",
+      "category": "writing",
       "tags": [
         "ai",
-        "free",
-        "study"
+        "writing",
+        "grammar",
+        "free"
       ],
       "categories": [
-        "ai-assistants",
+        "writing",
         "study"
       ]
     },
@@ -1707,100 +1815,66 @@
       "name": "Opencode",
       "description": "Open-source AI coding agent for terminal, desktop, and IDE workflows with multi-model support, LSP context, parallel sessions, and shareable links.",
       "url": "https://opencode.ai/",
-      "category": "ai-assistants",
+      "category": "dev",
       "tags": [
         "ai",
-        "open-source",
-        "coding-agent",
-        "dev tools",
-        "terminal",
-        "ide",
-        "llm",
-        "productivity"
+        "dev",
+        "code",
+        "open-source"
       ],
       "categories": [
-        "ai-assistants",
-        "dev"
+        "dev",
+        "ai-assistants"
       ]
     },
     {
       "name": "Monkey",
       "description": "Free live video chat app for meeting new people through random matching, short calls, text chat, and social discovery features.",
       "url": "https://monkey.app/",
-      "category": "fun",
+      "category": "social",
       "tags": [
-        "video-chat",
-        "random-chat",
         "social",
-        "live-chat",
-        "meet-people",
-        "streaming",
-        "mobile-app",
+        "video-chat",
         "free"
-      ],
-      "categories": [
-        "fun",
-        "misc"
       ]
     },
     {
       "name": "Ome TV",
       "description": "Random video chat platform to meet strangers worldwide through live cam chat, text chat, and social discovery features",
       "url": "https://ome.tv/",
-      "category": "fun",
+      "category": "social",
       "tags": [
-        "random-video-chat",
-        "cam-chat",
-        "stranger-chat",
         "social",
-        "text-chat",
-        "meet-people",
-        "free",
-        "omegle-alternative"
-      ],
-      "categories": [
-        "fun",
-        "misc"
+        "video-chat",
+        "free"
       ]
     },
     {
       "name": "Omegle",
       "description": "Free random video chat platform for anonymous 1-on-1 conversations with strangers through live cam chat, text chat, and interest-based matching.",
       "url": "https://omegle.fun/",
-      "category": "fun",
+      "category": "social",
       "tags": [
-        "random-video-chat",
-        "stranger-chat",
-        "anonymous-chat",
-        "cam-chat",
-        "text-chat",
-        "meet-people",
-        "omegle-alternative",
+        "social",
+        "video-chat",
         "free"
-      ],
-      "categories": [
-        "fun",
-        "misc"
       ]
     },
     {
       "name": "My Stylus",
       "description": "AI tool for academic writing, research, citations, paraphrasing, and essay support for students.",
       "url": "https://mystylus.com/",
-      "category": "research",
+      "category": "writing",
       "tags": [
-        "ai-writing",
-        "academic-writing",
-        "essay-helper",
-        "citations",
-        "paraphraser",
-        "summarizer",
-        "research",
-        "students"
+        "ai",
+        "writing",
+        "academic",
+        "research"
       ],
       "categories": [
-        "research",
-        "study"
+        "writing",
+        "study",
+        "research"
       ]
     },
     {
@@ -1809,13 +1883,9 @@
       "url": "https://www.duolingo.com/",
       "category": "study",
       "tags": [
-        "language-learning",
-        "education",
         "study",
-        "gamified-learning",
-        "math",
-        "music",
-        "chess",
+        "language",
+        "gamified",
         "free"
       ]
     },
@@ -1823,54 +1893,47 @@
       "name": "Emergent",
       "description": "AI app builder for creating and deploying full-stack web and mobile apps from prompts.",
       "url": "https://app.emergent.sh/",
-      "category": "ai-assistants",
+      "category": "dev",
       "tags": [
-        "ai-app-builder",
-        "no-code",
-        "full-stack",
-        "web-apps",
-        "mobile-apps",
-        "developer-tools",
-        "deployment",
-        "ai-coding"
+        "ai",
+        "dev",
+        "no-code"
       ],
       "categories": [
-        "ai-assistants",
-        "dev"
+        "dev",
+        "ai-assistants"
       ]
     },
     {
       "name": "Claude skills",
       "description": "A curated Claude prompt-codes collection for writing, reasoning, coding, research, and creative workflows.",
       "url": "https://github.com/alirezarezvani/claude-skills",
-      "category": "github",
+      "category": "ai-directories",
       "tags": [
         "ai",
-        "claude",
         "prompts",
-        "prompt engineering",
-        "productivity",
-        "writing",
-        "research",
-        "coding"
+        "coding",
+        "free"
+      ],
+      "categories": [
+        "ai-directories",
+        "dev"
       ]
     },
     {
       "name": "Superpowers",
       "description": "Free AI prompt collection for productivity, writing, research, and coding workflows.",
       "url": "https://github.com/obra/superpowers",
-      "category": "github",
+      "category": "ai-directories",
       "tags": [
         "ai",
-        "free",
         "prompts",
         "productivity",
-        "writing",
-        "research",
-        "coding",
-        "workflow",
-        "github",
-        "creative"
+        "free"
+      ],
+      "categories": [
+        "ai-directories",
+        "dev"
       ]
     },
     {
@@ -1879,17 +1942,14 @@
       "url": "https://www.w3schools.com/",
       "category": "study",
       "tags": [
-        "web development",
-        "tutorials",
+        "study",
+        "dev",
         "coding",
-        "html",
-        "css",
-        "javascript",
-        "python",
-        "sql",
-        "free",
-        "learning",
-        "reference"
+        "free"
+      ],
+      "categories": [
+        "study",
+        "dev"
       ]
     }
   ]
