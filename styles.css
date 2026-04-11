@@ -110,10 +110,21 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
 }
 .fwrap.expanded{max-height:600px;}
 
-/* On mobile: buttons grow to fill each row evenly — no jagged edges */
+/* Mobile: switch to CSS grid so every button is exactly equal width */
 @media(max-width:600px){
-  .fwrap{gap:6px;}
-  .fb{flex-grow:1;justify-content:center;}
+  .fwrap{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+  }
+  .fb{
+    white-space:normal;
+    text-align:center;
+    width:100%;
+    padding:7px 4px;
+    font-size:.68rem;
+    line-height:1.3;
+  }
 }
 
 .fb-showmore{
@@ -125,8 +136,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   cursor:pointer;white-space:nowrap;
   -webkit-tap-highlight-color:transparent;
   transition:background .15s,border-color .15s,color .15s;
-  flex-shrink:0;
-  margin-top:clamp(4px,.6vw,8px);
+  width:100%;margin-top:6px;text-align:center;
 }
 .fb-showmore:hover{background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.55);}
 .fb{
@@ -439,12 +449,10 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;}
   .modal-box{padding:20px;}
   .modal-actions{flex-direction:column;}
   .modal-submit,.modal-cancel{width:100%;}
-  /* Search full-width, filter panel below it */
   .ctrl{flex-direction:column;gap:8px;}
   .sw{flex:none;width:100%;max-width:100%;}
   .fwrap-outer,.fwrap{width:100%;}
-  .fb{font-size:.7rem;padding:5px 8px;}
-  .fb-showmore{font-size:.7rem;padding:5px 10px;}
+  .fb-showmore{border-radius:8px;}
 }
 
 /* ── Touch targets ── */
