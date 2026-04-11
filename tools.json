@@ -134,13 +134,6 @@
       "short": "Toolkit"
     },
     {
-      "id": "misc",
-      "label": "Random Chat",
-      "icon": "🏠",
-      "color": "#94a3b8",
-      "short": "Random"
-    },
-    {
       "id": "github",
       "label": "Github",
       "short": "Github",
