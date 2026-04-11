@@ -953,15 +953,14 @@
       "name": "Scribbr Plagiarism",
       "description": "Plagiarism checker for academic work",
       "url": "https://app.scribbr.com/plagiarism-checker",
-      "category": "ai-detection",
+      "category": "study",
       "tags": [
         "ai",
         "detection"
       ],
       "categories": [
-        "ai-detection",
-        "research",
-        "study"
+        "study",
+        "ai-detection"
       ]
     },
     {
