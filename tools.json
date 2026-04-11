@@ -280,15 +280,11 @@
     {
       "name": "10015.io",
       "description": "All-in-one AI toolbox with 100+ utilities",
-      "url": "https://10015.io",
+      "url": "https://10015.io/",
       "category": "ai-directories",
       "tags": [
         "ai",
         "directory"
-      ],
-      "categories": [
-        "ai-directories",
-        "dev"
       ]
     },
     {
