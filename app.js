@@ -144,7 +144,8 @@
   // ── Build category filter buttons ────────────────────────────
   function buildFilterButtons() {
     var fwrap = document.getElementById('fwrap');
-    // Wrap fwrap in outer container if not already done
+
+    // Wrap fwrap in outer container once
     if (!document.getElementById('fwrap-outer')) {
       var outer = document.createElement('div');
       outer.id = 'fwrap-outer';
@@ -152,8 +153,13 @@
       fwrap.parentNode.insertBefore(outer, fwrap);
       outer.appendChild(fwrap);
     }
+
     fwrap.innerHTML = '';
     fwrap.classList.remove('expanded');
+
+    // Remove existing show-more button if rebuilding
+    var existing = document.getElementById('fb-showmore-btn');
+    if (existing) existing.remove();
 
     var all = document.createElement('button');
     all.className = 'fb active';
@@ -172,28 +178,22 @@
       fwrap.appendChild(btn);
     });
 
-    // Build show more/less button — only if content overflows 3 rows
-    var outer2 = document.getElementById('fwrap-outer');
-    // Remove existing toggle if any
-    var existing = document.getElementById('fb-showmore-btn');
-    if (existing) existing.remove();
-
-    // Use rAF to measure after layout
+    // Inject show more/less after layout is computed
     requestAnimationFrame(function () {
-      var fullH = fwrap.scrollHeight;
-      var clampH = fwrap.offsetHeight;
-      if (fullH <= clampH + 4) return; // fits in 3 rows, no button needed
+      var outerEl = document.getElementById('fwrap-outer');
+      if (!outerEl) return;
+      // Only add button if content overflows the 3-row height
+      if (fwrap.scrollHeight <= fwrap.offsetHeight + 4) return;
 
-      var btn = document.createElement('button');
-      btn.id = 'fb-showmore-btn';
-      btn.className = 'fb-showmore';
-      btn.textContent = 'Show more ▾';
-      outer2.appendChild(btn);
-
-      btn.addEventListener('click', function () {
+      var toggle = document.createElement('button');
+      toggle.id = 'fb-showmore-btn';
+      toggle.className = 'fb-showmore';
+      toggle.textContent = 'Show more \u25be';
+      toggle.addEventListener('click', function () {
         var expanded = fwrap.classList.toggle('expanded');
-        btn.textContent = expanded ? 'Show less ▴' : 'Show more ▾';
+        toggle.textContent = expanded ? 'Show less \u25b4' : 'Show more \u25be';
       });
+      outerEl.appendChild(toggle);
     });
   }
 
