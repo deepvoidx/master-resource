@@ -1189,17 +1189,12 @@
     {
       "name": "Z-Library",
       "description": "World's largest free e-book and article library",
-      "url": "https://z-lib.id",
+      "url": "https://z-lib.id/",
       "category": "books",
       "tags": [
         "x27",
         "free",
         "books"
-      ],
-      "categories": [
-        "books",
-        "research",
-        "study"
       ]
     },
     {
