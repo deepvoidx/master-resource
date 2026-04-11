@@ -209,20 +209,6 @@
       ]
     },
     {
-      "name": "Blackbox AI",
-      "description": "AI coding assistant and chat tool",
-      "url": "https://www.blackbox.ai",
-      "category": "ai-assistants",
-      "tags": [
-        "ai",
-        "chatbot"
-      ],
-      "categories": [
-        "ai-assistants",
-        "dev"
-      ]
-    },
-    {
       "name": "Sarvam AI",
       "description": "Indian-language focused AI assistant",
       "url": "https://www.sarvam.ai",
