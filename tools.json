@@ -577,14 +577,10 @@
     {
       "name": "MyInstants",
       "description": "Instant sound effects soundboard",
-      "url": "https://www.myinstants.com",
+      "url": "https://www.myinstants.com/",
       "category": "audio",
       "tags": [
         "free",
-        "audio",
-        "fun"
-      ],
-      "categories": [
         "audio",
         "fun"
       ]
