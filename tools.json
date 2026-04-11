@@ -548,7 +548,7 @@
     {
       "name": "Adobe Podcast",
       "description": "AI audio enhancer that removes noise and sharpens clarity",
-      "url": "https://podcast.adobe.com",
+      "url": "https://podcast.adobe.com/",
       "category": "audio",
       "tags": [
         "ai",
@@ -557,8 +557,7 @@
       ],
       "categories": [
         "audio",
-        "content",
-        "design"
+        "content"
       ]
     },
     {
