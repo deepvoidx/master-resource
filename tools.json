@@ -1703,15 +1703,14 @@
       "name": "QuillBot Grammar Check",
       "description": "Free AI-powered grammar, spelling and punctuation checker",
       "url": "https://quillbot.com/grammar-check",
-      "category": "ai-detection",
-      "categories": [
-        "ai-detection",
-        "ai-assistants",
-        "study"
-      ],
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "free",
+        "study"
+      ],
+      "categories": [
+        "ai-assistants",
         "study"
       ]
     },
