@@ -1757,16 +1757,15 @@
       "description": "Free cultural and educational media — courses, films, audiobooks, textbooks",
       "url": "https://www.openculture.com/",
       "category": "study",
-      "categories": [
-        "study",
-        "books",
-        "research"
-      ],
       "tags": [
         "study",
         "free",
         "books",
         "research"
+      ],
+      "categories": [
+        "study",
+        "books"
       ]
     },
     {
