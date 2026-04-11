@@ -1947,6 +1947,29 @@
         "study",
         "dev"
       ]
+    },
+    {
+      "name": "Farhan Ashraf Dev",
+      "description": "A GitHub-based developer resource by Farhan Ashraf featuring practical tools, code projects, and technical utilities for developers.",
+      "url": "https://github.com/farhanashrafdev",
+      "category": "dev",
+      "tags": [
+        "github",
+        "developer",
+        "tools",
+        "coding",
+        "devtools",
+        "software",
+        "projects",
+        "utilities",
+        "free"
+      ],
+      "categories": [
+        "dev",
+        "research",
+        "study",
+        "professional"
+      ]
     }
   ]
 }
