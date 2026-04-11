@@ -1546,16 +1546,15 @@
       "name": "Lenso AI",
       "description": "AI-powered reverse image search engine",
       "url": "https://lenso.ai/en",
-      "category": "security",
+      "category": "ai-detection",
       "tags": [
         "ai",
         "security",
         "image"
       ],
       "categories": [
-        "security",
         "ai-detection",
-        "image-gen"
+        "security"
       ]
     },
     {
