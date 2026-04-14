@@ -1094,6 +1094,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     S.activeTab = tab;
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
+    if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
       var frame = document.getElementById('site-preview-frame');
       if (frame && !frame.getAttribute('data-loaded')) {
@@ -1101,6 +1102,61 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
       }
     }
   });
+});
+
+// ── Device toggle for site preview ────────────────────────────
+document.querySelectorAll('.device-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.device-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var device = btn.getAttribute('data-device');
+    var wrap = document.getElementById('preview-wrap');
+    var frame = document.getElementById('site-preview-frame');
+    if (!wrap || !frame) return;
+    wrap.className = 'preview-wrap ' + device;
+    if (device === 'mobile') {
+      frame.style.width = '390px';
+      frame.style.borderRadius = '20px';
+    } else if (device === 'tablet') {
+      frame.style.width = '768px';
+      frame.style.borderRadius = '14px';
+    } else {
+      frame.style.width = '100%';
+      frame.style.borderRadius = '12px';
+    }
+  });
+});
+
+// ── Analytics tab ─────────────────────────────────────────────
+function initAnalyticsTab() {
+  var savedUrl = localStorage.getItem('mr_analytics_url') || '';
+  var inp = document.getElementById('analytics-url');
+  if (inp && savedUrl && !inp.value) inp.value = savedUrl;
+  if (savedUrl) loadAnalyticsFrame(savedUrl);
+}
+
+function loadAnalyticsFrame(url) {
+  var frame    = document.getElementById('analytics-frame');
+  var wrap     = document.getElementById('analytics-frame-wrap');
+  var setup    = document.getElementById('analytics-setup');
+  if (!frame || !url) return;
+  // Clean URL
+  url = url.trim().replace(/\/+$/, '');
+  frame.src = url;
+  wrap.classList.remove('hidden');
+  setup.style.display = 'none';
+  localStorage.setItem('mr_analytics_url', url);
+}
+
+document.getElementById('analytics-load-btn').addEventListener('click', function(){
+  var url = (document.getElementById('analytics-url').value || '').trim();
+  if (!url) { toast('Enter your GoatCounter URL first', '⚠️'); return; }
+  if (!/^https?:\/\//.test(url)) url = 'https://' + url;
+  loadAnalyticsFrame(url);
+});
+
+document.getElementById('analytics-url').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') document.getElementById('analytics-load-btn').click();
 });
 
 // ═══════════════════════════════════════════════════════
