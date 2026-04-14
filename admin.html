@@ -48,6 +48,7 @@
     <button class="tab-btn" data-tab="preview">🌐 Site Preview</button>
     <button class="tab-btn" data-tab="history">📋 History</button>
     <button class="tab-btn" data-tab="stats">📊 Stats</button>
+    <button class="tab-btn" data-tab="analytics">📈 Analytics</button>
   </div>
 
   <!-- ── PENDING TAB ── -->
@@ -112,18 +113,25 @@
 
   <!-- ── SITE PREVIEW TAB ── -->
   <div class="tab-content" id="tab-preview">
-    <div class="sec-hdr" style="margin-bottom:10px;">
+    <div class="sec-hdr" style="margin-bottom:8px;">
       <h2>Site Preview</h2>
-      <small style="color:var(--mute);">Your live site — as users see it</small>
-      <a href="https://deepvoidx.github.io/master-resource/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm ml-auto">Open in new tab ↗</a>
+      <a href="https://deepvoidx.github.io/master-resource/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm ml-auto">Open ↗</a>
     </div>
-    <iframe
-      id="site-preview-frame"
-      src="https://deepvoidx.github.io/master-resource/"
-      style="width:100%;height:calc(100vh - 120px);min-height:400px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#08080f;display:block;"
-      loading="lazy"
-      title="Site Preview"
-    ></iframe>
+    <div class="preview-device-bar">
+      <span style="font-size:.74rem;color:var(--mute);">View as:</span>
+      <button class="device-btn active" data-device="desktop">🖥 Desktop</button>
+      <button class="device-btn" data-device="tablet">📱 Tablet (768px)</button>
+      <button class="device-btn" data-device="mobile">📱 Mobile (390px)</button>
+    </div>
+    <div class="preview-wrap desktop" id="preview-wrap">
+      <iframe
+        id="site-preview-frame"
+        src="https://deepvoidx.github.io/master-resource/"
+        style="width:100%;height:calc(100vh - 160px);min-height:400px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#08080f;display:block;"
+        loading="lazy"
+        title="Site Preview"
+      ></iframe>
+    </div>
   </div>
 
   <!-- ── HISTORY TAB ── -->
@@ -142,6 +150,32 @@
       <div class="flex center gap8" style="padding:16px;justify-content:center;">
         <div class="spinner"></div><span style="color:var(--mute);">Building stats…</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ── ANALYTICS TAB ── -->
+  <div class="tab-content" id="tab-analytics">
+    <div class="sec-hdr"><h2>Visitor Analytics</h2></div>
+
+    <!-- GoatCounter URL config -->
+    <div class="analytics-url-bar">
+      <label style="font-size:.76rem;color:var(--mute);white-space:nowrap;">GoatCounter URL:</label>
+      <input type="url" id="analytics-url" placeholder="https://yoursite.goatcounter.com" autocomplete="off"/>
+      <button class="btn btn-primary btn-sm" id="analytics-load-btn">Load</button>
+    </div>
+
+    <div id="analytics-setup" class="analytics-info">
+      <h3>🔢 How to set up free visitor analytics</h3>
+      <p><strong>Step 1:</strong> Sign up for free at <a href="https://www.goatcounter.com" target="_blank" rel="noopener">goatcounter.com</a> — no cookies, privacy-friendly, free for personal use.</p>
+      <p><strong>Step 2:</strong> During signup, choose a site code (e.g. <code>masterresource</code>). Your dashboard URL will be <code>https://masterresource.goatcounter.com</code></p>
+      <p><strong>Step 3:</strong> Add the tracking script to your <code>index.html</code> just before <code>&lt;/body&gt;</code>:</p>
+      <p><code>&lt;script data-goatcounter="https://yourcode.goatcounter.com/count" async src="//gc.zgo.at/count.js"&gt;&lt;/script&gt;</code></p>
+      <p><strong>Step 4:</strong> Paste your GoatCounter dashboard URL above and click Load. You will see page views, visitor countries, referrers, and visit times — all in real time.</p>
+      <p style="color:#f87171;font-size:.74rem;">Note: GitHub Pages is static — no server-side analytics. GoatCounter is the best free option that actually works.</p>
+    </div>
+
+    <div id="analytics-frame-wrap" class="hidden">
+      <iframe id="analytics-frame" class="analytics-iframe" title="Analytics"></iframe>
     </div>
   </div>
 </div>
