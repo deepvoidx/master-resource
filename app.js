@@ -39,23 +39,34 @@ testConnection();
   document.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
   // ── Load tools.json ─────────────────────────────────────────
-  fetch('./tools.json')
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-      allCategories = data.categories;
-      allTools = data.tools;
-      TOTAL = allTools.length;
-      buildFilterButtons();
-      buildDOM();
-      buildFlatView();
-      buildSortControls();
-      buildSubmitBtn();
-      apply(false);
-    })
-    .catch(function () {
-      document.getElementById('cats').innerHTML =
-        '<p style="color:#e11d48;padding:40px">Failed to load tools.json</p>';
-    });
+loadToolsFromDB();
+
+async function loadToolsFromDB() {
+  const { data, error } = await supabaseClient
+    .from("tools")
+    .select("*");
+
+  if (error) {
+    console.log("ERROR:", error);
+    return;
+  }
+
+  console.log("DB DATA:", data);
+
+  // temporary mapping
+  allTools = data;
+  TOTAL = allTools.length;
+
+  // keep empty for now
+  allCategories = [];
+
+  buildFilterButtons();
+  buildDOM();
+  buildFlatView();
+  buildSortControls();
+  buildSubmitBtn();
+  apply(false);
+}
 
   // ── Toast ────────────────────────────────────────────────────
   var toastT;
