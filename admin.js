@@ -80,9 +80,42 @@ function resetIdleTimer() {
 
 function logout() {
   S.token = null; S.toolsData = null; S.pendingData = null;
+  S.activeTab = 'pending'; S.toolsSortMode = 'default';
+  S.bulkSelected.clear();
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   clearTimeout(S.sessionTimer);
+
+  // Reset historyLoaded so it reloads fresh on next login
+  historyLoaded = false;
+
+  // Reset all rendered lists back to loading spinners
+  var spinner = '<div class="flex center gap8" style="padding:20px;justify-content:center;"><div class="spinner"></div><span style="color:var(--mute);">Loading…</span></div>';
+  ['pending-list','tools-list','cats-list','history-list'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = ''; el.classList.add('hidden'); }
+  });
+  ['pending-loading','tools-loading','cats-loading','history-loading'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = spinner; el.classList.remove('hidden'); }
+  });
+  var se = document.getElementById('stats-content');
+  if (se) se.innerHTML = spinner;
+  document.getElementById('pending-empty').classList.add('hidden');
+
+  // Reset tabs UI back to Pending
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+  var pendBtn = document.querySelector('.tab-btn[data-tab="pending"]');
+  var pendTab = document.getElementById('tab-pending');
+  if (pendBtn) pendBtn.classList.add('active');
+  if (pendTab) pendTab.classList.add('active');
+
+  // Reset counts
+  ['pending-count','tools-tab-count','cats-tab-count','tools-count','cats-count'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
+
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('pat-input').value = '';
