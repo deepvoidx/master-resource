@@ -1,3 +1,6 @@
+const supabaseClient = supabase.createClient(
+  "https://yfbnitpjoecvsdqpknkf.supabase.co",
+  "sb_publishable_K_V3o4HEFxALqN1CcUdZ2Q_a--jOH4n"
 (function () {
 
   // ══════════════════════════════════════════════════════════════
