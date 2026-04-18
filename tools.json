@@ -1500,7 +1500,7 @@
       "name": "Sejda PDF Editor",
       "description": "Free online PDF editor annotate fill sign",
       "url": "https://www.sejda.com/pdf-editor",
-      "category": "professional",
+      "category": "design",
       "tags": [
         "professional",
         "pdf",
@@ -1508,8 +1508,9 @@
         "design"
       ],
       "categories": [
+        "design",
         "professional",
-        "design"
+        "utilities"
       ]
     },
     {
