@@ -366,13 +366,17 @@
     {
       "name": "Pixelcut",
       "description": "AI image editor with magic object remover",
-      "url": "https://www.pixelcut.ai",
+      "url": "https://www.pixelcut.ai/",
       "category": "image-gen",
       "tags": [
         "ai",
         "creative",
         "image",
         "free"
+      ],
+      "categories": [
+        "image-gen",
+        "utilities"
       ]
     },
     {
