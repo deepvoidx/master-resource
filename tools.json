@@ -2202,6 +2202,95 @@
         "dev",
         "security"
       ]
+    },
+    {
+      "name": "Awesome NotebookLM Prompts",
+      "description": "Curated collection of field-tested NotebookLM prompts for turning papers, notes and transcripts into clean presentation-ready slide decks — includes a citation-checker skill",
+      "url": "https://github.com/serenakeyitan/awesome-notebookLM-prompts",
+      "category": "research",
+      "tags": [
+        "ai",
+        "free",
+        "research",
+        "prompts",
+        "opensource"
+      ],
+      "categories": [
+        "research",
+        "writing"
+      ]
+    },
+    {
+      "name": "Google Colab",
+      "description": "Free cloud-based Jupyter notebook environment — write and run Python in the browser with free GPU/TPU access, ideal for ML, data science and AI experiments",
+      "url": "https://colab.research.google.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "free",
+        "research",
+        "ai",
+        "python",
+        "ml"
+      ],
+      "categories": [
+        "dev",
+        "research",
+        "study"
+      ]
+    },
+    {
+      "name": "Google AI Studio",
+      "description": "Browser-based playground for Google's Gemini models — test prompts, tune parameters, generate API keys, and export production-ready code. Free to use.",
+      "url": "https://aistudio.google.com/welcome",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "free",
+        "gemini",
+        "api",
+        "prompts"
+      ],
+      "categories": [
+        "dev",
+        "ai-assistants"
+      ]
+    },
+    {
+      "name": "Google Earth Engine",
+      "description": "Cloud-based geospatial analysis platform with petabytes of satellite imagery — detect land changes, map trends and run environmental research at planetary scale. Free for non-commercial use.",
+      "url": "https://earthengine.google.com/",
+      "category": "research",
+      "tags": [
+        "research",
+        "dev",
+        "free",
+        "maps",
+        "data",
+        "science"
+      ],
+      "categories": [
+        "research",
+        "dev"
+      ]
+    },
+    {
+      "name": "Google Labs",
+      "description": "Google's experimental AI playground — explore and try early-stage AI experiments across creativity, productivity and generative media before they become mainstream products",
+      "url": "https://labs.google/lll/en",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "free",
+        "fun",
+        "creative",
+        "experimental"
+      ],
+      "categories": [
+        "ai-directories",
+        "fun"
+      ]
     }
   ]
 }
