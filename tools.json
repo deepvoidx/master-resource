@@ -118,6 +118,13 @@
       "short": "Social",
       "icon": "💬",
       "color": "#7c3aed"
+    },
+    {
+      "id": "utilities",
+      "label": "Utilities & File Tools",
+      "short": "Utilities",
+      "icon": "🔧",
+      "color": "#0284c7"
     }
   ],
   "tools": [
@@ -1987,6 +1994,205 @@
         "research",
         "study",
         "professional"
+      ]
+    },
+    {
+      "name": "Fabric",
+      "description": "Open-source AI framework with 100+ crowdsourced prompt patterns — pipe any input through CLI to summarise, extract wisdom, write essays, and more across 20+ AI providers",
+      "url": "https://github.com/danielmiessler/fabric",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "free",
+        "opensource",
+        "prompts",
+        "cli"
+      ],
+      "categories": [
+        "dev",
+        "ai-assistants"
+      ]
+    },
+    {
+      "name": "claude-mem",
+      "description": "Claude Code plugin that auto-captures session activity, compresses it with AI, and injects relevant context into future sessions — giving Claude persistent memory across projects",
+      "url": "https://github.com/thedotmack/claude-mem",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "free",
+        "opensource",
+        "memory",
+        "claude"
+      ]
+    },
+    {
+      "name": "MemPalace",
+      "description": "Best-benchmarked open-source AI memory system — 96.6% on LongMemEval. Gives LLMs persistent cross-session memory using hybrid vector + keyword retrieval. Free, MIT licensed.",
+      "url": "https://github.com/MemPalace/mempalace",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "free",
+        "opensource",
+        "memory",
+        "research"
+      ],
+      "categories": [
+        "dev",
+        "research"
+      ]
+    },
+    {
+      "name": "Meta AI",
+      "description": "Meta's AI assistant powered by Llama — chat, image generation, and real-time search built into WhatsApp, Instagram, and the web",
+      "url": "https://meta.ai/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot",
+        "free",
+        "image-gen"
+      ],
+      "categories": [
+        "ai-assistants",
+        "image-gen"
+      ]
+    },
+    {
+      "name": "Ollama",
+      "description": "Run Llama, Mistral, Gemma, DeepSeek and 100+ open-source LLMs locally on your machine — full privacy, no cloud, one command to install and run any model",
+      "url": "https://github.com/ollama/ollama",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "free",
+        "opensource",
+        "security",
+        "privacy",
+        "local"
+      ],
+      "categories": [
+        "dev",
+        "security"
+      ]
+    },
+    {
+      "name": "iLovePDF — PDF to Word",
+      "description": "Free online converter that turns PDFs into editable Word documents (.docx) — preserves formatting, handles scanned files with OCR, no signup needed",
+      "url": "https://www.ilovepdf.com/pdf_to_word",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "pdf"
+      ]
+    },
+    {
+      "name": "iLovePDF — Word to PDF",
+      "description": "Free online converter that turns Word documents into PDFs instantly — drag and drop, no signup, works in the browser",
+      "url": "https://www.ilovepdf.com/word_to_pdf",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "pdf"
+      ]
+    },
+    {
+      "name": "ImageCompressor.com",
+      "description": "Free browser-based image compressor — reduces JPEG, PNG, GIF and SVG file size without visible quality loss, no upload limit per file",
+      "url": "https://imagecompressor.com/",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "design",
+        "images"
+      ],
+      "categories": [
+        "utilities",
+        "design"
+      ]
+    },
+    {
+      "name": "Squoosh",
+      "description": "Google's open-source image compression web app — compare codecs side-by-side (WebP, AVIF, MozJPEG), tweak quality live, works entirely in the browser with no uploads",
+      "url": "https://squoosh.app/",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "dev",
+        "design",
+        "images",
+        "opensource"
+      ],
+      "categories": [
+        "utilities",
+        "dev",
+        "design"
+      ]
+    },
+    {
+      "name": "ImageResizer — Compressor",
+      "description": "Free online image compressor and resizer — bulk compress JPEG, PNG, WebP up to 90% smaller, with optional resizing, right in the browser",
+      "url": "https://imageresizer.com/image-compressor",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "images"
+      ]
+    },
+    {
+      "name": "Compress-or-Die",
+      "description": "Advanced browser-based image compressor focused on maximum JPEG/PNG compression — fine-grained quality controls, metadata stripping, and side-by-side preview",
+      "url": "https://compress-or-die.com/jpg",
+      "category": "utilities",
+      "tags": [
+        "free",
+        "utilities",
+        "design",
+        "images"
+      ],
+      "categories": [
+        "utilities",
+        "design"
+      ]
+    },
+    {
+      "name": "TinyFish",
+      "description": "AI web agent infrastructure — describe a task in plain English and TinyFish navigates live websites, logs in, extracts data, and automates workflows at scale via API",
+      "url": "https://www.tinyfish.ai/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "automation",
+        "agents"
+      ]
+    },
+    {
+      "name": "GoatCounter",
+      "description": "Privacy-friendly, open-source website analytics — no cookies, GDPR compliant, shows page views, countries, referrers and visit times. Free for personal use.",
+      "url": "https://www.goatcounter.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "free",
+        "opensource",
+        "security",
+        "privacy",
+        "analytics"
+      ],
+      "categories": [
+        "dev",
+        "security"
       ]
     }
   ]
