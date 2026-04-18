@@ -350,8 +350,8 @@
     {
       "name": "Clipdrop",
       "description": "AI image editing suite by Stability AI",
-      "url": "https://clipdrop.co",
-      "category": "image-gen",
+      "url": "https://clipdrop.co/",
+      "category": "design",
       "tags": [
         "ai",
         "creative",
@@ -359,8 +359,8 @@
         "design"
       ],
       "categories": [
-        "image-gen",
-        "design"
+        "design",
+        "utilities"
       ]
     },
     {
@@ -1811,7 +1811,6 @@
       ],
       "categories": [
         "writing",
-        "study",
         "utilities"
       ]
     },
