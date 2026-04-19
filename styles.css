@@ -438,21 +438,58 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 
 /* ── Mobile ── */
 @media(max-width:499px){
-  .card{padding:11px 10px;gap:4px;contain:layout;}
-  .tool-name{font-size:0.77rem;}
-  .tool-desc{font-size:0.67rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-  .card-actions{margin-top:5px;}
-  .ca-btn{padding:6px 4px;font-size:0.63rem;}
+  /* Cards — richer glass look to match desktop */
+  .card{
+    padding:13px 12px;gap:5px;contain:layout;
+    background:rgba(18,18,28,0.94);
+    border-color:rgba(255,255,255,0.10);
+    box-shadow:0 3px 14px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.065),inset 0 -1px 0 rgba(0,0,0,.14);
+  }
+  /* Always show accent bar on mobile (no hover) */
+  .card::before{opacity:.55;}
+
+  .tool-name{font-size:0.8rem;}
+  .tool-desc{font-size:0.7rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:#6a6a8a;}
+  .tool-link{font-size:0.68rem;color:#7e78e0;}
+
+  /* Card actions */
+  .card-actions{margin-top:6px;}
+  .ca-btn{
+    padding:7px 6px;font-size:0.68rem;
+    background:rgba(108,99,255,0.1);
+    border-color:rgba(108,99,255,0.22);
+  }
+
+  /* Category section header — richer glass */
+  .cat-hdr{
+    background:rgba(20,20,32,0.97);
+    border-color:rgba(255,255,255,0.12);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 8px rgba(0,0,0,.28);
+    padding:9px 12px;
+  }
+  .cat-title{font-size:.9rem;}
+  .cat-cnt{font-size:.68rem;padding:2px 9px;}
+
+  /* Ctrl bar */
   .sort-wrap{justify-content:flex-end;}
   .ctrl-meta{flex-direction:column;align-items:flex-start;gap:5px;}
   .tags-row{width:100%;}
-  .modal-box{padding:20px;}
-  .modal-actions{flex-direction:column;}
-  .modal-submit,.modal-cancel{width:100%;}
   .ctrl{flex-direction:column;gap:8px;}
   .sw{flex:none;width:100%;max-width:100%;}
   .fwrap-outer,.fwrap{width:100%;}
   .fb-showmore{border-radius:8px;}
+
+  /* Modal */
+  .modal-box{padding:20px;border-radius:16px;}
+  .modal-actions{flex-direction:column;}
+  .modal-submit,.modal-cancel{width:100%;}
+
+  /* Toast */
+  #toast{white-space:normal;text-align:center;max-width:calc(100vw - 32px);}
+
+  /* Top / submit buttons — larger tap targets */
+  #topbtn{width:42px;height:42px;}
+  #submit-btn{width:44px;height:44px;}
 }
 
 /* ── Touch targets ── */
