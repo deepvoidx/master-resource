@@ -431,6 +431,7 @@
 
   // ── Build a single card ──────────────────────────────────────
   function buildCard(tool, color) {
+    var toolIndex = allTools.indexOf(tool);
     var isNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
 
     var searchStr = [
