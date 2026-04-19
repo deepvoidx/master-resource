@@ -599,7 +599,7 @@ function renderTools(q) {
     }).join(' · ');
     var row = document.createElement('div');
     row.className = 'tool-row glass';
-    var isToolNew = tool.newUntil && new Date(tool.newUntil) > new Date();
+    var isToolNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
     row.innerHTML =
       '<div style="flex:1;min-width:0;">' +
         '<div class="tool-row-name">'+esc(tool.name)+(isToolNew?'<span class="tool-row-new">NEW</span>':'')+'</div>' +
@@ -668,8 +668,7 @@ function renderTools(q) {
       var tags=tv.split(',').map(function(t){return t.trim().replace(/^#/,'').toLowerCase().slice(0,30);}).filter(Boolean).slice(0,15);
       var updated={name:nv,description:dv,url:ur.url,category:cats[0],tags:tags};
       if(cats.length>1) updated.categories=cats;
-      // preserve newUntil if it exists
-      if(S.toolsData.tools[idx] && S.toolsData.tools[idx].newUntil) updated.newUntil = S.toolsData.tools[idx].newUntil;
+      if(S.toolsData.tools[idx]&&S.toolsData.tools[idx].newUntil) updated.newUntil=S.toolsData.tools[idx].newUntil;
       ee.textContent='';
       var original=JSON.parse(JSON.stringify(S.toolsData.tools[idx]));
       S.toolsData.tools[idx]=updated;
@@ -677,7 +676,7 @@ function renderTools(q) {
       row.querySelector('[data-action=expand]').textContent='⌄';
       renderTools(toolsSearchQ); maybeRefreshStats();
       scheduleWithUndo(
-        'Edit to "'+nv+'" will be saved in 10s…',
+        'Edit to "'+nv+'" saved — undo?',
         function(){ return apiPut('tools.json',S.toolsData,S.toolsSha,'Edit tool: '+nv).then(function(res){S.toolsSha=res.content.sha;}); },
         function(){ toast('Updated "'+nv+'"','✅'); maybeRefreshStats(); },
         function(){ S.toolsData.tools[idx]=original; renderTools(toolsSearchQ); maybeRefreshStats(); }
@@ -715,11 +714,10 @@ function openToolModal(idx) {
   // New tag
   var newChk = document.getElementById('tm-new-check');
   var newLbl = document.getElementById('tm-new-lbl');
-  var newExp = document.getElementById('tm-new-expires');
-  var isCurrentlyNew = tool.newUntil && new Date(tool.newUntil) > new Date();
   if (newChk) {
-    newChk.checked = !!isCurrentlyNew;
-    if (newLbl) newLbl.classList.toggle('checked', !!isCurrentlyNew);
+    var isCurrentlyNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
+    newChk.checked = isCurrentlyNew;
+    if (newLbl) newLbl.classList.toggle('checked', isCurrentlyNew);
   }
 
   var catsEl = document.getElementById('tm-cats');
@@ -788,7 +786,7 @@ document.getElementById('tm-save').addEventListener('click', function(){
 
   var tools = S.toolsData;
   var isNew = S.editToolIdx === -1;
-  var snap = JSON.parse(JSON.stringify(tools.tools));
+  var snapTools = JSON.parse(JSON.stringify(tools.tools));
   if (isNew) { tools.tools.push(tool); }
   else { tools.tools[S.editToolIdx] = tool; }
 
@@ -796,10 +794,10 @@ document.getElementById('tm-save').addEventListener('click', function(){
   renderTools(); updateTabCounts(); maybeRefreshStats();
 
   scheduleWithUndo(
-    '"'+nameVal+'" '+(isNew?'will be added':'changes will be saved')+' in 10s…',
+    '"'+nameVal+'" '+(isNew?'will be added':'changes saved')+' — undo?',
     function(){ return apiPut('tools.json', tools, S.toolsSha, (isNew?'Add':'Edit')+' tool: '+nameVal).then(function(r){ S.toolsSha=r.content.sha; }); },
     function(){ toast((isNew?'Added':'Updated')+' "'+nameVal+'"','✅'); maybeRefreshStats(); },
-    function(){ S.toolsData.tools = snap; renderTools(); updateTabCounts(); maybeRefreshStats(); }
+    function(){ S.toolsData.tools=snapTools; renderTools(); updateTabCounts(); maybeRefreshStats(); }
   );
 });
 
@@ -949,9 +947,9 @@ document.getElementById('bm-save').addEventListener('click', function() {
   renderTools(); updateTabCounts(); maybeRefreshStats();
 
   scheduleWithUndo(
-    tools.length + ' tool(s) will be added in 10s…',
-    function(){ return apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add ' + tools.length + ' tool(s)').then(function(res){ S.toolsSha = res.content.sha; }); },
-    function(){ toast('Added ' + tools.length + ' tool(s)!', '✅'); maybeRefreshStats(); },
+    tools.length + ' tool(s) will be added — undo?',
+    function(){ return apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add '+tools.length+' tool(s)').then(function(res){ S.toolsSha=res.content.sha; }); },
+    function(){ toast('Added '+tools.length+' tool(s)!','✅'); maybeRefreshStats(); },
     function(){ S.toolsData.tools.splice(snapLen, tools.length); renderTools(); updateTabCounts(); maybeRefreshStats(); }
   );
 });
@@ -1159,29 +1157,29 @@ document.querySelectorAll('.device-btn').forEach(function(btn){
     document.querySelectorAll('.device-btn').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
     var device = btn.getAttribute('data-device');
-    var wrap = document.getElementById('preview-wrap');
+    var wrap  = document.getElementById('preview-wrap');
     var frame = document.getElementById('site-preview-frame');
     if (!wrap || !frame) return;
     wrap.className = 'preview-wrap ' + device;
+    frame.style.transform = '';
+    frame.style.transformOrigin = '';
+    wrap.style.height = '';
     if (device === 'mobile') {
       frame.style.width = '390px';
-      frame.style.transform = '';
       frame.style.borderRadius = '20px';
     } else if (device === 'tablet') {
       frame.style.width = '768px';
-      frame.style.transform = '';
       frame.style.borderRadius = '14px';
     } else {
-      // Render at true desktop width (1280px) scaled to fit container
+      // True desktop: render at 1280px, scale-to-fit container
       var DESKTOP_W = 1280;
-      var containerW = wrap.offsetWidth || DESKTOP_W;
+      var containerW = wrap.getBoundingClientRect().width || DESKTOP_W;
       var scale = Math.min(1, containerW / DESKTOP_W);
       frame.style.width = DESKTOP_W + 'px';
       frame.style.transform = 'scale(' + scale + ')';
       frame.style.transformOrigin = 'top left';
       frame.style.borderRadius = '12px';
-      // shrink wrap height so it doesn't leave a gap
-      wrap.style.height = (frame.offsetHeight * scale) + 'px';
+      wrap.style.height = Math.round(frame.offsetHeight * scale) + 'px';
     }
   });
 });
