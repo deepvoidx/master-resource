@@ -11,7 +11,6 @@
   var activeFilters = [], at = 'all', sortMode = 'default';
   var allTools = [], allCategories = [];
   var TOTAL = 0;
-  var NEW_COUNT = 11;
 
   // ── Content protection ──────────────────────────────────────
   document.addEventListener('contextmenu', function (e) {
@@ -432,8 +431,7 @@
 
   // ── Build a single card ──────────────────────────────────────
   function buildCard(tool, color) {
-    var toolIndex = allTools.indexOf(tool);
-    var isNew = toolIndex >= allTools.length - NEW_COUNT;
+    var isNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
 
     var searchStr = [
       tool.name, tool.description,
