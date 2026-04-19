@@ -599,9 +599,10 @@ function renderTools(q) {
     }).join(' · ');
     var row = document.createElement('div');
     row.className = 'tool-row glass';
+    var isToolNew = tool.newUntil && new Date(tool.newUntil) > new Date();
     row.innerHTML =
       '<div style="flex:1;min-width:0;">' +
-        '<div class="tool-row-name">'+esc(tool.name)+'</div>' +
+        '<div class="tool-row-name">'+esc(tool.name)+(isToolNew?'<span class="tool-row-new">NEW</span>':'')+'</div>' +
         '<div class="tool-row-meta">'+esc(catMetaStr)+'&nbsp;·&nbsp;'+esc((tool.url||'').replace(/^https?:\/\//,'').split('/')[0])+'</div>' +
       '</div>' +
       '<div class="tool-row-badge">'+esc(tool.tags&&tool.tags.length?'#'+tool.tags.slice(0,2).join(' #'):'–')+'</div>' +
@@ -667,13 +668,20 @@ function renderTools(q) {
       var tags=tv.split(',').map(function(t){return t.trim().replace(/^#/,'').toLowerCase().slice(0,30);}).filter(Boolean).slice(0,15);
       var updated={name:nv,description:dv,url:ur.url,category:cats[0],tags:tags};
       if(cats.length>1) updated.categories=cats;
-      var saveBtn=inlineEdit.querySelector('.ie-save');
-      saveBtn.disabled=true; saveBtn.textContent='Saving…'; ee.textContent='';
-      var original=S.toolsData.tools[idx];
+      // preserve newUntil if it exists
+      if(S.toolsData.tools[idx] && S.toolsData.tools[idx].newUntil) updated.newUntil = S.toolsData.tools[idx].newUntil;
+      ee.textContent='';
+      var original=JSON.parse(JSON.stringify(S.toolsData.tools[idx]));
       S.toolsData.tools[idx]=updated;
-      apiPut('tools.json',S.toolsData,S.toolsSha,'Edit tool: '+nv)
-        .then(function(res){S.toolsSha=res.content.sha;toast('Updated "'+nv+'"','✅');renderTools(toolsSearchQ);maybeRefreshStats();})
-        .catch(function(e){S.toolsData.tools[idx]=original;saveBtn.disabled=false;saveBtn.textContent='Save';ee.textContent='Error: '+e.message;});
+      inlineEdit.classList.remove('open');
+      row.querySelector('[data-action=expand]').textContent='⌄';
+      renderTools(toolsSearchQ); maybeRefreshStats();
+      scheduleWithUndo(
+        'Edit to "'+nv+'" will be saved in 10s…',
+        function(){ return apiPut('tools.json',S.toolsData,S.toolsSha,'Edit tool: '+nv).then(function(res){S.toolsSha=res.content.sha;}); },
+        function(){ toast('Updated "'+nv+'"','✅'); maybeRefreshStats(); },
+        function(){ S.toolsData.tools[idx]=original; renderTools(toolsSearchQ); maybeRefreshStats(); }
+      );
     });
     inlineEdit.querySelector('.ie-cancel').addEventListener('click', function(){
       inlineEdit.classList.remove('open');
@@ -703,6 +711,16 @@ function openToolModal(idx) {
   document.getElementById('tm-url').value  = tool.url  || '';
   document.getElementById('tm-desc').value = tool.description || '';
   document.getElementById('tm-tags').value = (tool.tags||[]).join(', ');
+
+  // New tag
+  var newChk = document.getElementById('tm-new-check');
+  var newLbl = document.getElementById('tm-new-lbl');
+  var newExp = document.getElementById('tm-new-expires');
+  var isCurrentlyNew = tool.newUntil && new Date(tool.newUntil) > new Date();
+  if (newChk) {
+    newChk.checked = !!isCurrentlyNew;
+    if (newLbl) newLbl.classList.toggle('checked', !!isCurrentlyNew);
+  }
 
   var catsEl = document.getElementById('tm-cats');
   catsEl.innerHTML = '';
@@ -760,25 +778,29 @@ document.getElementById('tm-save').addEventListener('click', function(){
   var tool = { name:nameVal, description:desc, url:urlRes.url, category:catIds[0], tags:tags };
   if (catIds.length > 1) tool.categories = catIds;
 
-  var btn = document.getElementById('tm-save');
-  btn.disabled=true; btn.textContent='Saving…'; errEl.textContent='';
+  // New tag
+  var newChk = document.getElementById('tm-new-check');
+  var newExp = document.getElementById('tm-new-expires');
+  if (newChk && newChk.checked && newExp) {
+    var days = parseInt(newExp.value, 10) || 30;
+    tool.newUntil = new Date(Date.now() + days * 86400000).toISOString();
+  }
 
   var tools = S.toolsData;
   var isNew = S.editToolIdx === -1;
+  var snap = JSON.parse(JSON.stringify(tools.tools));
   if (isNew) { tools.tools.push(tool); }
   else { tools.tools[S.editToolIdx] = tool; }
 
-  apiPut('tools.json', tools, S.toolsSha, (isNew?'Add':'Edit')+' tool: '+nameVal)
-    .then(function(res){
-      S.toolsSha = res.content.sha;
-      toast((isNew?'Added':'Updated')+' "'+nameVal+'"','✅');
-      btn.disabled=false; btn.textContent='Save Tool';
-      closeToolModal(); renderTools(); updateTabCounts(); maybeRefreshStats();
-    })
-    .catch(function(e){
-      btn.disabled=false; btn.textContent='Save Tool';
-      errEl.textContent='Error: '+e.message;
-    });
+  closeToolModal();
+  renderTools(); updateTabCounts(); maybeRefreshStats();
+
+  scheduleWithUndo(
+    '"'+nameVal+'" '+(isNew?'will be added':'changes will be saved')+' in 10s…',
+    function(){ return apiPut('tools.json', tools, S.toolsSha, (isNew?'Add':'Edit')+' tool: '+nameVal).then(function(r){ S.toolsSha=r.content.sha; }); },
+    function(){ toast((isNew?'Added':'Updated')+' "'+nameVal+'"','✅'); maybeRefreshStats(); },
+    function(){ S.toolsData.tools = snap; renderTools(); updateTabCounts(); maybeRefreshStats(); }
+  );
 });
 
 function deleteTool(idx) {
@@ -921,23 +943,17 @@ document.getElementById('bm-save').addEventListener('click', function() {
 
   if (hasError) { errEl.textContent = 'Fix the errors above before saving.'; return; }
 
-  var btn = document.getElementById('bm-save');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  var snapLen = S.toolsData.tools.length;
   tools.forEach(function(t) { S.toolsData.tools.push(t); });
+  closeBulkModal();
+  renderTools(); updateTabCounts(); maybeRefreshStats();
 
-  apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add ' + tools.length + ' tool(s)')
-    .then(function(res) {
-      S.toolsSha = res.content.sha;
-      toast('Added ' + tools.length + ' tool(s)!', '✅');
-      btn.disabled = false; btn.textContent = 'Save All';
-      closeBulkModal();
-      renderTools(); updateTabCounts(); maybeRefreshStats();
-    })
-    .catch(function(e) {
-      S.toolsData.tools.splice(S.toolsData.tools.length - tools.length, tools.length);
-      btn.disabled = false; btn.textContent = 'Save All';
-      errEl.textContent = 'Error: ' + e.message;
-    });
+  scheduleWithUndo(
+    tools.length + ' tool(s) will be added in 10s…',
+    function(){ return apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk add ' + tools.length + ' tool(s)').then(function(res){ S.toolsSha = res.content.sha; }); },
+    function(){ toast('Added ' + tools.length + ' tool(s)!', '✅'); maybeRefreshStats(); },
+    function(){ S.toolsData.tools.splice(snapLen, tools.length); renderTools(); updateTabCounts(); maybeRefreshStats(); }
+  );
 });
 
 document.getElementById('bm-cancel').addEventListener('click', closeBulkModal);
@@ -1149,13 +1165,23 @@ document.querySelectorAll('.device-btn').forEach(function(btn){
     wrap.className = 'preview-wrap ' + device;
     if (device === 'mobile') {
       frame.style.width = '390px';
+      frame.style.transform = '';
       frame.style.borderRadius = '20px';
     } else if (device === 'tablet') {
       frame.style.width = '768px';
+      frame.style.transform = '';
       frame.style.borderRadius = '14px';
     } else {
-      frame.style.width = '100%';
+      // Render at true desktop width (1280px) scaled to fit container
+      var DESKTOP_W = 1280;
+      var containerW = wrap.offsetWidth || DESKTOP_W;
+      var scale = Math.min(1, containerW / DESKTOP_W);
+      frame.style.width = DESKTOP_W + 'px';
+      frame.style.transform = 'scale(' + scale + ')';
+      frame.style.transformOrigin = 'top left';
       frame.style.borderRadius = '12px';
+      // shrink wrap height so it doesn't leave a gap
+      wrap.style.height = (frame.offsetHeight * scale) + 'px';
     }
   });
 });
