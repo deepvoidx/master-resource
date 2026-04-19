@@ -194,12 +194,64 @@ textarea{resize:vertical;min-height:70px;}
 .tab-content{display:none;padding:8px var(--px,20px) 40px;}
 .tab-content.active{display:block;contain:layout style;}
 
-/* ── tool row — solid bg only, no backdrop-filter (perf) ── */
+/* ── tool/cat rows — solid bg, no backdrop-filter (scroll perf) ── */
 .tool-row.glass,.cat-row.glass{
-  background:rgba(14,14,22,0.82)!important;
-  backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
+  background:rgba(14,14,22,0.85)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   box-shadow:0 2px 8px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+
+/* ═══════════ ADMIN MOBILE ═══════════ */
+@media(max-width:600px){
+  :root{--px:12px;}
+
+  /* topbar: hide "Connected" text, keep dot; hide sub-text */
+  .topbar{gap:8px;padding:10px var(--px);}
+  .topbar-logo{font-size:.82rem;}
+  .topbar-sub{display:none;}
+  .topbar-status span:not(.status-dot){display:none;}
+  .topbar-status{padding:4px 8px;gap:4px;}
+  .btn-sm{padding:5px 9px;font-size:.72rem;}
+
+  /* tabs: smaller text so all fit */
+  .tab-btn{padding:6px 10px;font-size:.74rem;}
+
+  /* pending cards */
+  .pend-card{padding:14px;}
+  .pend-fields{grid-template-columns:1fr;}
+
+  /* tools list inline-edit */
+  .ie-grid{grid-template-columns:1fr;}
+  .tools-controls{flex-direction:column;gap:8px;}
+  .sort-wrap-inline{flex-wrap:wrap;gap:4px;}
+  .tool-row{padding:10px 12px;}
+  .tool-row-badge{display:none;}
+
+  /* categories */
+  .cat-move-btns{display:none;}
+
+  /* modals */
+  .modal-box{padding:18px;}
+  .modal-actions{flex-direction:column;}
+  .bm-tool-grid{grid-template-columns:1fr;}
+  .bm-tool-grid .bm-full{grid-column:1;}
+  .bm-box{max-height:90vh;overflow-y:auto;}
+  .bm-apply-strip{flex-wrap:wrap;}
+
+  /* sec header */
+  .sec-hdr{flex-wrap:wrap;gap:8px;}
+  .sec-hdr h2{font-size:.92rem;}
+
+  /* analytics */
+  .analytics-url-bar{flex-direction:column;align-items:stretch;}
+  .analytics-url-bar label{display:none;}
+
+  /* preview */
+  .preview-device-bar{gap:4px;}
+  .device-btn{padding:4px 9px;font-size:.7rem;}
+
+  /* undo toast */
+  #undo-toast{min-width:calc(100vw - 32px);bottom:16px;}
 }
 
 /* ── pending card ── */
@@ -425,14 +477,12 @@ textarea{resize:vertical;min-height:70px;}
 .device-btn{padding:5px 14px;border-radius:8px;font-size:.76rem;cursor:pointer;border:1px solid var(--g-bdr);background:rgba(255,255,255,.04);color:var(--mute);transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .device-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
 .device-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
-.preview-wrap{display:flex;justify-content:center;transition:all .3s;overflow:hidden;}
+.preview-wrap{display:flex;justify-content:center;transition:all .3s;}
 .preview-wrap.mobile{max-width:393px;margin:0 auto;}
 .preview-wrap.tablet{max-width:768px;margin:0 auto;}
 .preview-wrap.desktop{max-width:100%;overflow:hidden;}
-/* iframe scaled to render at true desktop width */
-.preview-wrap.desktop #site-preview-frame{transform-origin:top left;}
-/* ── new-tag badge in admin tools list ── */
+/* ── NEW badge in tool list row ── */
 .tool-row-new{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);margin-left:5px;vertical-align:middle;flex-shrink:0;}
-/* ── new tag expiry UI in modal ── */
-.new-tag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+/* ── new tag expiry row in modal ── */
+.new-tag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
 .new-tag-row select{flex:1;min-width:160px;}
