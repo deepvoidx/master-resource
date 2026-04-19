@@ -2008,7 +2008,7 @@
       "name": "Fabric",
       "description": "Open-source AI framework with 100+ crowdsourced prompt patterns — pipe any input through CLI to summarise, extract wisdom, write essays, and more across 20+ AI providers",
       "url": "https://github.com/danielmiessler/fabric",
-      "category": "dev",
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "dev",
@@ -2018,9 +2018,10 @@
         "cli"
       ],
       "categories": [
-        "dev",
-        "ai-assistants"
-      ]
+        "ai-assistants",
+        "dev"
+      ],
+      "newUntil": "2026-04-26T01:15:39.950Z"
     },
     {
       "name": "claude-mem",
@@ -2034,7 +2035,8 @@
         "opensource",
         "memory",
         "claude"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:36.191Z"
     },
     {
       "name": "MemPalace",
@@ -2052,7 +2054,8 @@
       "categories": [
         "dev",
         "research"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:32.630Z"
     },
     {
       "name": "Meta AI",
@@ -2068,7 +2071,8 @@
       "categories": [
         "ai-assistants",
         "image-gen"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:29.786Z"
     },
     {
       "name": "Ollama",
@@ -2087,7 +2091,8 @@
       "categories": [
         "dev",
         "security"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:26.532Z"
     },
     {
       "name": "iLovePDF — PDF to Word",
@@ -2098,7 +2103,8 @@
         "free",
         "utilities",
         "pdf"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:23.663Z"
     },
     {
       "name": "iLovePDF — Word to PDF",
@@ -2109,13 +2115,14 @@
         "free",
         "utilities",
         "pdf"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:19.044Z"
     },
     {
       "name": "ImageCompressor.com",
       "description": "Free browser-based image compressor — reduces JPEG, PNG, GIF and SVG file size without visible quality loss, no upload limit per file",
       "url": "https://imagecompressor.com/",
-      "category": "utilities",
+      "category": "design",
       "tags": [
         "free",
         "utilities",
@@ -2123,15 +2130,16 @@
         "images"
       ],
       "categories": [
-        "utilities",
-        "design"
-      ]
+        "design",
+        "utilities"
+      ],
+      "newUntil": "2026-04-26T01:15:16.091Z"
     },
     {
       "name": "Squoosh",
       "description": "Google's open-source image compression web app — compare codecs side-by-side (WebP, AVIF, MozJPEG), tweak quality live, works entirely in the browser with no uploads",
       "url": "https://squoosh.app/",
-      "category": "utilities",
+      "category": "design",
       "tags": [
         "free",
         "utilities",
@@ -2141,10 +2149,11 @@
         "opensource"
       ],
       "categories": [
-        "utilities",
+        "design",
         "dev",
-        "design"
-      ]
+        "utilities"
+      ],
+      "newUntil": "2026-04-26T01:15:12.558Z"
     },
     {
       "name": "ImageResizer — Compressor",
@@ -2155,7 +2164,8 @@
         "free",
         "utilities",
         "images"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:15:08.890Z"
     },
     {
       "name": "Compress-or-Die",
