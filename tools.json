@@ -2161,7 +2161,7 @@
       "name": "Compress-or-Die",
       "description": "Advanced browser-based image compressor focused on maximum JPEG/PNG compression — fine-grained quality controls, metadata stripping, and side-by-side preview",
       "url": "https://compress-or-die.com/jpg",
-      "category": "utilities",
+      "category": "design",
       "tags": [
         "free",
         "utilities",
@@ -2169,9 +2169,10 @@
         "images"
       ],
       "categories": [
-        "utilities",
-        "design"
-      ]
+        "design",
+        "utilities"
+      ],
+      "newUntil": "2026-04-26T01:14:32.788Z"
     },
     {
       "name": "TinyFish",
@@ -2183,7 +2184,8 @@
         "dev",
         "automation",
         "agents"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:14:29.128Z"
     },
     {
       "name": "GoatCounter",
@@ -2201,13 +2203,14 @@
       "categories": [
         "dev",
         "security"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:14:22.800Z"
     },
     {
       "name": "Awesome NotebookLM Prompts",
       "description": "Curated collection of field-tested NotebookLM prompts for turning papers, notes and transcripts into clean presentation-ready slide decks — includes a citation-checker skill",
       "url": "https://github.com/serenakeyitan/awesome-notebookLM-prompts",
-      "category": "research",
+      "category": "writing",
       "tags": [
         "ai",
         "free",
@@ -2216,9 +2219,10 @@
         "opensource"
       ],
       "categories": [
-        "research",
-        "writing"
-      ]
+        "writing",
+        "research"
+      ],
+      "newUntil": "2026-04-26T01:14:19.665Z"
     },
     {
       "name": "Google Colab",
@@ -2237,13 +2241,14 @@
         "dev",
         "research",
         "study"
-      ]
+      ],
+      "newUntil": "2026-04-26T01:14:15.748Z"
     },
     {
       "name": "Google AI Studio",
       "description": "Browser-based playground for Google's Gemini models — test prompts, tune parameters, generate API keys, and export production-ready code. Free to use.",
       "url": "https://aistudio.google.com/welcome",
-      "category": "dev",
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "dev",
@@ -2253,15 +2258,16 @@
         "prompts"
       ],
       "categories": [
-        "dev",
-        "ai-assistants"
-      ]
+        "ai-assistants",
+        "dev"
+      ],
+      "newUntil": "2026-04-26T01:14:12.313Z"
     },
     {
       "name": "Google Earth Engine",
       "description": "Cloud-based geospatial analysis platform with petabytes of satellite imagery — detect land changes, map trends and run environmental research at planetary scale. Free for non-commercial use.",
       "url": "https://earthengine.google.com/",
-      "category": "research",
+      "category": "dev",
       "tags": [
         "research",
         "dev",
@@ -2271,9 +2277,10 @@
         "science"
       ],
       "categories": [
-        "research",
-        "dev"
-      ]
+        "dev",
+        "research"
+      ],
+      "newUntil": "2026-04-26T01:14:06.277Z"
     },
     {
       "name": "Google Labs",
