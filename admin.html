@@ -215,6 +215,20 @@
         <div id="tm-cats" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
       </div>
       <div><label>Tags (comma separated, no #)</label><input id="tm-tags" type="text" placeholder="ai, free, creative"/></div>
+      <div>
+        <label>New Tag</label>
+        <div class="new-tag-row">
+          <label class="cat-check" id="tm-new-lbl" style="flex-shrink:0;" onclick="(function(lbl){var cb=lbl.querySelector('input');setTimeout(function(){lbl.classList.toggle('checked',cb.checked);},0);})(this)">
+            <input type="checkbox" id="tm-new-check"/> Mark as New
+          </label>
+          <select id="tm-new-expires">
+            <option value="7">Expires in 1 week</option>
+            <option value="14">Expires in 2 weeks</option>
+            <option value="30" selected>Expires in 1 month</option>
+            <option value="90">Expires in 3 months</option>
+          </select>
+        </div>
+      </div>
       <div id="tm-err" style="color:#f87171;font-size:.78rem;min-height:16px;"></div>
     </div>
     <div class="modal-actions">
