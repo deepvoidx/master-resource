@@ -1143,44 +1143,57 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     if (tab === 'history') fetchHistory();
     if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
-      var frame = document.getElementById('site-preview-frame');
-      if (frame && !frame.getAttribute('data-loaded')) {
-        frame.setAttribute('data-loaded','1');
-      }
+      // Apply desktop scaling after the tab is visible (getBoundingClientRect needs layout)
+      requestAnimationFrame(function(){
+        var activeBtn = document.querySelector('.device-btn.active');
+        var device = activeBtn ? activeBtn.getAttribute('data-device') : 'desktop';
+        applyPreviewDevice(device);
+      });
     }
   });
 });
 
 // ── Device toggle for site preview ────────────────────────────
+function applyPreviewDevice(device) {
+  var wrap  = document.getElementById('preview-wrap');
+  var frame = document.getElementById('site-preview-frame');
+  if (!wrap || !frame) return;
+  // Reset transforms first
+  frame.style.transform = '';
+  frame.style.transformOrigin = '';
+  frame.style.width = '';
+  wrap.style.height = '';
+  wrap.className = 'preview-wrap ' + device;
+
+  if (device === 'mobile') {
+    frame.style.width = '390px';
+    frame.style.borderRadius = '20px';
+  } else if (device === 'tablet') {
+    frame.style.width = '768px';
+    frame.style.borderRadius = '14px';
+  } else {
+    // Desktop: render at true 1280px then CSS-scale to fit container
+    var DESKTOP_W = 1280;
+    frame.style.width = DESKTOP_W + 'px';
+    frame.style.borderRadius = '12px';
+    // Use rAF so browser has painted the new width before we read it
+    requestAnimationFrame(function(){
+      var containerW = wrap.getBoundingClientRect().width;
+      if (!containerW) containerW = DESKTOP_W;
+      var scale = Math.min(1, containerW / DESKTOP_W);
+      frame.style.transform = 'scale(' + scale + ')';
+      frame.style.transformOrigin = 'top left';
+      var frameH = frame.getBoundingClientRect().height || parseInt(frame.style.height) || 600;
+      wrap.style.height = Math.round(frameH * scale) + 'px';
+    });
+  }
+}
+
 document.querySelectorAll('.device-btn').forEach(function(btn){
   btn.addEventListener('click', function(){
     document.querySelectorAll('.device-btn').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    var device = btn.getAttribute('data-device');
-    var wrap  = document.getElementById('preview-wrap');
-    var frame = document.getElementById('site-preview-frame');
-    if (!wrap || !frame) return;
-    wrap.className = 'preview-wrap ' + device;
-    frame.style.transform = '';
-    frame.style.transformOrigin = '';
-    wrap.style.height = '';
-    if (device === 'mobile') {
-      frame.style.width = '390px';
-      frame.style.borderRadius = '20px';
-    } else if (device === 'tablet') {
-      frame.style.width = '768px';
-      frame.style.borderRadius = '14px';
-    } else {
-      // True desktop: render at 1280px, scale-to-fit container
-      var DESKTOP_W = 1280;
-      var containerW = wrap.getBoundingClientRect().width || DESKTOP_W;
-      var scale = Math.min(1, containerW / DESKTOP_W);
-      frame.style.width = DESKTOP_W + 'px';
-      frame.style.transform = 'scale(' + scale + ')';
-      frame.style.transformOrigin = 'top left';
-      frame.style.borderRadius = '12px';
-      wrap.style.height = Math.round(frame.offsetHeight * scale) + 'px';
-    }
+    applyPreviewDevice(btn.getAttribute('data-device'));
   });
 });
 
