@@ -199,22 +199,39 @@ textarea{resize:vertical;min-height:70px;}
   background:rgba(14,14,22,0.85)!important;
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   box-shadow:0 2px 8px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.04)!important;
+  contain:layout style;
+  -webkit-transform:translateZ(0);transform:translateZ(0);
 }
 
 /* ═══════════ ADMIN MOBILE ═══════════ */
 @media(max-width:600px){
   :root{--px:12px;}
 
+  /* ── iOS zoom fix: all inputs must be 16px or larger ── */
+  input,textarea,select{font-size:16px!important;}
+  /* ── prevent zoom on password field specifically ── */
+  #pat-input{font-size:16px!important;touch-action:manipulation;}
+
   /* topbar: hide "Connected" text, keep dot; hide sub-text */
-  .topbar{gap:8px;padding:10px var(--px);}
+  .topbar{gap:8px;padding:10px var(--px);flex-shrink:0;}
   .topbar-logo{font-size:.82rem;}
   .topbar-sub{display:none;}
   .topbar-status span:not(.status-dot){display:none;}
   .topbar-status{padding:4px 8px;gap:4px;}
   .btn-sm{padding:5px 9px;font-size:.72rem;}
 
-  /* tabs: smaller text so all fit */
-  .tab-btn{padding:6px 10px;font-size:.74rem;}
+  /* ── tabs bar: stick below topbar, prevent jumping ── */
+  .tabs-bar{
+    flex-shrink:0;
+    position:sticky;
+    top:48px; /* approximate topbar height on mobile */
+    z-index:99;
+    background:rgba(6,6,12,.97);
+    padding-bottom:0;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+  .tab-btn{padding:6px 10px;font-size:.72rem;}
 
   /* pending cards */
   .pend-card{padding:14px;}
@@ -231,12 +248,19 @@ textarea{resize:vertical;min-height:70px;}
   .cat-move-btns{display:none;}
 
   /* modals */
-  .modal-box{padding:18px;}
+  .modal-box{padding:16px;border-radius:14px;}
   .modal-actions{flex-direction:column;}
-  .bm-tool-grid{grid-template-columns:1fr;}
-  .bm-tool-grid .bm-full{grid-column:1;}
-  .bm-box{max-height:90vh;overflow-y:auto;}
-  .bm-apply-strip{flex-wrap:wrap;}
+
+  /* ── bulk add: categories stay horizontal/wrapped like pc ── */
+  .bm-box{max-height:92vh;overflow-y:auto;padding:14px;}
+  .bm-tool-row{padding:10px;}
+  .bm-tool-cats,.bm-global-cats{
+    display:flex;flex-wrap:wrap;gap:4px;
+  }
+  .bm-tool-cats .cat-check,.bm-global-cats .cat-check{
+    font-size:.68rem;padding:3px 8px;
+  }
+  .bm-apply-strip{flex-wrap:wrap;padding:8px 10px;}
 
   /* sec header */
   .sec-hdr{flex-wrap:wrap;gap:8px;}
@@ -284,8 +308,11 @@ textarea{resize:vertical;min-height:70px;}
   border-radius:12px;padding:14px 16px;margin-bottom:8px;
   display:flex;align-items:center;gap:10px;cursor:pointer;
   transition:background .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
 }
 .tool-row:hover{background:rgba(108,99,255,.06);border-color:rgba(108,99,255,.2)!important;}
+.tool-row:active{background:rgba(108,99,255,.06);}
 .tool-row-name{font-size:.88rem;font-weight:600;color:#ddddf0;}
 .tool-row-meta{font-size:.72rem;color:var(--mute);margin-top:1px;}
 .tool-row-badge{
@@ -477,10 +504,10 @@ textarea{resize:vertical;min-height:70px;}
 .device-btn{padding:5px 14px;border-radius:8px;font-size:.76rem;cursor:pointer;border:1px solid var(--g-bdr);background:rgba(255,255,255,.04);color:var(--mute);transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .device-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
 .device-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
-.preview-wrap{display:flex;justify-content:center;transition:all .3s;}
-.preview-wrap.mobile{max-width:393px;margin:0 auto;}
-.preview-wrap.tablet{max-width:768px;margin:0 auto;}
-.preview-wrap.desktop{max-width:100%;overflow:hidden;}
+.preview-wrap{transition:all .3s;overflow:hidden;}
+.preview-wrap.mobile{max-width:393px;margin:0 auto;display:flex;justify-content:center;}
+.preview-wrap.tablet{max-width:768px;margin:0 auto;display:flex;justify-content:center;}
+.preview-wrap.desktop{max-width:100%;display:block;overflow:hidden;}
 /* ── NEW badge in tool list row ── */
 .tool-row-new{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);margin-left:5px;vertical-align:middle;flex-shrink:0;}
 /* ── new tag expiry row in modal ── */
