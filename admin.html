@@ -75,6 +75,7 @@
       <h2>All Tools</h2>
       <span class="sec-count" id="tools-count">–</span>
       <button class="btn btn-ghost btn-sm ml-auto" id="bulk-add-btn" style="margin-right:6px;">⚡ Bulk Add</button>
+      <button class="btn btn-ghost btn-sm" id="bulk-new-btn" style="margin-right:6px;">🆕 Bulk New Tag</button>
       <button class="btn btn-primary btn-sm" id="add-tool-btn">+ Add Tool</button>
     </div>
     <div class="tools-controls">
@@ -263,6 +264,39 @@
   </div>
 </div>
 
+
+<!-- ── bulk new tag modal ── -->
+<div class="modal-bg hidden" id="bulk-new-modal">
+  <div class="modal-box" style="width:min(560px,100%);">
+    <div class="modal-title">🆕 Bulk New Tag</div>
+    <p style="font-size:.8rem;color:var(--mute);margin-bottom:14px;">Search and select tools to mark as New. Set a single expiry for all selected.</p>
+    <div class="admin-search" style="margin-bottom:10px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--mute);pointer-events:none;">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="search" id="bn-search" placeholder="Search tools…" style="padding-left:34px;"/>
+    </div>
+    <div style="font-size:.74rem;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between;">
+      <span id="bn-selected-count">0 selected</span>
+      <button class="btn btn-ghost btn-sm" id="bn-select-all" style="font-size:.7rem;padding:2px 8px;">Select All Visible</button>
+    </div>
+    <div id="bn-tool-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--g-bdr);border-radius:10px;padding:6px;margin-bottom:14px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+      <label style="font-size:.78rem;color:var(--mute);white-space:nowrap;">Expiry:</label>
+      <select id="bn-expires" style="flex:1;min-width:160px;">
+        <option value="7">1 week</option>
+        <option value="14">2 weeks</option>
+        <option value="30" selected>1 month</option>
+        <option value="90">3 months</option>
+      </select>
+    </div>
+    <div id="bn-err" style="color:#f87171;font-size:.76rem;min-height:14px;margin-bottom:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="bn-cancel">Cancel</button>
+      <button class="btn btn-primary" id="bn-save">Apply New Tag</button>
+    </div>
+  </div>
+</div>
 
 <div id="a-toast"></div>
 
