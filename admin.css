@@ -522,7 +522,3 @@ textarea{resize:vertical;min-height:70px;}
 /* ── new tag expiry row in modal ── */
 .new-tag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
 .new-tag-row select{flex:1;min-width:160px;}
-
-/* New filter button in tools sort bar */
-.sort-btn-new{color:#6ee7b7!important;border-color:rgba(16,185,129,.3)!important;}
-.sort-btn-new.active{background:rgba(16,185,129,.15)!important;border-color:rgba(16,185,129,.55)!important;color:#6ee7b7!important;}

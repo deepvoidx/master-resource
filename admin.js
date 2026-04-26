@@ -574,15 +574,9 @@ function renderTools(q) {
     var allCatIds = Array.isArray(t.categories)&&t.categories.length ? t.categories : (t.category?[t.category]:[]);
     return (t.name+' '+(t.description||'')+' '+allCatIds.join(' ')+' '+(t.url||'')).toLowerCase().includes(q.toLowerCase());
   });
-  // Filter/Sort
+  // Sort
   filtered = filtered.slice();
-  if (S.toolsSortMode === 'new') {
-    // Show ONLY tools with an active newUntil date
-    var now = new Date();
-    filtered = filtered.filter(function(t){
-      return !!(t.newUntil && new Date(t.newUntil) > now);
-    });
-  } else if (S.toolsSortMode === 'az') {
+  if (S.toolsSortMode === 'az') {
     filtered.sort(function(a,b){ return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
   } else if (S.toolsSortMode === 'category') {
     filtered.sort(function(a,b){ return (a.category||'').localeCompare(b.category||''); });
