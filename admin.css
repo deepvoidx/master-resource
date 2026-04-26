@@ -233,9 +233,10 @@ textarea{resize:vertical;min-height:70px;}
   }
   .tab-btn{padding:6px 10px;font-size:.72rem;}
 
-  /* pending cards */
-  .pend-card{padding:14px;}
+  /* pending cards — remove extra left indent */
+  .pend-card{padding:12px;margin-bottom:10px;}
   .pend-fields{grid-template-columns:1fr;}
+  #tab-pending{padding-left:var(--px);padding-right:var(--px);}
 
   /* tools list inline-edit */
   .ie-grid{grid-template-columns:1fr;}
@@ -251,16 +252,23 @@ textarea{resize:vertical;min-height:70px;}
   .modal-box{padding:16px;border-radius:14px;}
   .modal-actions{flex-direction:column;}
 
-  /* ── bulk add: categories stay horizontal/wrapped like pc ── */
-  .bm-box{max-height:92vh;overflow-y:auto;padding:14px;}
+  /* ── bulk add: categories horizontal wrap matching pending layout ── */
+  .bm-box{max-height:92vh;overflow-y:auto;padding:12px;}
   .bm-tool-row{padding:10px;}
-  .bm-tool-cats,.bm-global-cats{
-    display:flex;flex-wrap:wrap;gap:4px;
+  .bm-apply-strip{
+    flex-direction:column;align-items:flex-start;gap:6px;padding:8px 10px;
+  }
+  .bm-apply-label{width:100%;}
+  .bm-global-cats{
+    display:flex;flex-wrap:wrap;gap:5px;width:100%;flex:none;
+  }
+  .bm-tool-cats{
+    display:flex;flex-wrap:wrap;gap:5px;width:100%;
   }
   .bm-tool-cats .cat-check,.bm-global-cats .cat-check{
-    font-size:.68rem;padding:3px 8px;
+    font-size:.7rem;padding:4px 10px;flex-shrink:0;flex-grow:0;
   }
-  .bm-apply-strip{flex-wrap:wrap;padding:8px 10px;}
+  .bm-apply-strip .btn{align-self:flex-start;}
 
   /* sec header */
   .sec-hdr{flex-wrap:wrap;gap:8px;}
@@ -510,6 +518,7 @@ textarea{resize:vertical;min-height:70px;}
 .preview-wrap.desktop{max-width:100%;display:block;overflow:hidden;}
 /* ── NEW badge in tool list row ── */
 .tool-row-new{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);margin-left:5px;vertical-align:middle;flex-shrink:0;}
+.tool-row-new-days{font-size:.62rem;color:#6ee7b7;opacity:.7;margin-left:3px;vertical-align:middle;}
 /* ── new tag expiry row in modal ── */
 .new-tag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
 .new-tag-row select{flex:1;min-width:160px;}
