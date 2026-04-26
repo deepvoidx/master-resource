@@ -600,9 +600,14 @@ function renderTools(q) {
     var row = document.createElement('div');
     row.className = 'tool-row glass';
     var isToolNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
+    var newDaysLeft = '';
+    if (isToolNew) {
+      var daysLeft = Math.ceil((new Date(tool.newUntil) - new Date()) / 86400000);
+      newDaysLeft = daysLeft <= 1 ? '· expires today' : '· '+daysLeft+'d left';
+    }
     row.innerHTML =
       '<div style="flex:1;min-width:0;">' +
-        '<div class="tool-row-name">'+esc(tool.name)+(isToolNew?'<span class="tool-row-new">NEW</span>':'')+'</div>' +
+        '<div class="tool-row-name">'+esc(tool.name)+(isToolNew?'<span class="tool-row-new">NEW</span><span class="tool-row-new-days">'+esc(newDaysLeft)+'</span>':'')+'</div>' +
         '<div class="tool-row-meta">'+esc(catMetaStr)+'&nbsp;·&nbsp;'+esc((tool.url||'').replace(/^https?:\/\//,'').split('/')[0])+'</div>' +
       '</div>' +
       '<div class="tool-row-badge">'+esc(tool.tags&&tool.tags.length?'#'+tool.tags.slice(0,2).join(' #'):'–')+'</div>' +
@@ -958,6 +963,78 @@ document.getElementById('bm-cancel').addEventListener('click', closeBulkModal);
 document.getElementById('bm-close').addEventListener('click', closeBulkModal);
 document.getElementById('bulk-modal').addEventListener('click', function(e) { if (e.target === this) closeBulkModal(); });
 document.getElementById('bulk-add-btn').addEventListener('click', openBulkModal);
+
+// ── Bulk New Tag ──────────────────────────────────────────────
+var bnSelected = new Set();
+
+function openBulkNewModal() {
+  bnSelected.clear();
+  document.getElementById('bn-search').value = '';
+  document.getElementById('bn-err').textContent = '';
+  document.getElementById('bulk-new-modal').classList.remove('hidden');
+  renderBnList('');
+}
+function closeBulkNewModal() {
+  document.getElementById('bulk-new-modal').classList.add('hidden');
+}
+function renderBnList(q) {
+  var list = document.getElementById('bn-tool-list');
+  var tools = (S.toolsData && S.toolsData.tools) ? S.toolsData.tools : [];
+  var filtered = q ? tools.filter(function(t){
+    return (t.name+' '+(t.description||'')).toLowerCase().includes(q.toLowerCase());
+  }) : tools;
+  list.innerHTML = '';
+  filtered.forEach(function(tool) {
+    var idx = tools.indexOf(tool);
+    var isNew = !!(tool.newUntil && new Date(tool.newUntil) > new Date());
+    var daysLeft = isNew ? Math.ceil((new Date(tool.newUntil)-new Date())/86400000) : 0;
+    var row = document.createElement('label');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;-webkit-tap-highlight-color:transparent;';
+    row.innerHTML =
+      '<input type="checkbox" data-idx="'+idx+'" '+(bnSelected.has(idx)?'checked':'')+' style="width:15px;height:15px;flex-shrink:0;cursor:pointer;"/>' +
+      '<span style="flex:1;font-size:.82rem;color:#ddddf0;">'+esc(tool.name)+'</span>' +
+      (isNew ? '<span style="font-size:.66rem;color:#6ee7b7;border:1px solid rgba(16,185,129,.4);border-radius:4px;padding:1px 5px;">NEW·'+daysLeft+'d</span>' : '');
+    row.querySelector('input').addEventListener('change', function(){
+      if (this.checked) bnSelected.add(idx); else bnSelected.delete(idx);
+      document.getElementById('bn-selected-count').textContent = bnSelected.size + ' selected';
+    });
+    list.appendChild(row);
+  });
+  document.getElementById('bn-selected-count').textContent = bnSelected.size + ' selected';
+}
+
+document.getElementById('bn-search').addEventListener('input', function(){ renderBnList(this.value); });
+document.getElementById('bn-select-all').addEventListener('click', function(){
+  var tools = (S.toolsData && S.toolsData.tools) ? S.toolsData.tools : [];
+  var q = document.getElementById('bn-search').value;
+  var filtered = q ? tools.filter(function(t){
+    return (t.name+' '+(t.description||'')).toLowerCase().includes(q.toLowerCase());
+  }) : tools;
+  filtered.forEach(function(t){ bnSelected.add(tools.indexOf(t)); });
+  renderBnList(q);
+});
+document.getElementById('bn-cancel').addEventListener('click', closeBulkNewModal);
+document.getElementById('bulk-new-modal').addEventListener('click', function(e){ if(e.target===this) closeBulkNewModal(); });
+document.getElementById('bulk-new-btn').addEventListener('click', openBulkNewModal);
+document.getElementById('bn-save').addEventListener('click', function(){
+  var errEl = document.getElementById('bn-err');
+  if (!bnSelected.size) { errEl.textContent = 'Select at least one tool.'; return; }
+  var days = parseInt(document.getElementById('bn-expires').value, 10) || 30;
+  var until = new Date(Date.now() + days * 86400000).toISOString();
+  var snap = JSON.parse(JSON.stringify(S.toolsData.tools));
+  bnSelected.forEach(function(idx){
+    if (S.toolsData.tools[idx]) S.toolsData.tools[idx].newUntil = until;
+  });
+  var count = bnSelected.size;
+  closeBulkNewModal();
+  renderTools(toolsSearchQ);
+  scheduleWithUndo(
+    count+' tool(s) marked as New — undo?',
+    function(){ return apiPut('tools.json', S.toolsData, S.toolsSha, 'Bulk new tag: '+count+' tools').then(function(r){ S.toolsSha=r.content.sha; }); },
+    function(){ toast(count+' tool(s) marked as New!','🆕'); },
+    function(){ S.toolsData.tools=snap; renderTools(toolsSearchQ); }
+  );
+});
 document.querySelectorAll('.sort-btn-sm').forEach(function(btn){
   btn.addEventListener('click', function(){
     var isActive  = btn.classList.contains('active');
