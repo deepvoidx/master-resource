@@ -91,6 +91,7 @@
         <button class="sort-btn-sm" data-sort="az">A→Z</button>
         <button class="sort-btn-sm" data-sort="category">Category</button>
         <button class="sort-btn-sm" data-sort="recent">Recent</button>
+        <button class="sort-btn-sm sort-btn-new" data-sort="new">🆕 New</button>
       </div>
     </div>
     <div id="tools-loading" class="flex center gap8" style="padding:20px;justify-content:center;">
@@ -206,7 +207,10 @@
 <!-- ── tool edit modal ── -->
 <div class="modal-bg hidden" id="tool-modal">
   <div class="modal-box">
-    <div class="modal-title" id="tool-modal-title">Edit Tool</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+      <div class="modal-title" style="margin-bottom:0;" id="tool-modal-title">Edit Tool</div>
+      <button id="tm-close-x" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:1.3rem;line-height:1;padding:4px 6px;border-radius:6px;transition:color .15s;" title="Close">✕</button>
+    </div>
     <div style="display:grid;gap:12px;">
       <div><label>Name *</label><input id="tm-name" type="text" maxlength="100" placeholder="Tool name"/></div>
       <div><label>URL *</label><input id="tm-url" type="url" maxlength="500" placeholder="https://example.com"/></div>
@@ -227,6 +231,7 @@
             <option value="14">Expires in 2 weeks</option>
             <option value="30" selected>Expires in 1 month</option>
             <option value="90">Expires in 3 months</option>
+            <option value="99999">Forever</option>
           </select>
         </div>
       </div>
@@ -276,9 +281,14 @@
       </svg>
       <input type="search" id="bn-search" placeholder="Search tools…" style="padding-left:34px;"/>
     </div>
-    <div style="font-size:.74rem;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between;">
+    <div style="font-size:.74rem;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
       <span id="bn-selected-count">0 selected</span>
-      <button class="btn btn-ghost btn-sm" id="bn-select-all" style="font-size:.7rem;padding:2px 8px;">Select All Visible</button>
+      <div style="display:flex;gap:5px;align-items:center;">
+        <button class="btn btn-ghost btn-sm bn-sort-btn active" data-bnsort="default" style="font-size:.68rem;padding:2px 8px;">Default</button>
+        <button class="btn btn-ghost btn-sm bn-sort-btn" data-bnsort="az" style="font-size:.68rem;padding:2px 8px;">A→Z</button>
+        <button class="btn btn-ghost btn-sm bn-sort-btn" data-bnsort="recent" style="font-size:.68rem;padding:2px 8px;">Recent</button>
+        <button class="btn btn-ghost btn-sm" id="bn-select-all" style="font-size:.68rem;padding:2px 8px;">Select All</button>
+      </div>
     </div>
     <div id="bn-tool-list" style="max-height:280px;overflow-y:auto;border:1px solid var(--g-bdr);border-radius:10px;padding:6px;margin-bottom:14px;"></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
@@ -288,6 +298,7 @@
         <option value="14">2 weeks</option>
         <option value="30" selected>1 month</option>
         <option value="90">3 months</option>
+        <option value="99999">Forever</option>
       </select>
     </div>
     <div id="bn-err" style="color:#f87171;font-size:.76rem;min-height:14px;margin-bottom:8px;"></div>

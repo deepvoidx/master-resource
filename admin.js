@@ -381,10 +381,8 @@ function renderPending() {
     }).join('');
 
     card.innerHTML =
-      '<div style="display:flex;align-items:flex-start;gap:10px;">' +
-        '<input type="checkbox" class="bulk-cb" data-id="'+esc(item.id)+'" style="margin-top:4px;width:16px;height:16px;cursor:pointer;flex-shrink:0;"/>' +
-        '<div style="flex:1;">' +
       '<div class="pend-header">' +
+        '<input type="checkbox" class="bulk-cb" data-id="'+esc(item.id)+'" style="margin-top:2px;width:16px;height:16px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;"/>' +
         '<div style="flex:1;">' +
           '<div class="pend-name">'+esc(item.name)+'</div>' +
           '<div class="pend-url"><a href="'+safeHref(item.url)+'" target="_blank" rel="noopener noreferrer">'+esc(item.url)+'</a></div>' +
@@ -399,14 +397,20 @@ function renderPending() {
         '<div style="grid-column:1/-1"><label>Tags (comma separated)</label><input class="pf-tags" type="text" placeholder="ai, free, creative"/></div>' +
       '</div>' +
       '<div><label>Categories</label><div class="pend-cats pf-cats">'+catChecks+'</div></div>' +
-      '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">' +
+      '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center;">' +
         '<button class="btn btn-ghost btn-sm pf-preview-btn" style="font-size:.8rem;">👁 Preview</button>' +
         '<div class="pf-preview" style="margin-top:0;"></div>' +
+        '<label class="cat-check pf-new-lbl" style="flex-shrink:0;"><input type="checkbox" class="pf-new-check"/> Mark as New</label>' +
+        '<select class="pf-new-expires" style="font-size:.74rem;padding:3px 6px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--txt);">' +
+          '<option value="7">1 week</option>' +
+          '<option value="30" selected>1 month</option>' +
+          '<option value="90">3 months</option>' +
+          '<option value="99999">Forever</option>' +
+        '</select>' +
         '<button class="btn btn-ok btn-sm pf-approve">✓ Approve</button>' +
         '<button class="btn btn-danger btn-sm pf-reject">✗ Reject</button>' +
       '</div>' +
-      '<div class="pf-err" style="color:#f87171;font-size:.76rem;margin-top:6px;min-height:14px;"></div>' +
-      '</div></div>';
+      '<div class="pf-err" style="color:#f87171;font-size:.76rem;margin-top:6px;min-height:14px;"></div>';
 
     list.appendChild(card);
 
@@ -431,6 +435,14 @@ function renderPending() {
       card.classList.toggle('sel', this.checked);
       updateBulkBar();
     });
+    // Wire new-tag checkbox in pending card
+    card.querySelector('.pf-new-lbl').addEventListener('click', function(e){
+      if (e.target.tagName === 'INPUT') { this.classList.toggle('checked', e.target.checked); return; }
+      e.preventDefault();
+      var cb = this.querySelector('input'); cb.checked = !cb.checked;
+      this.classList.toggle('checked', cb.checked);
+    });
+
     // Preview button — toggle open/close
     card.querySelector('.pf-preview-btn').addEventListener('click', function(){
       var prev = card.querySelector('.pf-preview');
@@ -489,6 +501,12 @@ function approvePending(item, card) {
   // Store primary category + categories array for multi-cat support
   var toolEntry = { name:nameVal, description:desc, url:urlRes.url, category:cats[0], tags:tags };
   if (cats.length > 1) toolEntry.categories = cats;
+  var pfNewChk = card.querySelector('.pf-new-check');
+  var pfNewExp = card.querySelector('.pf-new-expires');
+  if (pfNewChk && pfNewChk.checked && pfNewExp) {
+    var pfDays = parseInt(pfNewExp.value, 10) || 30;
+    toolEntry.newUntil = pfDays >= 99999 ? '9999-12-31T23:59:59.000Z' : new Date(Date.now() + pfDays*86400000).toISOString();
+  }
 
   // Add to tools.json
   var tools = S.toolsData;
@@ -574,9 +592,12 @@ function renderTools(q) {
     var allCatIds = Array.isArray(t.categories)&&t.categories.length ? t.categories : (t.category?[t.category]:[]);
     return (t.name+' '+(t.description||'')+' '+allCatIds.join(' ')+' '+(t.url||'')).toLowerCase().includes(q.toLowerCase());
   });
-  // Sort
+  // Sort / Filter
   filtered = filtered.slice();
-  if (S.toolsSortMode === 'az') {
+  if (S.toolsSortMode === 'new') {
+    var now = new Date();
+    filtered = filtered.filter(function(t){ return !!(t.newUntil && new Date(t.newUntil) > now); });
+  } else if (S.toolsSortMode === 'az') {
     filtered.sort(function(a,b){ return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
   } else if (S.toolsSortMode === 'category') {
     filtered.sort(function(a,b){ return (a.category||'').localeCompare(b.category||''); });
@@ -758,6 +779,7 @@ function closeToolModal(){
 }
 
 document.getElementById('tm-cancel').addEventListener('click', closeToolModal);
+document.getElementById('tm-close-x').addEventListener('click', closeToolModal);
 document.getElementById('tool-modal').addEventListener('click', function(e){
   if(e.target===this) closeToolModal();
 });
@@ -862,7 +884,25 @@ function bmAddRow() {
     '<div><label>Name *</label><input class="bm-name" type="text" maxlength="100" placeholder="Tool name"/></div>' +
     '<div><label>URL *</label><input class="bm-url" type="url" maxlength="500" placeholder="https://example.com"/></div>' +
     '<div class="bm-full"><label>Description</label><input class="bm-desc" type="text" maxlength="200" placeholder="Short description…"/></div>' +
-    '<div class="bm-full"><label>Tags (comma separated, no #)</label><input class="bm-tags" type="text" placeholder="ai, free, creative"/></div>';
+    '<div class="bm-full"><label>Tags (comma separated, no #)</label><input class="bm-tags" type="text" placeholder="ai, free, creative"/></div>' +
+    '<div class="bm-full" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
+      '<label class="cat-check bm-new-lbl"><input type="checkbox" class="bm-new-check"/> Mark as New</label>' +
+      '<select class="bm-new-expires" style="font-size:.74rem;padding:3px 6px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--txt);">' +
+        '<option value="7">1 week</option>' +
+        '<option value="30" selected>1 month</option>' +
+        '<option value="90">3 months</option>' +
+        '<option value="99999">Forever</option>' +
+      '</select>' +
+    '</div>';
+  // Wire new-tag checkbox in bulk add row
+  grid.querySelectorAll('.bm-new-lbl').forEach(function(lbl){
+    lbl.addEventListener('click', function(e){
+      if (e.target.tagName === 'INPUT') { lbl.classList.toggle('checked', e.target.checked); return; }
+      e.preventDefault();
+      var cb = lbl.querySelector('input'); cb.checked = !cb.checked;
+      lbl.classList.toggle('checked', cb.checked);
+    });
+  });
   rowEl.appendChild(grid);
 
   var catLabel = document.createElement('div');
@@ -941,6 +981,12 @@ document.getElementById('bm-save').addEventListener('click', function() {
     var tags = tagsRaw.split(',').map(function(t) { return t.trim().replace(/^#/, '').toLowerCase().slice(0,30); }).filter(Boolean).slice(0,15);
     var tool = { name: nameVal, description: desc, url: urlRes.url, category: cats[0], tags: tags };
     if (cats.length > 1) tool.categories = cats;
+    var bmNewChk = row.querySelector('.bm-new-check');
+    var bmNewExp = row.querySelector('.bm-new-expires');
+    if (bmNewChk && bmNewChk.checked && bmNewExp) {
+      var bmDays = parseInt(bmNewExp.value, 10) || 30;
+      tool.newUntil = bmDays >= 99999 ? '9999-12-31T23:59:59.000Z' : new Date(Date.now() + bmDays*86400000).toISOString();
+    }
     tools.push(tool);
   });
 
@@ -977,12 +1023,18 @@ function openBulkNewModal() {
 function closeBulkNewModal() {
   document.getElementById('bulk-new-modal').classList.add('hidden');
 }
+var bnSortMode = 'default';
 function renderBnList(q) {
   var list = document.getElementById('bn-tool-list');
   var tools = (S.toolsData && S.toolsData.tools) ? S.toolsData.tools : [];
   var filtered = q ? tools.filter(function(t){
     return (t.name+' '+(t.description||'')).toLowerCase().includes(q.toLowerCase());
-  }) : tools;
+  }) : tools.slice();
+  if (bnSortMode === 'az') {
+    filtered = filtered.slice().sort(function(a,b){ return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); });
+  } else if (bnSortMode === 'recent') {
+    filtered = filtered.slice().reverse();
+  }
   list.innerHTML = '';
   filtered.forEach(function(tool) {
     var idx = tools.indexOf(tool);
@@ -1004,6 +1056,14 @@ function renderBnList(q) {
 }
 
 document.getElementById('bn-search').addEventListener('input', function(){ renderBnList(this.value); });
+document.querySelectorAll('.bn-sort-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.bn-sort-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    bnSortMode = btn.getAttribute('data-bnsort');
+    renderBnList(document.getElementById('bn-search').value);
+  });
+});
 document.getElementById('bn-select-all').addEventListener('click', function(){
   var tools = (S.toolsData && S.toolsData.tools) ? S.toolsData.tools : [];
   var q = document.getElementById('bn-search').value;
@@ -1249,19 +1309,23 @@ function applyPreviewDevice(device) {
     frame.style.width = '768px';
     frame.style.borderRadius = '14px';
   } else {
-    // Desktop: render at true 1280px then CSS-scale to fit container
+    // Desktop — read containerW BEFORE changing frame width to avoid shrink loop
+    frame.style.transform = '';
+    frame.style.transformOrigin = '';
+    frame.style.width = '';
+    wrap.style.height = '';
     var DESKTOP_W = 1280;
-    frame.style.width = DESKTOP_W + 'px';
     frame.style.borderRadius = '12px';
-    // Use rAF so browser has painted the new width before we read it
     requestAnimationFrame(function(){
-      var containerW = wrap.getBoundingClientRect().width;
-      if (!containerW) containerW = DESKTOP_W;
+      var containerW = wrap.getBoundingClientRect().width || DESKTOP_W;
+      frame.style.width = DESKTOP_W + 'px';
       var scale = Math.min(1, containerW / DESKTOP_W);
-      frame.style.transform = 'scale(' + scale + ')';
-      frame.style.transformOrigin = 'top left';
-      var frameH = frame.getBoundingClientRect().height || parseInt(frame.style.height) || 600;
-      wrap.style.height = Math.round(frameH * scale) + 'px';
+      requestAnimationFrame(function(){
+        frame.style.transform = 'scale(' + scale + ')';
+        frame.style.transformOrigin = 'top left';
+        var rawH = parseInt(frame.style.height) || 600;
+        wrap.style.height = Math.round(rawH * scale) + 'px';
+      });
     });
   }
 }

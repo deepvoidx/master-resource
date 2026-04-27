@@ -60,7 +60,7 @@ textarea{resize:vertical;min-height:70px;}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:8px 16px;border-radius:9px;font-family:inherit;font-size:.82rem;
-  font-weight:600;cursor:pointer;border:1px solid;transition:all .18s;
+  font-weight:600;cursor:pointer;border:1px solid;transition:background .18s,border-color .18s,color .18s,box-shadow .18s,opacity .18s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
 }
 .btn:disabled{opacity:.45;cursor:not-allowed;}
@@ -409,7 +409,7 @@ textarea{resize:vertical;min-height:70px;}
 .sort-label-sm{font-size:.74rem;color:var(--mute);}
 .sort-btn-sm{padding:4px 10px;border-radius:100px;font-size:.72rem;cursor:pointer;
   background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--mute);
-  transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+  transition:background .15s,border-color .15s,color .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
 .sort-btn-sm:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
 .sort-btn-sm.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
 /* ── inline edit ── */
@@ -509,7 +509,7 @@ textarea{resize:vertical;min-height:70px;}
 .analytics-url-bar input{flex:1;font-size:.82rem;}
 /* ── device toggle for site preview ── */
 .preview-device-bar{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
-.device-btn{padding:5px 14px;border-radius:8px;font-size:.76rem;cursor:pointer;border:1px solid var(--g-bdr);background:rgba(255,255,255,.04);color:var(--mute);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.device-btn{padding:5px 14px;border-radius:8px;font-size:.76rem;cursor:pointer;border:1px solid var(--g-bdr);background:rgba(255,255,255,.04);color:var(--mute);transition:background .15s,border-color .15s,color .15s;-webkit-tap-highlight-color:transparent;}
 .device-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
 .device-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
 .preview-wrap{transition:all .3s;overflow:hidden;}
@@ -522,3 +522,18 @@ textarea{resize:vertical;min-height:70px;}
 /* ── new tag expiry row in modal ── */
 .new-tag-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;}
 .new-tag-row select{flex:1;min-width:160px;}
+
+/* ── Preview tab: PC only ────────────────────────────── */
+@media(max-width:768px){
+  .tab-btn[data-tab="preview"],
+  #tab-preview{display:none!important;}
+}
+
+/* ── PC smoothness: avoid transition:all ─────────────── */
+/* ── New sort button ─────────────────────────────────── */
+.sort-btn-new{color:#6ee7b7!important;border-color:rgba(16,185,129,.3)!important;}
+.sort-btn-new.active{background:rgba(16,185,129,.15)!important;border-color:rgba(16,185,129,.55)!important;color:#6ee7b7!important;}
+
+/* ── Pending checkbox: no tap highlight ──────────────── */
+.bulk-cb{-webkit-tap-highlight-color:transparent;outline:none;accent-color:var(--acc);}
+.pend-card{-webkit-tap-highlight-color:transparent;}
