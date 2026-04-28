@@ -1016,7 +1016,7 @@ document.getElementById('bm-save').addEventListener('click', function() {
 document.getElementById('bm-cancel').addEventListener('click', closeBulkModal);
 document.getElementById('bm-close').addEventListener('click', closeBulkModal);
 document.getElementById('bulk-modal').addEventListener('click', function(e) { if (e.target === this) closeBulkModal(); });
-document.getElementById('bulk-add-btn').addEventListener('click', openBulkModal);
+// bulk-add-btn removed from UI — openBulkModal kept for reference only
 
 // ── Bulk New Tag ──────────────────────────────────────────────
 var bnSelected = new Set();
