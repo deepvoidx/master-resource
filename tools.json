@@ -2153,7 +2153,7 @@
         "dev",
         "utilities"
       ],
-      "newUntil": "2026-04-26T01:15:12.558Z"
+      "newUntil": "2026-05-28T11:42:59.783Z"
     },
     {
       "name": "ImageResizer — Compressor",
@@ -2165,7 +2165,7 @@
         "utilities",
         "images"
       ],
-      "newUntil": "2026-04-26T01:15:08.890Z"
+      "newUntil": "2026-05-28T11:43:07.208Z"
     },
     {
       "name": "Compress-or-Die",
