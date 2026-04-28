@@ -74,7 +74,8 @@
     <div class="sec-hdr">
       <h2>All Tools</h2>
       <span class="sec-count" id="tools-count">–</span>
-      <button class="btn btn-ghost btn-sm ml-auto" id="bulk-new-btn">🆕 Bulk New Tag</button>
+      <button class="btn btn-ghost btn-sm" id="bulk-new-btn" style="margin-right:6px;">🆕 Bulk New Tag</button>
+      <button class="btn btn-primary btn-sm ml-auto" id="add-tool-btn">+ Add Tool</button>
     </div>
     <div class="tools-controls">
       <div class="admin-search" style="flex:1;min-width:180px;">
@@ -202,14 +203,16 @@
   </div>
 </div>
 
-<!-- ── tool edit modal ── -->
+<!-- ── tool edit / multi-add modal ── -->
 <div class="modal-bg hidden" id="tool-modal">
-  <div class="modal-box">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+  <div class="modal-box" style="width:min(600px,100%);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="modal-title" style="margin-bottom:0;" id="tool-modal-title">Edit Tool</div>
       <button id="tm-close-x" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:1.3rem;line-height:1;padding:4px 6px;border-radius:6px;transition:color .15s;" title="Close">✕</button>
     </div>
-    <div style="display:grid;gap:12px;">
+
+    <!-- SINGLE EDIT mode -->
+    <div id="tm-single-mode" style="display:grid;gap:12px;">
       <div><label>Name *</label><input id="tm-name" type="text" maxlength="100" placeholder="Tool name"/></div>
       <div><label>URL *</label><input id="tm-url" type="url" maxlength="500" placeholder="https://example.com"/></div>
       <div><label>Description</label><input id="tm-desc" type="text" maxlength="200" placeholder="Short description of the tool"/></div>
@@ -229,12 +232,19 @@
             <option value="14">Expires in 2 weeks</option>
             <option value="30" selected>Expires in 1 month</option>
             <option value="90">Expires in 3 months</option>
-            <option value="99999">Forever</option>
+            <option value="99999">Never expires</option>
           </select>
         </div>
       </div>
-      <div id="tm-err" style="color:#f87171;font-size:.78rem;min-height:16px;"></div>
     </div>
+
+    <!-- MULTI ADD mode -->
+    <div id="tm-multi-mode" class="hidden">
+      <div id="tm-rows"></div>
+      <button class="btn btn-ghost btn-sm" id="tm-add-another" style="width:100%;margin-top:8px;border-style:dashed;justify-content:center;font-size:.8rem;">+ Add Another Tool</button>
+    </div>
+
+    <div id="tm-err" style="color:#f87171;font-size:.78rem;min-height:16px;margin-top:10px;"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="tm-cancel">Cancel</button>
       <button class="btn btn-primary" id="tm-save">Save Tool</button>
@@ -308,11 +318,6 @@
 </div>
 
 <div id="a-toast"></div>
-
-<!-- ── Floating Add Tool FAB ── -->
-<button id="add-tool-btn" aria-label="Add Tool" title="Add Tool">
-  <span class="fab-icon">+</span>
-</button>
 
 <div id="undo-toast">
   <span class="ut-msg" id="ut-msg"></span>
