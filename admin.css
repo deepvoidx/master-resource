@@ -410,8 +410,8 @@ textarea{resize:vertical;min-height:70px;}
 .sort-btn-sm{padding:4px 10px;border-radius:100px;font-size:.72rem;cursor:pointer;
   background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--mute);
   transition:background .15s,border-color .15s,color .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
-.sort-btn-sm:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
-.sort-btn-sm.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
+.sort-btn-sm:hover{border-color:rgba(59,130,246,.4);color:#93c5fd;}
+.sort-btn-sm.active{background:rgba(59,130,246,.18);border-color:rgba(59,130,246,.55);color:#93c5fd;font-weight:600;}
 /* ── inline edit ── */
 .inline-edit{display:none;padding:12px 16px 14px;background:rgba(108,99,255,.04);
   border-top:1px solid rgba(108,99,255,.12);border-radius:0 0 12px 12px;}
@@ -536,8 +536,8 @@ input[type=checkbox],input[type=radio]{
   background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--mute);
   transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;
 }
-.bn-sort-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
-.bn-sort-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
+.bn-sort-btn:hover{border-color:rgba(59,130,246,.4);color:#93c5fd;}
+.bn-sort-btn.active{background:rgba(59,130,246,.18);border-color:rgba(59,130,246,.55);color:#93c5fd;font-weight:600;}
 .tool-row-new{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);margin-left:5px;vertical-align:middle;flex-shrink:0;}
 .tool-row-new-days{font-size:.62rem;color:#6ee7b7;opacity:.7;margin-left:3px;vertical-align:middle;}
 /* ── new tag expiry row in modal ── */
@@ -558,3 +558,37 @@ input[type=checkbox],input[type=radio]{
 /* ── Pending checkbox: no tap highlight ──────────────── */
 .bulk-cb{-webkit-tap-highlight-color:transparent;outline:none;accent-color:var(--acc);}
 .pend-card{-webkit-tap-highlight-color:transparent;}
+
+/* ── Floating Action Button (Add Tool) ───────────────────── */
+@keyframes water-blob {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(1.22) rotate(-4deg); }
+  40%  { transform: scale(0.92) rotate(3deg); }
+  60%  { transform: scale(1.1) rotate(-2deg); }
+  78%  { transform: scale(0.97) rotate(1deg); }
+  90%  { transform: scale(1.03) rotate(-0.5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+#add-tool-fab{
+  position:fixed;bottom:28px;right:24px;z-index:500;
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#6c63ff 0%,#8b5cf6 100%);
+  border:none;cursor:pointer;
+  display:none;/* shown only when tools tab is active */
+  align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(108,99,255,.45),0 2px 8px rgba(0,0,0,.35);
+  transition:box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+  color:#fff;
+}
+#add-tool-fab:hover{box-shadow:0 6px 28px rgba(108,99,255,.6),0 2px 10px rgba(0,0,0,.4);}
+#add-tool-fab.water-pop{animation:water-blob .55s cubic-bezier(.36,.07,.19,.97) both;}
+#add-tool-fab.visible{display:flex;}
+
+/* ── Tabs-bar gap fix: more breathing room ───────────────── */
+.tabs-bar{padding-bottom:2px;}
+.tab-content{padding-top:14px;}
+@media(max-width:600px){
+  .tabs-bar{padding:8px var(--px,14px) 2px;}
+  .tab-content{padding-top:12px;}
+}

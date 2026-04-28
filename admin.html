@@ -74,8 +74,8 @@
     <div class="sec-hdr">
       <h2>All Tools</h2>
       <span class="sec-count" id="tools-count">–</span>
-      <button class="btn btn-ghost btn-sm" id="bulk-new-btn" style="margin-right:6px;">🆕 Bulk New Tag</button>
-      <button class="btn btn-primary btn-sm ml-auto" id="add-tool-btn">+ Add Tool</button>
+      <button class="btn btn-ghost btn-sm ml-auto" id="bulk-add-btn" style="margin-right:6px;">⚡ Bulk Add</button>
+      <button class="btn btn-primary btn-sm" id="bulk-new-btn">🆕 Bulk New Tag</button>
     </div>
     <div class="tools-controls">
       <div class="admin-search" style="flex:1;min-width:180px;">
@@ -179,6 +179,12 @@
       <iframe id="analytics-frame" class="analytics-iframe" title="Analytics"></iframe>
     </div>
   </div>
+  <!-- ── Floating Add Tool button ── -->
+  <button id="add-tool-fab" title="Add Tool" aria-label="Add Tool">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="26" height="26">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
 </div>
 
 <!-- ── bulk add modal ── -->

@@ -956,7 +956,7 @@ function deleteTool(idx) {
   );
 }
 
-document.getElementById('add-tool-btn').addEventListener('click', function(){ openToolModal(-1); });
+// add-tool is handled by the FAB (#add-tool-fab)
 
 function bmBuildCatChecks(container) {
   container.innerHTML = '';
@@ -1417,11 +1417,14 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     var tab = btn.getAttribute('data-tab');
     document.getElementById('tab-'+tab).classList.add('active');
     S.activeTab = tab;
+    window.scrollTo(0, 0);
+    // Show FAB only on tools tab
+    var fab = document.getElementById('add-tool-fab');
+    if (fab) fab.classList.toggle('visible', tab === 'tools');
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
     if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
-      // Apply desktop scaling after the tab is visible (getBoundingClientRect needs layout)
       requestAnimationFrame(function(){
         var activeBtn = document.querySelector('.device-btn.active');
         var device = activeBtn ? activeBtn.getAttribute('data-device') : 'desktop';
@@ -1431,45 +1434,58 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
   });
 });
 
+// ── FAB: Add Tool floating button ─────────────────────────────
+(function(){
+  var fab = document.getElementById('add-tool-fab');
+  if (!fab) return;
+  fab.addEventListener('click', function(){
+    fab.classList.remove('water-pop');
+    void fab.offsetWidth; // reflow to restart animation
+    fab.classList.add('water-pop');
+    fab.addEventListener('animationend', function onEnd(){
+      fab.classList.remove('water-pop');
+      fab.removeEventListener('animationend', onEnd);
+    });
+    openToolModal(-1);
+  });
+})();
+
 // ── Device toggle for site preview ────────────────────────────
 function applyPreviewDevice(device) {
   var wrap  = document.getElementById('preview-wrap');
   var frame = document.getElementById('site-preview-frame');
   if (!wrap || !frame) return;
-  // Reset transforms first
-  frame.style.transform = '';
+
+  // Measure container BEFORE any style changes to avoid feedback loop
+  var containerW = wrap.getBoundingClientRect().width || 1280;
+  var containerH = wrap.getBoundingClientRect().height ||
+                   (window.innerHeight - 160);
+
+  // Reset all transforms and sizing first
+  frame.style.transform       = '';
   frame.style.transformOrigin = '';
-  frame.style.width = '';
-  wrap.style.height = '';
+  frame.style.width           = '';
+  frame.style.borderRadius    = '';
+  wrap.style.height           = '';
   wrap.className = 'preview-wrap ' + device;
 
-  if (device === 'mobile') {
-    frame.style.width = '390px';
-    frame.style.borderRadius = '20px';
-  } else if (device === 'tablet') {
-    frame.style.width = '768px';
-    frame.style.borderRadius = '14px';
-  } else {
-    // Desktop — read containerW BEFORE setting frame width to avoid shrink loop
-    var DESKTOP_W = 1280;
-    frame.style.transform = '';
-    frame.style.transformOrigin = '';
-    frame.style.width = '';
-    wrap.style.height = '';
-    frame.style.borderRadius = '12px';
-    // Read container width synchronously now (frame width is reset to auto)
-    var containerW = wrap.getBoundingClientRect().width || DESKTOP_W;
-    var scale = Math.min(1, containerW / DESKTOP_W);
-    frame.style.width = DESKTOP_W + 'px';
-    // Apply scale after browser paints the new width
-    requestAnimationFrame(function(){
-      frame.style.transform = 'scale(' + scale + ')';
-      frame.style.transformOrigin = 'top left';
-      // Height: use the iframe's inline height attribute value
-      var frameH = parseFloat(frame.style.height) || frame.offsetHeight || 600;
-      wrap.style.height = Math.round(frameH * scale) + 'px';
-    });
-  }
+  var DEVICE_W = device === 'mobile' ? 390
+               : device === 'tablet' ? 768
+               : 1280;
+
+  frame.style.width        = DEVICE_W + 'px';
+  frame.style.borderRadius = device === 'mobile' ? '20px'
+                           : device === 'tablet' ? '14px' : '12px';
+
+  // Scale to fit container for all device modes
+  var scale = Math.min(1, containerW / DEVICE_W);
+  frame.style.transform       = 'scale(' + scale + ')';
+  frame.style.transformOrigin = 'top left';
+
+  // Set wrap height so content below doesn't overlap
+  var frameH = Math.max(containerH, 400);
+  wrap.style.height = Math.round(frameH * scale) + 'px';
+  wrap.style.overflow = 'hidden';
 }
 
 document.querySelectorAll('.device-btn').forEach(function(btn){
