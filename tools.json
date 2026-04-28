@@ -2195,7 +2195,7 @@
         "automation",
         "agents"
       ],
-      "newUntil": "2026-04-26T01:14:29.128Z"
+      "newUntil": "2026-05-05T11:37:23.557Z"
     },
     {
       "name": "GoatCounter",
@@ -2214,7 +2214,7 @@
         "dev",
         "security"
       ],
-      "newUntil": "2026-04-26T01:14:22.800Z"
+      "newUntil": "2026-05-05T11:37:29.921Z"
     },
     {
       "name": "Awesome NotebookLM Prompts",
