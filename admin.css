@@ -190,9 +190,45 @@ textarea{resize:vertical;min-height:70px;}
   border-color:var(--g-bdr);border-bottom-color:var(--bg);
 }
 
-/* content area */
-.tab-content{display:none;padding:8px var(--px,20px) 40px;}
+/* content area — more breathing room, extra bottom for FAB */
+.tab-content{display:none;padding:16px var(--px,20px) 90px;}
 .tab-content.active{display:block;contain:layout style;}
+
+/* ── Floating Action Button (Add Tool) ── */
+#add-tool-btn{
+  position:fixed;bottom:28px;right:24px;z-index:500;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,#6c63ff 0%,#a78bfa 100%);
+  border:none;color:#fff;font-size:1.65rem;line-height:1;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(108,99,255,.55),0 2px 8px rgba(0,0,0,.35);
+  transition:box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+  will-change:transform;overflow:hidden;
+}
+#admin-panel.tab-tools-active #add-tool-btn{display:flex;}
+#add-tool-btn .fab-icon{display:block;pointer-events:none;transition:transform .15s;}
+#add-tool-btn:hover{box-shadow:0 10px 32px rgba(108,99,255,.7),0 2px 8px rgba(0,0,0,.35);}
+@keyframes fab-water{
+  0%  {transform:scale(1)      rotate(0deg);}
+  15% {transform:scale(1.16)   rotate(-5deg);}
+  30% {transform:scale(0.92)   rotate(4deg);}
+  50% {transform:scale(1.09)   rotate(-2deg);}
+  70% {transform:scale(0.96)   rotate(1.5deg);}
+  85% {transform:scale(1.03)   rotate(-.5deg);}
+  100%{transform:scale(1)      rotate(0deg);}
+}
+#add-tool-btn.water{animation:fab-water .52s cubic-bezier(.36,.07,.19,.97);}
+
+/* ── bn sort buttons — same style as sort-btn-sm ── */
+.bn-sort-btn{
+  padding:4px 10px;border-radius:100px;font-size:.72rem;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--mute);
+  transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.bn-sort-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
+.bn-sort-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
 
 /* ── tool/cat rows — solid bg, no backdrop-filter (scroll perf) ── */
 .tool-row.glass,.cat-row.glass{
@@ -220,18 +256,19 @@ textarea{resize:vertical;min-height:70px;}
   .topbar-status{padding:4px 8px;gap:4px;}
   .btn-sm{padding:5px 9px;font-size:.72rem;}
 
-  /* ── tabs bar: stick below topbar, prevent jumping ── */
+  /* ── tabs bar: stick below topbar ── */
   .tabs-bar{
     flex-shrink:0;
     position:sticky;
-    top:48px; /* approximate topbar height on mobile */
+    top:48px;
     z-index:99;
     background:rgba(6,6,12,.97);
+    backdrop-filter:none;-webkit-backdrop-filter:none;
     padding-bottom:0;
-    backdrop-filter:none;
-    -webkit-backdrop-filter:none;
   }
   .tab-btn{padding:6px 10px;font-size:.72rem;}
+  /* FAB on mobile: slightly smaller, higher up to avoid browser chrome */
+  #add-tool-btn{width:52px;height:52px;font-size:1.5rem;bottom:80px;right:18px;}
 
   /* pending cards — remove extra left indent */
   .pend-card{padding:12px;margin-bottom:10px;}
@@ -516,28 +553,7 @@ textarea{resize:vertical;min-height:70px;}
 .preview-wrap.mobile{max-width:393px;margin:0 auto;display:flex;justify-content:center;}
 .preview-wrap.tablet{max-width:768px;margin:0 auto;display:flex;justify-content:center;}
 .preview-wrap.desktop{max-width:100%;display:block;overflow:hidden;}
-/* ── checkbox / radio reset — never strip native appearance ── */
-input[type=checkbox],input[type=radio]{
-  width:auto!important;height:auto!important;
-  background:none!important;border:none!important;
-  padding:0!important;box-shadow:none!important;
-  appearance:auto!important;-webkit-appearance:auto!important;
-  cursor:pointer;flex-shrink:0;
-}
-/* ── bn (bulk-new-tag) row hover ── */
-#bn-tool-list label{transition:background .13s;}
-#bn-tool-list label:hover{background:rgba(108,99,255,.10);}
-#bn-tool-list label.bn-selected{
-  background:rgba(108,99,255,.14);
-  border-radius:7px;
-}
-.bn-sort-btn{
-  padding:4px 10px;border-radius:100px;font-size:.72rem;cursor:pointer;
-  background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--mute);
-  transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;
-}
-.bn-sort-btn:hover{border-color:rgba(108,99,255,.4);color:#b0b0d8;}
-.bn-sort-btn.active{background:rgba(108,99,255,.18);border-color:rgba(108,99,255,.52);color:#d4d0ff;font-weight:600;}
+/* ── NEW badge in tool list row ── */
 .tool-row-new{display:inline-block;padding:1px 6px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);margin-left:5px;vertical-align:middle;flex-shrink:0;}
 .tool-row-new-days{font-size:.62rem;color:#6ee7b7;opacity:.7;margin-left:3px;vertical-align:middle;}
 /* ── new tag expiry row in modal ── */
