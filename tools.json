@@ -2021,7 +2021,7 @@
         "ai-assistants",
         "dev"
       ],
-      "newUntil": "2026-04-26T01:15:39.950Z"
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "claude-mem",
@@ -2036,7 +2036,7 @@
         "memory",
         "claude"
       ],
-      "newUntil": "2026-04-26T01:15:36.191Z"
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "MemPalace",
@@ -2055,7 +2055,7 @@
         "dev",
         "research"
       ],
-      "newUntil": "2026-04-26T01:15:32.630Z"
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "Meta AI",
@@ -2072,7 +2072,7 @@
         "ai-assistants",
         "image-gen"
       ],
-      "newUntil": "2026-04-26T01:15:29.786Z"
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "Ollama",
@@ -2092,7 +2092,7 @@
         "dev",
         "security"
       ],
-      "newUntil": "2026-04-26T01:15:26.532Z"
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "iLovePDF — PDF to Word",
@@ -2103,7 +2103,8 @@
         "free",
         "utilities",
         "pdf"
-      ]
+      ],
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "iLovePDF — Word to PDF",
@@ -2114,7 +2115,8 @@
         "free",
         "utilities",
         "pdf"
-      ]
+      ],
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "ImageCompressor.com",
@@ -2130,7 +2132,8 @@
       "categories": [
         "design",
         "utilities"
-      ]
+      ],
+      "newUntil": "2026-05-05T11:50:49.330Z"
     },
     {
       "name": "Squoosh",
