@@ -20,6 +20,7 @@ var S = {
   token:null, ghUser:'', activeTab:'pending',
   toolsData:null, toolsSha:null,
   pendingData:null, pendingSha:null,
+  settingsSha:null,
   sessionTimer:null,
   editToolIdx:-1,
   toolsSortMode:'default',
@@ -264,7 +265,15 @@ function loadData() {
     apiGet('pending.json').catch(function(){
       // pending.json might not exist yet
       S.pendingData = { pending:[] }; S.pendingSha = null;
-    }).then(function(d){ if(d){ S.pendingData = d.content; S.pendingSha = d.sha; } })
+    }).then(function(d){ if(d){ S.pendingData = d.content; S.pendingSha = d.sha; } }),
+    // Fetch settings.json for cross-device auto-logout sync
+    apiGet('settings.json').then(function(d){
+      S.settingsSha = d.sha;
+      var mins = d.content && d.content.autoLogoutMins !== undefined ? String(d.content.autoLogoutMins) : '30';
+      localStorage.setItem('a_idle_mins', mins);
+      SESSION_MS = getIdleTimeoutMs();
+      resetIdleTimer();
+    }).catch(function(){ /* settings.json may not exist yet — use localStorage default */ })
   ]).then(function(){
     renderPending();
     renderTools();
@@ -1519,15 +1528,35 @@ function initHomeTab() {
 document.getElementById('save-timeout-btn').addEventListener('click', function(){
   var radio = document.querySelector('.timeout-opt input[type=radio]:checked');
   if (!radio) return;
-  localStorage.setItem('a_idle_mins', radio.value);
-  SESSION_MS = getIdleTimeoutMs();
-  resetIdleTimer(); // apply immediately
-  var msg = document.getElementById('timeout-saved-msg');
+  var minsVal = radio.value;
   var label = radio.parentElement.querySelector('span').textContent;
-  msg.textContent = '✓ Saved — auto-logout set to ' + label;
-  msg.style.opacity = '1';
-  setTimeout(function(){ msg.style.opacity = '0'; }, 3000);
-  toast('Auto-logout updated to ' + label, '⏱');
+  var btn = document.getElementById('save-timeout-btn');
+  var msg = document.getElementById('timeout-saved-msg');
+
+  // Save locally immediately so current session updates right away
+  localStorage.setItem('a_idle_mins', minsVal);
+  SESSION_MS = getIdleTimeoutMs();
+  resetIdleTimer();
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  var settingsContent = { autoLogoutMins: parseInt(minsVal, 10) };
+  apiPut('settings.json', settingsContent, S.settingsSha, 'Update auto-logout setting')
+    .then(function(res){
+      S.settingsSha = res.content.sha;
+      msg.textContent = '✓ Saved to all devices — auto-logout: ' + label;
+      msg.style.opacity = '1';
+      setTimeout(function(){ msg.style.opacity = '0'; }, 3500);
+      toast('Auto-logout updated to ' + label, '⏱');
+    })
+    .catch(function(e){
+      msg.textContent = '⚠ Saved locally only — GitHub write failed';
+      msg.style.opacity = '1';
+      setTimeout(function(){ msg.style.opacity = '0'; }, 3500);
+      toast('Settings saved locally (GitHub error: ' + e.message + ')', '⚠️');
+    })
+    .finally(function(){
+      btn.disabled = false; btn.textContent = 'Save Setting';
+    });
 });
 
 // ── FAB: Add Tool floating button ─────────────────────────────
