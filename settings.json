@@ -1,4 +1,11 @@
 {
   "autoLogoutMins": 60,
-  "sessions": []
+  "sessions": [
+    {
+      "id": "56ac58a75794cb898bb1dec7",
+      "device": "Chrome / Windows",
+      "loginAt": "2026-04-29T11:21:03.640Z",
+      "isTemp": false
+    }
+  ]
 }
