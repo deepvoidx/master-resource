@@ -274,6 +274,7 @@ function registerSession(settingsData) {
   S.sessionId = randomHex(12);
   sessionStorage.setItem('a_sid', S.sessionId);
   if (!Array.isArray(settingsData.sessions)) settingsData.sessions = [];
+  if (!Array.isArray(settingsData.loginHistory)) settingsData.loginHistory = [];
   // Clean up expired temp-password sessions older than 7 days
   var cutoff = Date.now() - 7 * 24 * 3600 * 1000;
   settingsData.sessions = settingsData.sessions.filter(function(s){
@@ -285,6 +286,15 @@ function registerSession(settingsData) {
     loginAt: new Date().toISOString(),
     isTemp: !!S._loginedWithTemp
   });
+  // Persistent login history — never removed on logout, capped at 50
+  settingsData.loginHistory.push({
+    device: getDeviceInfo(),
+    loginAt: new Date().toISOString(),
+    isTemp: !!S._loginedWithTemp
+  });
+  if (settingsData.loginHistory.length > 50) {
+    settingsData.loginHistory = settingsData.loginHistory.slice(-50);
+  }
   return settingsData;
 }
 
@@ -1666,7 +1676,8 @@ function initHomeTab() {
     S.settingsSha = d.sha;
     renderSessions(d.content);
     renderTempPassStatus(d.content);
-  }).catch(function(){ renderSessions({}); renderTempPassStatus({}); });
+    renderLoginHistory(d.content);
+  }).catch(function(){ renderSessions({}); renderTempPassStatus({}); renderLoginHistory({}); });
 }
 
 function renderSessions(cfg) {
@@ -1719,6 +1730,31 @@ function renderTempPassStatus(cfg) {
     banner.classList.add('active-temp');
     if (deleteBtn) deleteBtn.classList.remove('hidden');
   }
+}
+
+function renderLoginHistory(cfg) {
+  var list = document.getElementById('login-history-list');
+  if (!list) return;
+  var history = Array.isArray(cfg.loginHistory) ? cfg.loginHistory : [];
+  if (!history.length) {
+    list.innerHTML = '<div class="home-empty-msg">No login history yet. It will be recorded from your next sign-in onwards.</div>';
+    return;
+  }
+  // Most recent first
+  var reversed = history.slice().reverse();
+  list.innerHTML = reversed.map(function(s){
+    var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
+    return '<div class="session-card">'
+      +'<div style="flex:1;">'
+        +'<div class="session-device">'+esc(s.device||'Unknown device')+'</div>'
+        +'<div class="session-meta">'+esc(loginTime)+'</div>'
+      +'</div>'
+      +(s.isTemp
+        ? '<span class="session-badge temp">Temp</span>'
+        : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.32);color:#b0b0ff;">PAT</span>'
+      )
+    +'</div>';
+  }).join('');
 }
 
 function doForceLogout(sessionId) {
