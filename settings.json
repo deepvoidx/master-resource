@@ -12,6 +12,19 @@
       "device": "Chrome / Windows",
       "loginAt": "2026-04-29T11:54:27.354Z",
       "isTemp": false
+    },
+    {
+      "id": "661aaa5e78e2bf30d72a0e62",
+      "device": "Chrome / Windows",
+      "loginAt": "2026-04-29T11:59:52.837Z",
+      "isTemp": false
+    }
+  ],
+  "loginHistory": [
+    {
+      "device": "Chrome / Windows",
+      "loginAt": "2026-04-29T11:59:52.837Z",
+      "isTemp": false
     }
   ]
 }
