@@ -17,10 +17,11 @@ var SESSION_MS = getIdleTimeoutMs();
 // STATE
 // ═══════════════════════════════════════════════════════
 var S = {
-  token:null, ghUser:'', activeTab:'pending',
+  token:null, ghUser:'', activeTab:'home',
   toolsData:null, toolsSha:null,
   pendingData:null, pendingSha:null,
   settingsSha:null,
+  sessionId:null,
   sessionTimer:null,
   editToolIdx:-1,
   toolsSortMode:'default',
@@ -91,10 +92,16 @@ function resetIdleTimer() {
 
 function logout() {
   S.token = null; S.toolsData = null; S.pendingData = null;
-  S.activeTab = 'pending'; S.toolsSortMode = 'default';
+  S.activeTab = 'home'; S.toolsSortMode = 'default';
   S.bulkSelected.clear();
+  // Remove own session from settings on clean logout (best-effort)
+  if (S.sessionId && S.settingsSha) {
+    removeOwnSession().catch(function(){});
+  }
+  S.sessionId = null;
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
+  sessionStorage.removeItem('a_sid');
   clearTimeout(S.sessionTimer);
 
   // Reset historyLoaded so it reloads fresh on next login
@@ -114,13 +121,17 @@ function logout() {
   if (se) se.innerHTML = spinner;
   document.getElementById('pending-empty').classList.add('hidden');
 
-  // Reset tabs UI back to Pending
+  // Reset tabs UI back to Home
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
-  var pendBtn = document.querySelector('.tab-btn[data-tab="pending"]');
-  var pendTab = document.getElementById('tab-pending');
-  if (pendBtn) pendBtn.classList.add('active');
-  if (pendTab) pendTab.classList.add('active');
+  var homeBtn = document.querySelector('.tab-btn[data-tab="home"]');
+  var homeTab = document.getElementById('tab-home');
+  if (homeBtn) homeBtn.classList.add('active');
+  if (homeTab) homeTab.classList.add('active');
+  requestAnimationFrame(function(){
+    var active = document.querySelector('.tab-btn.active');
+    if (active) moveLiquidIndicator(active);
+  });
 
   // Reset counts
   ['pending-count','tools-tab-count','cats-tab-count','tools-count','cats-count'].forEach(function(id){
@@ -227,6 +238,133 @@ function safeColor(raw) {
 }
 
 // ═══════════════════════════════════════════════════════
+// CRYPTO HELPERS
+// ═══════════════════════════════════════════════════════
+function sha256hex(message) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(message))
+    .then(function(buf){
+      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    });
+}
+
+function randomHex(bytes) {
+  var arr = new Uint8Array(bytes);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+
+function getDeviceInfo() {
+  var ua = navigator.userAgent;
+  var browser = ua.includes('Firefox') ? 'Firefox'
+    : ua.includes('Edg/') ? 'Edge'
+    : ua.includes('Chrome') ? 'Chrome'
+    : ua.includes('Safari') ? 'Safari' : 'Browser';
+  var os = ua.includes('Windows') ? 'Windows'
+    : ua.includes('Mac') ? 'macOS'
+    : (ua.includes('iPhone')||ua.includes('iPad')) ? 'iOS'
+    : ua.includes('Android') ? 'Android'
+    : ua.includes('Linux') ? 'Linux' : 'Unknown';
+  return browser + ' / ' + os;
+}
+
+// ═══════════════════════════════════════════════════════
+// SESSION TRACKING
+// ═══════════════════════════════════════════════════════
+function registerSession(settingsData) {
+  S.sessionId = randomHex(12);
+  sessionStorage.setItem('a_sid', S.sessionId);
+  if (!Array.isArray(settingsData.sessions)) settingsData.sessions = [];
+  // Clean up expired temp-password sessions older than 7 days
+  var cutoff = Date.now() - 7 * 24 * 3600 * 1000;
+  settingsData.sessions = settingsData.sessions.filter(function(s){
+    return !s.loginAt || new Date(s.loginAt).getTime() > cutoff;
+  });
+  settingsData.sessions.push({
+    id: S.sessionId,
+    device: getDeviceInfo(),
+    loginAt: new Date().toISOString(),
+    isTemp: !!S._loginedWithTemp
+  });
+  return settingsData;
+}
+
+function removeOwnSession() {
+  return apiGet('settings.json').then(function(d){
+    var data = d.content;
+    S.settingsSha = d.sha;
+    if (!Array.isArray(data.sessions)) return;
+    data.sessions = data.sessions.filter(function(s){ return s.id !== S.sessionId; });
+    return apiPut('settings.json', data, S.settingsSha, 'Session ended');
+  });
+}
+
+function forceLogoutSession(sessionId) {
+  return apiGet('settings.json').then(function(d){
+    var data = d.content;
+    S.settingsSha = d.sha;
+    if (!Array.isArray(data.sessions)) return;
+    data.sessions = data.sessions.filter(function(s){ return s.id !== sessionId; });
+    return apiPut('settings.json', data, S.settingsSha, 'Force logout session').then(function(r){
+      S.settingsSha = r.content.sha;
+      toast('Device logged out', '✓');
+      initHomeTab();
+    });
+  });
+}
+
+function checkOwnSessionValid(settingsData) {
+  if (!S.sessionId) return true; // legacy session before tracking
+  if (!Array.isArray(settingsData.sessions)) return true;
+  return settingsData.sessions.some(function(s){ return s.id === S.sessionId; });
+}
+
+// ═══════════════════════════════════════════════════════
+// TEMPORARY PASSWORD
+// ═══════════════════════════════════════════════════════
+var WORKER_URL = 'https://winter-art-8e2b.anshtripathi872.workers.dev';
+
+function createTempPassword(password, expiryMins) {
+  var salt = randomHex(16);
+  return sha256hex(salt + password).then(function(hash){
+    var expiry = expiryMins > 0 ? Date.now() + expiryMins * 60000
+               : expiryMins === 0 ? 0  // never
+               : -1;                   // -1 = until deleted
+    return apiGet('settings.json').then(function(d){
+      var data = d.content;
+      S.settingsSha = d.sha;
+      data.tempPasswordHash = hash;
+      data.tempPasswordSalt = salt;
+      data.tempPasswordExpiry = expiry;
+      return apiPut('settings.json', data, S.settingsSha, 'Create temporary password').then(function(r){
+        S.settingsSha = r.content.sha;
+      });
+    });
+  });
+}
+
+function deleteTempPassword() {
+  return apiGet('settings.json').then(function(d){
+    var data = d.content;
+    S.settingsSha = d.sha;
+    delete data.tempPasswordHash;
+    delete data.tempPasswordSalt;
+    delete data.tempPasswordExpiry;
+    return apiPut('settings.json', data, S.settingsSha, 'Delete temporary password').then(function(r){
+      S.settingsSha = r.content.sha;
+    });
+  });
+}
+
+// Verify temp password via worker (worker holds the real GH token)
+function verifyTempPassword(password) {
+  return fetch(WORKER_URL + '/verify-temp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: password })
+  }).then(function(r){ return r.json(); });
+}
+
+// ═══════════════════════════════════════════════════════
 // TAB COUNTS
 // ═══════════════════════════════════════════════════════
 function updateTabCounts() {
@@ -266,14 +404,22 @@ function loadData() {
       // pending.json might not exist yet
       S.pendingData = { pending:[] }; S.pendingSha = null;
     }).then(function(d){ if(d){ S.pendingData = d.content; S.pendingSha = d.sha; } }),
-    // Fetch settings.json for cross-device auto-logout sync
+    // Fetch settings.json for cross-device sync
     apiGet('settings.json').then(function(d){
       S.settingsSha = d.sha;
-      var mins = d.content && d.content.autoLogoutMins !== undefined ? String(d.content.autoLogoutMins) : '30';
+      var cfg = d.content || {};
+      // Sync auto-logout
+      var mins = cfg.autoLogoutMins !== undefined ? String(cfg.autoLogoutMins) : '30';
       localStorage.setItem('a_idle_mins', mins);
       SESSION_MS = getIdleTimeoutMs();
       resetIdleTimer();
-    }).catch(function(){ /* settings.json may not exist yet — use localStorage default */ })
+      // Check if our own session was force-revoked
+      if (S.sessionId && !checkOwnSessionValid(cfg)) {
+        toast('Your session was revoked from another device.', '⚠️');
+        setTimeout(logout, 1800);
+        return;
+      }
+    }).catch(function(){ /* settings.json may not exist yet */ })
   ]).then(function(){
     renderPending();
     renderTools();
@@ -281,6 +427,7 @@ function loadData() {
     updateTabCounts();
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') fetchHistory();
+    if (S.activeTab==='home') initHomeTab();
   }).catch(function(e){
     toast('Failed to load data: ' + e.message, '❌');
   });
@@ -1502,61 +1649,164 @@ requestAnimationFrame(function(){
   if (active) moveLiquidIndicator(active);
 });
 
-// ── Home Tab: auto-logout settings ────────────────────────────
+// ── Home Tab ──────────────────────────────────────────────────
 function initHomeTab() {
-  var saved = localStorage.getItem('a_idle_mins');
-  var cur = saved !== null ? saved : '30';
-  var opts = document.querySelectorAll('.timeout-opt');
-  opts.forEach(function(lbl) {
-    var radio = lbl.querySelector('input[type=radio]');
-    if (radio.value === cur) {
-      radio.checked = true;
-      lbl.classList.add('selected');
-    } else {
-      radio.checked = false;
-      lbl.classList.remove('selected');
-    }
-    radio.addEventListener('change', function(){
-      opts.forEach(function(l){ l.classList.remove('selected'); });
-      lbl.classList.add('selected');
-    });
-  });
+  // Sync user info
   var homeGhUser = document.getElementById('home-gh-user');
   if (homeGhUser) homeGhUser.textContent = S.ghUser ? '@'+S.ghUser : '—';
+
+  // Segmented auto-logout selector
+  var saved = localStorage.getItem('a_idle_mins') || '30';
+  document.querySelectorAll('.tseg-btn').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-val') === saved);
+  });
+
+  // Load sessions + temp-pass status from settings.json
+  apiGet('settings.json').then(function(d){
+    S.settingsSha = d.sha;
+    renderSessions(d.content);
+    renderTempPassStatus(d.content);
+  }).catch(function(){ renderSessions({}); renderTempPassStatus({}); });
 }
 
+function renderSessions(cfg) {
+  var list = document.getElementById('sessions-list');
+  if (!list) return;
+  var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
+  if (!sessions.length) {
+    list.innerHTML = '<div class="home-empty-msg">No sessions recorded yet.</div>';
+    return;
+  }
+  list.innerHTML = sessions.map(function(s){
+    var isCurrent = s.id === S.sessionId;
+    var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
+    return '<div class="session-card'+(isCurrent?' current':'')+'">'
+      +'<div style="flex:1;">'
+        +'<div class="session-device">'+esc(s.device||'Unknown device')+'</div>'
+        +'<div class="session-meta">Logged in: '+esc(loginTime)+'</div>'
+      +'</div>'
+      +(s.isTemp ? '<span class="session-badge temp">Temp</span>' : '')
+      +(isCurrent
+        ? '<span class="session-badge">This device</span>'
+        : '<button class="btn btn-danger btn-sm" onclick="doForceLogout(\''+esc(s.id)+'\')">Logout</button>'
+      )
+    +'</div>';
+  }).join('');
+}
+
+function renderTempPassStatus(cfg) {
+  var banner = document.getElementById('temp-status-banner');
+  var deleteBtn = document.getElementById('temp-delete-btn');
+  if (!banner) return;
+
+  var hasHash = !!cfg.tempPasswordHash;
+  var expiry = cfg.tempPasswordExpiry;
+  var isExpired = hasHash && expiry > 0 && Date.now() > expiry;
+  var isNeverExpires = hasHash && (expiry === 0 || expiry === -1);
+  var isUntilDeleted = hasHash && expiry === -1;
+
+  banner.className = 'temp-status';
+  if (!hasHash) {
+    banner.classList.add('hidden');
+    if (deleteBtn) deleteBtn.classList.add('hidden');
+  } else if (isExpired) {
+    banner.textContent = '⚠ Temporary password has expired and is no longer valid.';
+    banner.classList.add('expired-temp');
+    if (deleteBtn) deleteBtn.classList.remove('hidden');
+  } else {
+    var expiryStr = isNeverExpires ? 'Never expires' : isUntilDeleted ? 'Until deleted' : 'Expires: '+new Date(expiry).toLocaleString();
+    banner.textContent = '✓ Temporary password is active. '+expiryStr+'.';
+    banner.classList.add('active-temp');
+    if (deleteBtn) deleteBtn.classList.remove('hidden');
+  }
+}
+
+function doForceLogout(sessionId) {
+  if (!confirm('Force logout this device?')) return;
+  forceLogoutSession(sessionId).then(function(){ initHomeTab(); }).catch(function(e){ toast('Error: '+e.message,'❌'); });
+}
+
+// Segmented selector click
+document.getElementById('timeout-seg').addEventListener('click', function(e){
+  var btn = e.target.closest('.tseg-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tseg-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+});
+
+// Save auto-logout
 document.getElementById('save-timeout-btn').addEventListener('click', function(){
-  var radio = document.querySelector('.timeout-opt input[type=radio]:checked');
-  if (!radio) return;
-  var minsVal = radio.value;
-  var label = radio.parentElement.querySelector('span').textContent;
+  var active = document.querySelector('.tseg-btn.active');
+  if (!active) return;
+  var minsVal = active.getAttribute('data-val');
+  var labelMap = {'1':'1 min','10':'10 min','30':'30 min','60':'1 hour','0':'Never'};
+  var label = labelMap[minsVal] || minsVal+' min';
   var btn = document.getElementById('save-timeout-btn');
   var msg = document.getElementById('timeout-saved-msg');
 
-  // Save locally immediately so current session updates right away
   localStorage.setItem('a_idle_mins', minsVal);
   SESSION_MS = getIdleTimeoutMs();
   resetIdleTimer();
 
   btn.disabled = true; btn.textContent = 'Saving…';
-  var settingsContent = { autoLogoutMins: parseInt(minsVal, 10) };
-  apiPut('settings.json', settingsContent, S.settingsSha, 'Update auto-logout setting')
-    .then(function(res){
-      S.settingsSha = res.content.sha;
-      msg.textContent = '✓ Saved to all devices — auto-logout: ' + label;
-      msg.style.opacity = '1';
-      setTimeout(function(){ msg.style.opacity = '0'; }, 3500);
-      toast('Auto-logout updated to ' + label, '⏱');
+  apiGet('settings.json').then(function(d){
+    S.settingsSha = d.sha;
+    var data = d.content;
+    data.autoLogoutMins = parseInt(minsVal, 10);
+    return apiPut('settings.json', data, S.settingsSha, 'Update auto-logout setting');
+  }).then(function(res){
+    S.settingsSha = res.content.sha;
+    msg.textContent = '✓ Saved — '+label;
+    msg.style.opacity = '1';
+    setTimeout(function(){ msg.style.opacity = '0'; }, 2500);
+    toast('Auto-logout: '+label, '⏱');
+  }).catch(function(e){
+    msg.textContent = '⚠ Local only';
+    msg.style.opacity = '1';
+    setTimeout(function(){ msg.style.opacity = '0'; }, 2500);
+    toast('Local save only — '+e.message, '⚠️');
+  }).finally(function(){ btn.disabled=false; btn.textContent='Save'; });
+});
+
+// Create temp password
+document.getElementById('temp-create-btn').addEventListener('click', function(){
+  var pw = document.getElementById('temp-pass-input').value;
+  var expiry = document.getElementById('temp-expiry-sel').value;
+  var errEl = document.getElementById('temp-pass-err');
+  var savingEl = document.getElementById('temp-saving-msg');
+  errEl.textContent = '';
+  if (!pw || pw.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+
+  var btn = document.getElementById('temp-create-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  savingEl.textContent = 'Hashing and saving…';
+
+  createTempPassword(pw, parseInt(expiry, 10))
+    .then(function(){
+      document.getElementById('temp-pass-input').value = '';
+      savingEl.textContent = '';
+      toast('Temporary password created', '🔑');
+      initHomeTab();
     })
     .catch(function(e){
-      msg.textContent = '⚠ Saved locally only — GitHub write failed';
-      msg.style.opacity = '1';
-      setTimeout(function(){ msg.style.opacity = '0'; }, 3500);
-      toast('Settings saved locally (GitHub error: ' + e.message + ')', '⚠️');
+      savingEl.textContent = '';
+      errEl.textContent = 'Error: '+e.message;
     })
-    .finally(function(){
-      btn.disabled = false; btn.textContent = 'Save Setting';
-    });
+    .finally(function(){ btn.disabled=false; btn.textContent='Create Temp Password'; });
+});
+
+// Delete temp password
+document.getElementById('temp-delete-btn').addEventListener('click', function(){
+  if (!confirm('Delete the temporary password? It will immediately stop working.')) return;
+  var btn = document.getElementById('temp-delete-btn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  deleteTempPassword()
+    .then(function(){
+      toast('Temporary password deleted', '🗑️');
+      initHomeTab();
+    })
+    .catch(function(e){ toast('Error: '+e.message,'❌'); })
+    .finally(function(){ btn.disabled=false; btn.textContent='🗑 Delete Temp Password'; });
 });
 
 // ── FAB: Add Tool floating button ─────────────────────────────
@@ -1764,27 +2014,68 @@ function doLogin() {
   pat = pat.replace(/[\x00-\x1F\x7F]/g,'');
   if (!pat) { errEl.textContent='Password is required.'; return; }
   btn.disabled=true; btn.textContent='Verifying…'; errEl.textContent='';
+
   var timeoutId;
   var timeoutP = new Promise(function(_,reject){ timeoutId=setTimeout(function(){ reject(new Error('Connection timed out.')); },10000); });
 
+  function onLoginSuccess(token, user, isTemp) {
+    clearTimeout(timeoutId);
+    clearLoginState();
+    S._loginedWithTemp = !!isTemp;
+    startSession(token, user ? user.login || user : 'admin');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-panel').style.display='flex';
+    document.getElementById('gh-user').textContent = 'Signed in as @'+(user ? user.login||user : 'admin');
+    // Register this session in settings.json after data loads
+    return loadData().then(function(){
+      return apiGet('settings.json').then(function(d){
+        S.settingsSha = d.sha;
+        var data = registerSession(d.content);
+        return apiPut('settings.json', data, S.settingsSha, 'New session: '+getDeviceInfo())
+          .then(function(r){ S.settingsSha = r.content.sha; })
+          .catch(function(){}); // non-critical
+      }).catch(function(){});
+    });
+  }
+
+  // First try: GitHub PAT
   Promise.race([validateGHToken(pat), timeoutP])
-    .then(function(ok){ clearTimeout(timeoutId);
-      if (!ok) {
+    .then(function(ok){
+      if (ok) {
+        // Valid GH token
+        return getGHUser(pat).then(function(user){
+          return onLoginSuccess(pat, user, false);
+        });
+      }
+      // Not a GH token — try temp password via worker
+      btn.textContent = 'Checking temp password…';
+      return fetch(WORKER_URL+'/verify-temp', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({password:pat})
+      }).then(function(r){ return r.json(); }).then(function(res){
+        clearTimeout(timeoutId);
+        if (res.error) {
+          recordFailedAttempt();
+          errEl.textContent = res.error === 'invalid' ? 'Incorrect password. Please try again.'
+            : res.error === 'expired' ? 'Temporary password has expired.'
+            : res.error === 'none' ? 'Incorrect password. Please try again.'
+            : res.error;
+          btn.disabled=false; btn.textContent='Sign In';
+          return;
+        }
+        if (res.token) {
+          return getGHUser(res.token).then(function(user){
+            return onLoginSuccess(res.token, user, true);
+          });
+        }
         recordFailedAttempt();
         errEl.textContent='Incorrect password. Please try again.';
         btn.disabled=false; btn.textContent='Sign In';
-        return;
-      }
-      return getGHUser(pat).then(function(user){
-        clearLoginState();
-        startSession(pat, user ? user.login : 'admin');
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('admin-panel').style.display='flex';
-        document.getElementById('gh-user').textContent = 'Signed in as @'+(user?user.login:'admin');
-        return loadData();
       });
     })
-    .catch(function(e){ clearTimeout(timeoutId); recordFailedAttempt();
+    .catch(function(e){
+      clearTimeout(timeoutId); recordFailedAttempt();
       errEl.textContent=e.message||'Connection failed. Try again.';
       btn.disabled=false; btn.textContent='Sign In';
     });
@@ -1814,10 +2105,10 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   btn.disabled=true; btn.textContent='↻ Loading…';
   historyLoaded=false;
   loadData().then(function(){
-    // Force re-render the currently active tab
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
-    toast('Data refreshed successfully', '✅');
+    if (S.activeTab==='home') initHomeTab();
+    toast('Data refreshed', '✅');
   }).catch(function(e){
     toast('Refresh failed: '+e.message, '❌');
   }).finally(function(){
@@ -1833,12 +2124,18 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   checkLockout();
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
+  var sid = sessionStorage.getItem('a_sid');
   if (tok) {
-    S.token=tok; S.ghUser=usr||'admin';
+    S.token=tok; S.ghUser=usr||'admin'; S.sessionId=sid||null;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-panel').style.display='flex';
     document.getElementById('gh-user').textContent='Signed in as @'+S.ghUser;
     resetIdleTimer();
     loadData();
+    // Ensure home tab is active visually on init
+    requestAnimationFrame(function(){
+      var active = document.querySelector('.tab-btn.active');
+      if (active) moveLiquidIndicator(active);
+    });
   }
 })();
