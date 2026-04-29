@@ -1,10 +1,17 @@
 // CONFIG
 // ═══════════════════════════════════════════════════════
 var GH = { owner:'deepvoidx', repo:'master-resource', branch:'main' };
-var SESSION_MS   = 30 * 60 * 1000; // 30 min idle timeout
 var MAX_ATTEMPTS = 3;
 var LOCK_MS      = 5 * 60 * 1000;  // 5 min lockout
 var UNDO_MS      = 10000; // 10 seconds
+
+function getIdleTimeoutMs() {
+  var saved = localStorage.getItem('a_idle_mins');
+  var mins = saved !== null ? parseInt(saved, 10) : 30;
+  if (isNaN(mins) || mins <= 0) return 0; // 0 = never
+  return mins * 60 * 1000;
+}
+var SESSION_MS = getIdleTimeoutMs();
 
 // ═══════════════════════════════════════════════════════
 // STATE
@@ -73,6 +80,8 @@ function startSession(token, user) {
 
 function resetIdleTimer() {
   clearTimeout(S.sessionTimer);
+  SESSION_MS = getIdleTimeoutMs();
+  if (!SESSION_MS) return; // never timeout
   S.sessionTimer = setTimeout(function(){
     toast('Session expired. Please sign in again.', '⚠️');
     setTimeout(logout, 1500);
@@ -1456,6 +1465,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
     if (tab === 'analytics') initAnalyticsTab();
+    if (tab === 'home') initHomeTab();
     if (tab === 'preview') {
       requestAnimationFrame(function(){
         var activeBtn = document.querySelector('.device-btn.active');
@@ -1468,20 +1478,56 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
 
 // ── Liquid glass tab indicator ────────────────────────────────
 function moveLiquidIndicator(activeBtn) {
+  var ind = document.getElementById('tab-indicator');
   var bar = document.querySelector('.tabs-bar');
-  if (!bar || !activeBtn) return;
+  if (!ind || !bar || !activeBtn) return;
   var barRect = bar.getBoundingClientRect();
   var btnRect = activeBtn.getBoundingClientRect();
-  // Account for scrollLeft of the bar (when tabs overflow on mobile)
   var left = btnRect.left - barRect.left + bar.scrollLeft;
-  var width = btnRect.width;
-  bar.style.setProperty('--ind-left', left + 'px');
-  bar.style.setProperty('--ind-width', width + 'px');
+  ind.style.left = left + 'px';
+  ind.style.width = btnRect.width + 'px';
 }
 // Set initial position after DOM ready
 requestAnimationFrame(function(){
   var active = document.querySelector('.tab-btn.active');
   if (active) moveLiquidIndicator(active);
+});
+
+// ── Home Tab: auto-logout settings ────────────────────────────
+function initHomeTab() {
+  var saved = localStorage.getItem('a_idle_mins');
+  var cur = saved !== null ? saved : '30';
+  var opts = document.querySelectorAll('.timeout-opt');
+  opts.forEach(function(lbl) {
+    var radio = lbl.querySelector('input[type=radio]');
+    if (radio.value === cur) {
+      radio.checked = true;
+      lbl.classList.add('selected');
+    } else {
+      radio.checked = false;
+      lbl.classList.remove('selected');
+    }
+    radio.addEventListener('change', function(){
+      opts.forEach(function(l){ l.classList.remove('selected'); });
+      lbl.classList.add('selected');
+    });
+  });
+  var homeGhUser = document.getElementById('home-gh-user');
+  if (homeGhUser) homeGhUser.textContent = S.ghUser ? '@'+S.ghUser : '—';
+}
+
+document.getElementById('save-timeout-btn').addEventListener('click', function(){
+  var radio = document.querySelector('.timeout-opt input[type=radio]:checked');
+  if (!radio) return;
+  localStorage.setItem('a_idle_mins', radio.value);
+  SESSION_MS = getIdleTimeoutMs();
+  resetIdleTimer(); // apply immediately
+  var msg = document.getElementById('timeout-saved-msg');
+  var label = radio.parentElement.querySelector('span').textContent;
+  msg.textContent = '✓ Saved — auto-logout set to ' + label;
+  msg.style.opacity = '1';
+  setTimeout(function(){ msg.style.opacity = '0'; }, 3000);
+  toast('Auto-logout updated to ' + label, '⏱');
 });
 
 // ── FAB: Add Tool floating button ─────────────────────────────
@@ -1737,7 +1783,17 @@ document.getElementById('clear-lockout-btn').addEventListener('click', function(
 document.getElementById('refresh-btn').addEventListener('click', function(){
   var btn = document.getElementById('refresh-btn');
   btn.disabled=true; btn.textContent='↻ Loading…';
-  historyLoaded=false; loadData().finally(function(){ btn.disabled=false; btn.textContent='↻ Refresh'; });
+  historyLoaded=false;
+  loadData().then(function(){
+    // Force re-render the currently active tab
+    if (S.activeTab==='stats') renderStats();
+    if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
+    toast('Data refreshed successfully', '✅');
+  }).catch(function(e){
+    toast('Refresh failed: '+e.message, '❌');
+  }).finally(function(){
+    btn.disabled=false; btn.textContent='↻ Refresh';
+  });
 });
 
 // ═══════════════════════════════════════════════════════

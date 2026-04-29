@@ -42,6 +42,8 @@
   </div>
 
   <div class="tabs-bar">
+    <div id="tab-indicator"></div>
+    <button class="tab-btn" data-tab="home">🏠 Home</button>
     <button class="tab-btn active" data-tab="pending">⏳ Pending <span id="pending-count"></span></button>
     <button class="tab-btn" data-tab="tools">🛠 Tools <span id="tools-tab-count"></span></button>
     <button class="tab-btn" data-tab="categories">🗂 Categories <span id="cats-tab-count"></span></button>
@@ -49,6 +51,32 @@
     <button class="tab-btn" data-tab="history">📋 History</button>
     <button class="tab-btn" data-tab="stats">📊 Stats</button>
     <button class="tab-btn" data-tab="analytics">📈 Analytics</button>
+  </div>
+
+  <!-- ── HOME TAB ── -->
+  <div class="tab-content" id="tab-home">
+    <div class="sec-hdr"><h2>Settings</h2></div>
+    <div class="home-card glass">
+      <div class="home-card-title">⏱ Auto-Logout</div>
+      <p class="home-card-desc">Automatically sign out after a period of inactivity. Takes effect immediately after saving.</p>
+      <div class="timeout-options" id="timeout-options">
+        <label class="timeout-opt"><input type="radio" name="timeout" value="1"/> <span>1 minute</span></label>
+        <label class="timeout-opt"><input type="radio" name="timeout" value="10"/> <span>10 minutes</span></label>
+        <label class="timeout-opt"><input type="radio" name="timeout" value="30"/> <span>30 minutes</span></label>
+        <label class="timeout-opt"><input type="radio" name="timeout" value="60"/> <span>1 hour</span></label>
+        <label class="timeout-opt"><input type="radio" name="timeout" value="0"/> <span>Never (until logout)</span></label>
+      </div>
+      <button class="btn btn-primary btn-sm" id="save-timeout-btn" style="margin-top:16px;">Save Setting</button>
+      <div id="timeout-saved-msg" style="font-size:.76rem;color:#6ee7b7;margin-top:8px;min-height:18px;opacity:0;transition:opacity .3s;"></div>
+    </div>
+
+    <div class="home-card glass" style="margin-top:14px;">
+      <div class="home-card-title">ℹ️ Session Info</div>
+      <p class="home-card-desc">Current session details and admin panel version.</p>
+      <div class="home-info-row"><span class="home-info-label">Signed in as</span><span id="home-gh-user" class="home-info-val">—</span></div>
+      <div class="home-info-row"><span class="home-info-label">Repo</span><span class="home-info-val">deepvoidx/master-resource</span></div>
+      <div class="home-info-row"><span class="home-info-label">Branch</span><span class="home-info-val">main</span></div>
+    </div>
   </div>
 
   <!-- ── PENDING TAB ── -->
