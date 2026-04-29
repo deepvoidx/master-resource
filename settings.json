@@ -1,3 +1,4 @@
 {
-  "autoLogoutMins": 10
+  "autoLogoutMins": 60,
+  "sessions": []
 }
