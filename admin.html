@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="robots" content="noindex,nofollow"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.github.com; img-src 'self' data: https:; frame-src https://deepvoidx.github.io; object-src 'none'; base-uri 'self';"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.github.com https://winter-art-8e2b.anshtripathi872.workers.dev; img-src 'self' data: https:; frame-src https://deepvoidx.github.io; object-src 'none'; base-uri 'self';"/>
 <title>Admin — Master Resource</title>
 <link rel="stylesheet" href="admin.css"/>
 </head>
@@ -43,8 +43,8 @@
 
   <div class="tabs-bar">
     <div id="tab-indicator"></div>
-    <button class="tab-btn" data-tab="home">🏠 Home</button>
-    <button class="tab-btn active" data-tab="pending">⏳ Pending <span id="pending-count"></span></button>
+    <button class="tab-btn active" data-tab="home">🏠 Home</button>
+    <button class="tab-btn" data-tab="pending">⏳ Pending <span id="pending-count"></span></button>
     <button class="tab-btn" data-tab="tools">🛠 Tools <span id="tools-tab-count"></span></button>
     <button class="tab-btn" data-tab="categories">🗂 Categories <span id="cats-tab-count"></span></button>
     <button class="tab-btn" data-tab="preview">🌐 Site Preview</button>
@@ -54,33 +54,76 @@
   </div>
 
   <!-- ── HOME TAB ── -->
-  <div class="tab-content" id="tab-home">
-    <div class="sec-hdr"><h2>Settings</h2></div>
-    <div class="home-card glass">
-      <div class="home-card-title">⏱ Auto-Logout</div>
-      <p class="home-card-desc">Automatically sign out after a period of inactivity. Takes effect immediately after saving.</p>
-      <div class="timeout-options" id="timeout-options">
-        <label class="timeout-opt"><input type="radio" name="timeout" value="1"/> <span>1 minute</span></label>
-        <label class="timeout-opt"><input type="radio" name="timeout" value="10"/> <span>10 minutes</span></label>
-        <label class="timeout-opt"><input type="radio" name="timeout" value="30"/> <span>30 minutes</span></label>
-        <label class="timeout-opt"><input type="radio" name="timeout" value="60"/> <span>1 hour</span></label>
-        <label class="timeout-opt"><input type="radio" name="timeout" value="0"/> <span>Never (until logout)</span></label>
-      </div>
-      <button class="btn btn-primary btn-sm" id="save-timeout-btn" style="margin-top:16px;">Save Setting</button>
-      <div id="timeout-saved-msg" style="font-size:.76rem;color:#6ee7b7;margin-top:8px;min-height:18px;opacity:0;transition:opacity .3s;"></div>
-    </div>
+  <div class="tab-content active" id="tab-home">
+    <div class="home-grid">
 
-    <div class="home-card glass" style="margin-top:14px;">
-      <div class="home-card-title">ℹ️ Session Info</div>
-      <p class="home-card-desc">Current session details and admin panel version.</p>
-      <div class="home-info-row"><span class="home-info-label">Signed in as</span><span id="home-gh-user" class="home-info-val">—</span></div>
-      <div class="home-info-row"><span class="home-info-label">Repo</span><span class="home-info-val">deepvoidx/master-resource</span></div>
-      <div class="home-info-row"><span class="home-info-label">Branch</span><span class="home-info-val">main</span></div>
+      <!-- ── Auto-Logout ── -->
+      <div class="home-card glass">
+        <div class="home-card-title">⏱ Auto-Logout</div>
+        <p class="home-card-desc">Sign out automatically after inactivity. Synced across all devices.</p>
+        <div class="timeout-seg" id="timeout-seg">
+          <button class="tseg-btn" data-val="1">1 min</button>
+          <button class="tseg-btn" data-val="10">10 min</button>
+          <button class="tseg-btn" data-val="30">30 min</button>
+          <button class="tseg-btn" data-val="60">1 hr</button>
+          <button class="tseg-btn" data-val="0">Never</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+          <button class="btn btn-primary btn-sm" id="save-timeout-btn">Save</button>
+          <span id="timeout-saved-msg" style="font-size:.74rem;color:#6ee7b7;opacity:0;transition:opacity .3s;"></span>
+        </div>
+      </div>
+
+      <!-- ── Session Info ── -->
+      <div class="home-card glass">
+        <div class="home-card-title">ℹ️ Session</div>
+        <div class="home-info-row"><span class="home-info-label">Signed in as</span><span id="home-gh-user" class="home-info-val">—</span></div>
+        <div class="home-info-row"><span class="home-info-label">Repo</span><span class="home-info-val">deepvoidx/master-resource</span></div>
+        <div class="home-info-row"><span class="home-info-label">Branch</span><span class="home-info-val">main</span></div>
+      </div>
+
+      <!-- ── Active Devices ── -->
+      <div class="home-card glass home-card-full">
+        <div class="home-card-title">📱 Active Devices</div>
+        <p class="home-card-desc">All currently logged-in sessions. You can force-logout any device.</p>
+        <div id="sessions-list"><div class="home-empty-msg">Loading sessions…</div></div>
+      </div>
+
+      <!-- ── Temporary Password ── -->
+      <div class="home-card glass home-card-full">
+        <div class="home-card-title">🔑 Temporary Password</div>
+        <p class="home-card-desc">Create a short-lived password for temporary access. Your GitHub token and temp password both work simultaneously. The temp password is stored as a hash only — never the plaintext.</p>
+
+        <!-- Status banner -->
+        <div id="temp-status-banner" class="temp-status hidden"></div>
+
+        <!-- Create form -->
+        <div id="temp-create-form">
+          <div class="temp-row">
+            <input type="password" id="temp-pass-input" placeholder="Enter new temporary password" autocomplete="new-password" maxlength="128"/>
+            <select id="temp-expiry-sel">
+              <option value="1">Expires in 1 minute</option>
+              <option value="10">Expires in 10 minutes</option>
+              <option value="30">Expires in 30 minutes</option>
+              <option value="60">Expires in 1 hour</option>
+              <option value="0">Never expires</option>
+              <option value="-1">Until I delete it</option>
+            </select>
+          </div>
+          <div id="temp-pass-err" style="color:#f87171;font-size:.74rem;min-height:14px;margin-top:4px;"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" id="temp-create-btn">Create Temp Password</button>
+            <button class="btn btn-danger btn-sm hidden" id="temp-delete-btn">🗑 Delete Temp Password</button>
+          </div>
+        </div>
+        <div id="temp-saving-msg" style="font-size:.74rem;color:var(--mute);margin-top:8px;min-height:14px;"></div>
+      </div>
+
     </div>
   </div>
 
   <!-- ── PENDING TAB ── -->
-  <div class="tab-content active" id="tab-pending">
+  <div class="tab-content" id="tab-pending">
     <div class="bulk-bar" id="bulk-bar">
       <input type="checkbox" id="bulk-all" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;"/>
       <span class="bulk-count" id="bulk-count">0 selected</span>
