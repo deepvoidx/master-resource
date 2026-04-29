@@ -1,5 +1,5 @@
 {
-  "autoLogoutMins": 60,
+  "autoLogoutMins": 10,
   "sessions": [
     {
       "id": "56ac58a75794cb898bb1dec7",
