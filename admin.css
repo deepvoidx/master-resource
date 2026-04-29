@@ -172,50 +172,51 @@ textarea{resize:vertical;min-height:70px;}
 
 /* tabs */
 .tabs-bar{
-  display:flex;gap:4px;padding:10px var(--px,20px) 0;
+  display:flex;gap:2px;padding:8px var(--px,20px);
   border-bottom:1px solid var(--g-bdr);
   overflow-x:auto;scrollbar-width:none;
   position:relative;
+  align-items:center;
 }
 .tabs-bar::-webkit-scrollbar{display:none;}
 
 /* Liquid glass sliding pill indicator */
 #tab-indicator {
   position: absolute;
-  bottom: 0;
-  top: 4px;
-  border-radius: 10px 10px 0 0;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(18px) saturate(200%);
-  -webkit-backdrop-filter: blur(18px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.11);
-  border-bottom: 2px solid rgba(139,120,255,0.9);
+  top: 5px;
+  bottom: 5px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px) saturate(220%);
+  -webkit-backdrop-filter: blur(20px) saturate(220%);
+  border: 1px solid rgba(255,255,255,0.22);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -1px 0 rgba(108,99,255,0.1),
-    0 0 18px rgba(108,99,255,0.12);
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.12),
+    0 4px 20px rgba(108,99,255,0.18),
+    0 1px 6px rgba(0,0,0,0.25);
   pointer-events: none;
-  transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
+  transition: left 0.28s cubic-bezier(.4,0,.2,1), width 0.28s cubic-bezier(.4,0,.2,1);
   z-index: 0;
   will-change: left, width;
 }
 
 .tab-btn{
-  padding:8px 16px;border-radius:10px 10px 0 0;font-size:.82rem;font-weight:600;
-  cursor:pointer;border:none;background:transparent;color:var(--mute);
-  transition:color .22s,transform .14s;white-space:nowrap;
-  border:1px solid transparent;border-bottom:none;
-  position:relative;bottom:-1px;
+  padding:7px 16px;border-radius:100px;font-size:.82rem;font-weight:600;
+  cursor:pointer;background:transparent;color:var(--mute);
+  transition:color .2s,transform .14s;white-space:nowrap;
+  border:1px solid transparent;
+  position:relative;
   z-index:1;
   -webkit-tap-highlight-color:transparent;
 }
-.tab-btn:hover{color:#c0c0e0;}
+.tab-btn:hover{color:#c8c8e8;}
 .tab-btn.active{
-  color:#e4e0ff;
+  color:#f0eeff;
   font-weight:700;
+  text-shadow:0 0 12px rgba(180,170,255,0.35);
 }
-/* Liquid press feel */
-.tab-btn:active{transform:scaleY(0.96);}
+.tab-btn:active{transform:scale(0.97);}
 
 /* content area */
 .tab-content{display:none;padding:8px var(--px,20px) 40px;}
@@ -247,18 +248,17 @@ textarea{resize:vertical;min-height:70px;}
   .topbar-status{padding:4px 8px;gap:4px;}
   .btn-sm{padding:5px 9px;font-size:.72rem;}
 
-  /* ── tabs bar: stick below topbar, prevent jumping ── */
+  /* ── tabs bar: stick below topbar ── */
   .tabs-bar{
     flex-shrink:0;
     position:sticky;
-    top:48px; /* approximate topbar height on mobile */
+    top:48px;
     z-index:99;
     background:rgba(6,6,12,.97);
-    padding-bottom:0;
     backdrop-filter:none;
     -webkit-backdrop-filter:none;
   }
-  .tab-btn{padding:6px 10px;font-size:.72rem;}
+  .tab-btn{padding:5px 10px;font-size:.72rem;}
 
   /* pending cards — remove extra left indent */
   .pend-card{padding:12px;margin-bottom:10px;}
@@ -599,39 +599,39 @@ input[type=checkbox],input[type=radio]{
 #add-tool-fab{
   position:fixed;bottom:28px;right:24px;z-index:500;
   width:56px;height:56px;border-radius:50%;
-  background:rgba(30,26,70,0.72);
-  backdrop-filter:blur(20px) saturate(200%);
-  -webkit-backdrop-filter:blur(20px) saturate(200%);
-  border:1.5px solid rgba(180,170,255,0.55);
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(24px) saturate(220%);
+  -webkit-backdrop-filter:blur(24px) saturate(220%);
+  border:1.5px solid rgba(255,255,255,0.32);
   cursor:pointer;
   display:none;
   align-items:center;justify-content:center;
   box-shadow:
-    0 4px 24px rgba(108,99,255,.45),
-    0 1px 0 rgba(255,255,255,.12) inset,
-    0 -1px 0 rgba(0,0,0,.3) inset;
+    0 4px 24px rgba(108,99,255,.5),
+    0 1px 0 rgba(255,255,255,.25) inset,
+    0 -1px 0 rgba(0,0,0,.2) inset;
   transition:background .2s,box-shadow .2s,border-color .2s;
   -webkit-tap-highlight-color:transparent;
   color:#ffffff;
 }
 #add-tool-fab svg{
-  filter:drop-shadow(0 0 4px rgba(200,196,255,0.6));
+  filter:drop-shadow(0 0 5px rgba(255,255,255,0.5));
+  stroke-width:3;
 }
 #add-tool-fab:hover{
-  background:rgba(50,42,110,0.85);
-  border-color:rgba(200,192,255,0.75);
+  background:rgba(255,255,255,0.18);
+  border-color:rgba(255,255,255,0.48);
   box-shadow:
-    0 6px 32px rgba(108,99,255,.6),
-    0 1px 0 rgba(255,255,255,.18) inset;
+    0 6px 32px rgba(108,99,255,.65),
+    0 1px 0 rgba(255,255,255,.3) inset;
 }
 #add-tool-fab.water-pop{animation:water-blob .55s cubic-bezier(.36,.07,.19,.97) both;}
 #add-tool-fab.visible{display:flex;}
 
-/* ── Tabs-bar gap fix: more breathing room ───────────────── */
-.tabs-bar{padding-bottom:2px;}
+/* ── Tabs-bar gap fix ───────────────────── */
 .tab-content{padding-top:14px;}
 @media(max-width:600px){
-  .tabs-bar{padding:8px var(--px,14px) 2px;}
+  .tabs-bar{padding:6px var(--px,14px);}
   .tab-content{padding-top:12px;}
 }
 
