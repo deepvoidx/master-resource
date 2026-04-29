@@ -18,7 +18,8 @@ var S = {
   toolsSortMode:'default',
   bulkSelected:new Set(),
   undoTimer:null,
-  undoProgressAnim:null
+  undoProgressAnim:null,
+  _pendingAction:null
 };
 
 // ═══════════════════════════════════════════════════════
@@ -276,10 +277,11 @@ function scheduleWithUndo(msg, actionFn, onSuccess, onRevert) {
   var prog = document.getElementById('ut-progress');
   var msgEl = document.getElementById('ut-msg');
   if (!el || !prog || !msgEl) {
-    // Elements missing — just run action immediately
     actionFn().then(onSuccess).catch(function(e){ toast('Error: '+e.message,'❌'); if(onRevert) onRevert(); });
     return;
   }
+  // Store so commitNow() can fire immediately if user taps ✕
+  S._pendingAction = { actionFn: actionFn, onSuccess: onSuccess, onRevert: onRevert };
   msgEl.textContent = msg;
   el.classList.add('show');
   prog.style.transition = 'none';
@@ -290,6 +292,7 @@ function scheduleWithUndo(msg, actionFn, onSuccess, onRevert) {
   }); });
   S.undoTimer = setTimeout(function(){
     el.classList.remove('show'); S.undoTimer = null;
+    S._pendingAction = null;
     actionFn().then(onSuccess).catch(function(e){
       toast('Error: '+e.message, '❌');
       if (onRevert) onRevert();
@@ -299,15 +302,35 @@ function scheduleWithUndo(msg, actionFn, onSuccess, onRevert) {
 function cancelUndo() {
   if (S.undoTimer) {
     clearTimeout(S.undoTimer); S.undoTimer = null;
+    S._pendingAction = null;
     var el = document.getElementById('undo-toast');
     if (el) el.classList.remove('show');
   }
 }
+
+// Dismiss without undoing — fires the pending action immediately
+function commitNow() {
+  if (S.undoTimer) {
+    clearTimeout(S.undoTimer); S.undoTimer = null;
+    var el = document.getElementById('undo-toast');
+    if (el) el.classList.remove('show');
+    // Fire the queued action right away
+    if (S._pendingAction) {
+      var pa = S._pendingAction;
+      S._pendingAction = null;
+      pa.actionFn().then(pa.onSuccess).catch(function(e){
+        toast('Error: '+e.message,'❌');
+        if (pa.onRevert) pa.onRevert();
+      });
+    }
+  }
+}
+
 function wireUndoListeners() {
   var undoBtn  = document.getElementById('ut-undo');
   var closeBtn = document.getElementById('ut-close');
-  if (undoBtn)  undoBtn.addEventListener('click', function(){ cancelUndo(); toast('Action cancelled', '↩️'); });
-  if (closeBtn) closeBtn.addEventListener('click', function(){ cancelUndo(); toast('Action cancelled', '↩️'); });
+  if (undoBtn)  undoBtn.addEventListener('click', function(){ cancelUndo(); toast('Action undone','↩️'); });
+  if (closeBtn) closeBtn.addEventListener('click', function(){ commitNow(); });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -786,12 +809,16 @@ function openToolModal(idx) {
       catsEl.appendChild(lbl);
     });
 
-    // Snapshot for change detection
+    // Snapshot for change detection — include expiry value so period changes are detected
+    var currentExpiry = (tool.newUntil && new Date(tool.newUntil) > new Date())
+      ? Math.round((new Date(tool.newUntil) - Date.now()) / 86400000)
+      : 0;
     S._editSnap = JSON.stringify({
       name: tool.name||'', url: tool.url||'', desc: tool.description||'',
       tags: (tool.tags||[]).join(', '),
       cats: (Array.isArray(tool.categories)&&tool.categories.length ? tool.categories : (tool.category?[tool.category]:[])).slice().sort().join(','),
-      newUntil: !!(tool.newUntil && new Date(tool.newUntil) > new Date())
+      newUntil: !!(tool.newUntil && new Date(tool.newUntil) > new Date()),
+      expiryDays: currentExpiry
     });
   }
   document.getElementById('tool-modal').classList.remove('hidden');
@@ -919,15 +946,18 @@ document.getElementById('tm-save').addEventListener('click', function(){
   var nowNew=!!(newChk&&newChk.checked);
 
   // Change detection
+  var newExp=document.getElementById('tm-new-expires');
+  var selectedDays = (newChk&&newChk.checked&&newExp) ? (parseInt(newExp.value,10)||30) : 0;
   var nowSnap=JSON.stringify({
     name:nameVal,url:urlRes.url,desc:desc,tags:tags.join(', '),
-    cats:catIds.slice().sort().join(','),newUntil:nowNew
+    cats:catIds.slice().sort().join(','),
+    newUntil:nowNew,
+    expiryDays:selectedDays
   });
   if(nowSnap===S._editSnap){errEl.textContent='No changes to save.';return;}
 
   var tool={name:nameVal,description:desc,url:urlRes.url,category:catIds[0],tags:tags};
   if(catIds.length>1) tool.categories=catIds;
-  var newExp=document.getElementById('tm-new-expires');
   if(newChk&&newChk.checked&&newExp){
     var days=parseInt(newExp.value,10)||30;
     tool.newUntil=days>=99999?'9999-12-31T23:59:59.000Z':new Date(Date.now()+days*86400000).toISOString();
@@ -1418,6 +1448,8 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.getElementById('tab-'+tab).classList.add('active');
     S.activeTab = tab;
     window.scrollTo(0, 0);
+    // Move liquid glass indicator
+    moveLiquidIndicator(btn);
     // Show FAB only on tools tab
     var fab = document.getElementById('add-tool-fab');
     if (fab) fab.classList.toggle('visible', tab === 'tools');
@@ -1432,6 +1464,24 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
       });
     }
   });
+});
+
+// ── Liquid glass tab indicator ────────────────────────────────
+function moveLiquidIndicator(activeBtn) {
+  var bar = document.querySelector('.tabs-bar');
+  if (!bar || !activeBtn) return;
+  var barRect = bar.getBoundingClientRect();
+  var btnRect = activeBtn.getBoundingClientRect();
+  // Account for scrollLeft of the bar (when tabs overflow on mobile)
+  var left = btnRect.left - barRect.left + bar.scrollLeft;
+  var width = btnRect.width;
+  bar.style.setProperty('--ind-left', left + 'px');
+  bar.style.setProperty('--ind-width', width + 'px');
+}
+// Set initial position after DOM ready
+requestAnimationFrame(function(){
+  var active = document.querySelector('.tab-btn.active');
+  if (active) moveLiquidIndicator(active);
 });
 
 // ── FAB: Add Tool floating button ─────────────────────────────
