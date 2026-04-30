@@ -72,6 +72,12 @@
       "device": "Chrome / Windows",
       "loginAt": "2026-04-30T11:42:18.047Z",
       "isTemp": false
+    },
+    {
+      "id": "6b9781a02408c18c65b0e59c",
+      "device": "Chrome / Windows",
+      "loginAt": "2026-04-30T15:28:04.457Z",
+      "isTemp": false
     }
   ],
   "loginHistory": [
@@ -144,6 +150,11 @@
       "device": "Safari / macOS",
       "loginAt": "2026-04-30T11:49:12.237Z",
       "isTemp": true
+    },
+    {
+      "device": "Chrome / Windows",
+      "loginAt": "2026-04-30T15:28:04.457Z",
+      "isTemp": false
     }
   ],
   "tempPasswordHash": "c5829623f69b9e67271706d82e7b865cd064d90089e1b009bf570192b2e01338",
