@@ -153,6 +153,13 @@
       "short": "AI Agents",
       "icon": "📦",
       "color": "#9503a0"
+    },
+    {
+      "id": "public-knowledge",
+      "label": "News & Public Knowledge",
+      "short": "Public Knowledge",
+      "icon": "📦",
+      "color": "#0674db"
     }
   ],
   "tools": [
