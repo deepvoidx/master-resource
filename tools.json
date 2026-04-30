@@ -139,6 +139,13 @@
       "short": "Website Builders",
       "icon": "📦",
       "color": "#d8db14"
+    },
+    {
+      "id": "career-&-jobs",
+      "label": "Career & Jobs",
+      "short": "Career & Jobs",
+      "icon": "💼",
+      "color": "#14d011"
     }
   ],
   "tools": [
