@@ -146,6 +146,13 @@
       "short": "Career & Jobs",
       "icon": "💼",
       "color": "#14d011"
+    },
+    {
+      "id": "ai-agents",
+      "label": "AI Agents & Automation",
+      "short": "AI Agents",
+      "icon": "📦",
+      "color": "#9503a0"
     }
   ],
   "tools": [
