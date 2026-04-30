@@ -125,6 +125,13 @@
       "short": "Utilities",
       "icon": "🔧",
       "color": "#0284c7"
+    },
+    {
+      "id": "prompt",
+      "label": "Prompt Engineering",
+      "short": "Prompt",
+      "icon": "📦",
+      "color": "#e21296"
     }
   ],
   "tools": [
