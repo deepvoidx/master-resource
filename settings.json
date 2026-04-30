@@ -140,5 +140,8 @@
       "loginAt": "2026-04-30T11:42:18.047Z",
       "isTemp": false
     }
-  ]
+  ],
+  "tempPasswordHash": "a66d181ef8bb6074b83cdb571e9715365df2d83eac2b55826a70fc8f39be52af",
+  "tempPasswordSalt": "eb9bd6bb183fed5861b2395bbe773b7c",
+  "tempPasswordExpiry": 1777549790157
 }
