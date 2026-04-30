@@ -90,7 +90,56 @@ function resetIdleTimer() {
   }, SESSION_MS);
 }
 
+// ── Cross-device session polling ─────────────────────────────
+function startSessionPolling() {
+  stopSessionPolling();
+  _sessionPollInterval = setInterval(function(){
+    if (!S.token || !S.sessionId) return;
+    apiGet('settings.json').then(function(d){
+      S.settingsSha = d.sha;
+      var cfg = d.content || {};
+      // Check if our session was revoked
+      if (!checkOwnSessionValid(cfg)) {
+        stopSessionPolling();
+        toast('Logged out from another device.', '⚠️');
+        setTimeout(logout, 1500);
+        return;
+      }
+      // Check if temp password was deleted/expired and we logged in with temp
+      if (S._loginedWithTemp) {
+        var hasHash = !!cfg.tempPasswordHash;
+        var expiry = cfg.tempPasswordExpiry;
+        var isStillValid = hasHash && (expiry === 0 || expiry === -1 || (expiry > 0 && Date.now() < expiry));
+        if (!isStillValid) {
+          stopSessionPolling();
+          toast('Temporary password expired or deleted. Signing out.', '⚠️');
+          setTimeout(logout, 1500);
+        }
+      }
+    }).catch(function(){});
+  }, 25000); // poll every 25 seconds
+}
+
+function stopSessionPolling() {
+  if (_sessionPollInterval) {
+    clearInterval(_sessionPollInterval);
+    _sessionPollInterval = null;
+  }
+}
+
+// ── Get client IP from worker ────────────────────────────────
+function fetchClientIp() {
+  return fetch(WORKER_URL + '/my-ip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}'
+  }).then(function(r){ return r.json(); })
+    .then(function(d){ return d.ip || 'Unknown'; })
+    .catch(function(){ return 'Unknown'; });
+}
+
 function logout() {
+  stopSessionPolling();
   S.token = null; S.toolsData = null; S.pendingData = null;
   S.activeTab = 'home'; S.toolsSortMode = 'default';
   S.bulkSelected.clear();
@@ -98,10 +147,11 @@ function logout() {
   if (S.sessionId && S.settingsSha) {
     removeOwnSession().catch(function(){});
   }
-  S.sessionId = null;
+  S.sessionId = null; S._loginedWithTemp = false;
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   sessionStorage.removeItem('a_sid');
+  sessionStorage.removeItem('a_tmp');
   clearTimeout(S.sessionTimer);
 
   // Reset historyLoaded so it reloads fresh on next login
@@ -316,8 +366,6 @@ function forceLogoutSession(sessionId) {
     data.sessions = data.sessions.filter(function(s){ return s.id !== sessionId; });
     return apiPut('settings.json', data, S.settingsSha, 'Force logout session').then(function(r){
       S.settingsSha = r.content.sha;
-      toast('Device logged out', '✓');
-      initHomeTab();
     });
   });
 }
@@ -407,7 +455,7 @@ function toast(msg, icon) {
 // ═══════════════════════════════════════════════════════
 // LOAD DATA
 // ═══════════════════════════════════════════════════════
-function loadData() {
+function loadData(skipSessionCheck) {
   return Promise.all([
     apiGet('tools.json').then(function(d){ S.toolsData = d.content; S.toolsSha = d.sha; }),
     apiGet('pending.json').catch(function(){
@@ -423,8 +471,8 @@ function loadData() {
       localStorage.setItem('a_idle_mins', mins);
       SESSION_MS = getIdleTimeoutMs();
       resetIdleTimer();
-      // Check if our own session was force-revoked
-      if (S.sessionId && !checkOwnSessionValid(cfg)) {
+      // Only check session validity when NOT doing a manual refresh
+      if (!skipSessionCheck && S.sessionId && !checkOwnSessionValid(cfg)) {
         toast('Your session was revoked from another device.', '⚠️');
         setTimeout(logout, 1800);
         return;
@@ -438,6 +486,7 @@ function loadData() {
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') fetchHistory();
     if (S.activeTab==='home') initHomeTab();
+    if (S.activeTab==='devices') renderDevicesTab();
   }).catch(function(e){
     toast('Failed to load data: ' + e.message, '❌');
   });
@@ -1759,8 +1808,123 @@ function renderLoginHistory(cfg) {
 
 function doForceLogout(sessionId) {
   if (!confirm('Force logout this device?')) return;
-  forceLogoutSession(sessionId).then(function(){ initHomeTab(); }).catch(function(e){ toast('Error: '+e.message,'❌'); });
+  forceLogoutSession(sessionId)
+    .then(function(){ toast('Device logged out','✓'); renderDevicesTab(); })
+    .catch(function(e){ toast('Error: '+e.message,'❌'); });
 }
+
+// ── Devices Tab ───────────────────────────────────────────────
+function renderDevicesTab() {
+  var list = document.getElementById('devices-list');
+  var histList = document.getElementById('login-history-list');
+  if (!list) return;
+  list.innerHTML = '<div class="home-empty-msg">Loading…</div>';
+  if (histList) histList.innerHTML = '<div class="home-empty-msg">Loading…</div>';
+
+  apiGet('settings.json').then(function(d){
+    S.settingsSha = d.sha;
+    var cfg = d.content || {};
+    var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
+    var history  = Array.isArray(cfg.loginHistory) ? cfg.loginHistory.slice().reverse() : [];
+
+    var countEl = document.getElementById('devices-active-count');
+    if (countEl) countEl.textContent = sessions.length;
+
+    if (!sessions.length) {
+      list.innerHTML = '<div class="home-empty-msg">No active sessions recorded.</div>';
+    } else {
+      list.innerHTML = '<div class="device-divider">🟢 Active Sessions ('+sessions.length+')</div>';
+      sessions.forEach(function(s){
+        var isCurrent = s.id === S.sessionId;
+        var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
+        var icon = (s.device||'').includes('iOS') || (s.device||'').includes('Android') ? '📱' : '🖥';
+        var card = document.createElement('div');
+        card.className = 'device-card active-device'+(isCurrent?' current-device':'');
+        card.innerHTML =
+          '<div class="device-status-dot online" title="Online"></div>'+
+          '<div class="device-card-icon">'+icon+'</div>'+
+          '<div class="device-card-body">'+
+            '<div class="device-card-name">'+esc(s.device||'Unknown')+(isCurrent?' <span style="font-size:.68rem;color:#a0a0c8;">(this device)</span>':'')+'</div>'+
+            '<div class="device-card-meta">'+
+              '<span>📅 '+esc(loginTime)+'</span>'+
+              '<span>🌐 '+esc(s.ip||'Unknown')+'</span>'+
+            '</div>'+
+            '<div class="device-card-badges">'+
+              (s.isTemp
+                ? '<span class="session-badge temp">Temp</span>'
+                : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.3);color:#b0b0ff;">PAT</span>'
+              )+
+              (isCurrent ? '<span class="session-badge">This device</span>' : '')+
+            '</div>'+
+          '</div>'+
+          (!isCurrent ? '<button class="btn btn-danger btn-sm" data-sid="'+esc(s.id)+'">Logout</button>' : '');
+        var logoutBtn = card.querySelector('[data-sid]');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', function(){
+            if (!confirm('Force logout this device?')) return;
+            logoutBtn.disabled=true; logoutBtn.textContent='…';
+            forceLogoutSession(s.id)
+              .then(function(){ toast('Device logged out','✓'); renderDevicesTab(); })
+              .catch(function(e){ toast('Error: '+e.message,'❌'); logoutBtn.disabled=false; logoutBtn.textContent='Logout'; });
+          });
+        }
+        list.appendChild(card);
+      });
+    }
+
+    if (!histList) return;
+    if (!history.length) {
+      histList.innerHTML = '<div class="home-empty-msg">No login history yet.</div>';
+      return;
+    }
+    histList.innerHTML = '<div class="device-divider">🕐 Login History (most recent first)</div>';
+    history.forEach(function(s){
+      var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
+      var icon = (s.device||'').includes('iOS') || (s.device||'').includes('Android') ? '📱' : '🖥';
+      var card = document.createElement('div');
+      card.className = 'device-card inactive-device';
+      card.innerHTML =
+        '<div class="device-status-dot offline" title="Signed out"></div>'+
+        '<div class="device-card-icon">'+icon+'</div>'+
+        '<div class="device-card-body">'+
+          '<div class="device-card-name">'+esc(s.device||'Unknown')+'</div>'+
+          '<div class="device-card-meta">'+
+            '<span>📅 '+esc(loginTime)+'</span>'+
+            '<span>🌐 '+esc(s.ip||'Unknown')+'</span>'+
+          '</div>'+
+          '<div class="device-card-badges">'+
+            (s.isTemp
+              ? '<span class="session-badge temp">Temp</span>'
+              : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.3);color:#b0b0ff;">PAT</span>'
+            )+
+          '</div>'+
+        '</div>';
+      histList.appendChild(card);
+    });
+  }).catch(function(){
+    list.innerHTML = '<div class="home-empty-msg">Failed to load device data.</div>';
+  });
+}
+
+function signOutAllDevices() {
+  if (!confirm('Sign out ALL devices? This will immediately log out every active session including yours.')) return;
+  var btn = document.getElementById('signout-all-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Signing out…'; }
+  apiGet('settings.json').then(function(d){
+    S.settingsSha = d.sha;
+    var data = d.content;
+    data.sessions = [];
+    return apiPut('settings.json', data, S.settingsSha, 'Sign out all devices');
+  }).then(function(){
+    toast('All devices signed out','✓');
+    setTimeout(logout, 800);
+  }).catch(function(e){
+    toast('Error: '+e.message,'❌');
+    if (btn) { btn.disabled=false; btn.textContent='⊗ Sign Out All Devices'; }
+  });
+}
+
+document.getElementById('signout-all-btn').addEventListener('click', signOutAllDevices);
 
 // Segmented selector click
 document.getElementById('timeout-seg').addEventListener('click', function(e){
@@ -1833,12 +1997,12 @@ document.getElementById('temp-create-btn').addEventListener('click', function(){
 
 // Delete temp password
 document.getElementById('temp-delete-btn').addEventListener('click', function(){
-  if (!confirm('Delete the temporary password? It will immediately stop working.')) return;
+  if (!confirm('Delete the temporary password? It will immediately stop working and all devices logged in via temp will be signed out.')) return;
   var btn = document.getElementById('temp-delete-btn');
   btn.disabled = true; btn.textContent = 'Deleting…';
   deleteTempPassword()
     .then(function(){
-      toast('Temporary password deleted', '🗑️');
+      toast('Temporary password deleted — temp sessions removed', '🗑️');
       initHomeTab();
     })
     .catch(function(e){ toast('Error: '+e.message,'❌'); })
@@ -1950,27 +2114,96 @@ function apiGetCommits() {
   }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
 }
 
+function apiGetPagesDeployments() {
+  // Fetch the latest GitHub Pages deployments to match against commit SHAs
+  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
+    headers:apiHeaders()
+  }).then(function(r){ return r.ok ? r.json() : null; })
+    .catch(function(){ return null; });
+}
+
 function fetchHistory() {
-  if (historyLoaded) return; // already loaded this session
+  if (historyLoaded) return;
   var loading = document.getElementById('history-loading');
   var list    = document.getElementById('history-list');
   loading.classList.remove('hidden'); list.classList.add('hidden');
-  if (!S.token) { list.innerHTML='<div class="empty-state"><div>Sign in first.</div></div>'; loading.classList.add('hidden'); list.classList.remove('hidden'); return; }
-  apiGetCommits()
-    .then(function(commits){
+  if (!S.token) {
+    list.innerHTML='<div class="empty-state"><div>Sign in first.</div></div>';
+    loading.classList.add('hidden'); list.classList.remove('hidden');
+    return;
+  }
+
+  Promise.all([apiGetCommits(), apiGetPagesDeployments()])
+    .then(function(results){
+      var commits     = results[0] || [];
+      var deployments = results[1];
       historyLoaded = true;
-      loading.classList.add('hidden'); list.classList.remove('hidden'); list.innerHTML = '';
-      if (!commits.length) { list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>'; return; }
-      commits.forEach(function(c){
+      loading.classList.add('hidden');
+      list.classList.remove('hidden');
+      list.innerHTML = '';
+
+      if (!commits.length) {
+        list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>';
+        return;
+      }
+
+      // Build a map of commit SHA → deploy status from Pages API
+      // deployments come back newest first; first deployed commit = live
+      var deployMap = {};
+      if (deployments && Array.isArray(deployments)) {
+        deployments.forEach(function(dep, i){
+          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
+          if (!sha) return;
+          var status = dep.status_url || dep.status;
+          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
+          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
+            : succeeded ? 'live'
+            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
+            : 'failed';
+        });
+      }
+
+      // Update the top-bar badge with latest deploy state
+      var badge = document.getElementById('deploy-status-badge');
+      if (badge) {
+        var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
+        var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
+        if (latestStatus === 'live') {
+          badge.textContent = '🟢 Live'; badge.className='deploy-badge live'; badge.style.display='';
+        } else if (latestStatus === 'building') {
+          badge.textContent = '🟡 Deploying'; badge.className='deploy-badge building'; badge.style.display='';
+        } else if (latestStatus === 'failed') {
+          badge.textContent = '🔴 Deploy Failed'; badge.className='deploy-badge failed'; badge.style.display='';
+        } else {
+          badge.style.display='none';
+        }
+      }
+
+      commits.forEach(function(c, idx){
         var item = document.createElement('div');
         item.className = 'history-item glass';
-        var sha   = (c.sha||'').slice(0,7);
-        var msg   = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
-        var author= c.commit&&c.commit.author ? c.commit.author.name : '';
-        var date  = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+        var sha    = (c.sha||'').slice(0,7);
+        var fullSha= c.sha||'';
+        var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
+        var author = c.commit&&c.commit.author ? c.commit.author.name : '';
+        var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+
+        // Determine deploy dot for this commit
+        var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
+        var dotColor  = depStatus === 'live' ? '#10b981'
+                      : depStatus === 'building' ? '#f59e0b'
+                      : depStatus === 'failed' ? '#ef4444'
+                      : '#6b7280';
+        var dotTitle  = depStatus === 'live' ? 'Live on GitHub Pages'
+                      : depStatus === 'building' ? 'Deploying…'
+                      : depStatus === 'failed' ? 'Deploy failed'
+                      : idx === 0 ? 'Pending deploy check'
+                      : 'Older commit';
+
         item.innerHTML =
-          '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>' +
-          '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>' +
+          '<div class="deploy-dot" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
+          '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
+          '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
           '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
         list.appendChild(item);
       });
@@ -2058,19 +2291,26 @@ function doLogin() {
     clearTimeout(timeoutId);
     clearLoginState();
     S._loginedWithTemp = !!isTemp;
+    sessionStorage.setItem('a_tmp', isTemp ? '1' : '0');
     startSession(token, user ? user.login || user : 'admin');
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-panel').style.display='flex';
     document.getElementById('gh-user').textContent = 'Signed in as @'+(user ? user.login||user : 'admin');
-    // Register this session in settings.json after data loads
-    return loadData().then(function(){
-      return apiGet('settings.json').then(function(d){
-        S.settingsSha = d.sha;
-        var data = registerSession(d.content);
-        return apiPut('settings.json', data, S.settingsSha, 'New session: '+getDeviceInfo())
-          .then(function(r){ S.settingsSha = r.content.sha; })
-          .catch(function(){}); // non-critical
-      }).catch(function(){});
+    // Fetch client IP then register session
+    return fetchClientIp().then(function(ip){
+      S.clientIp = ip;
+      return loadData().then(function(){
+        return apiGet('settings.json').then(function(d){
+          S.settingsSha = d.sha;
+          var data = registerSession(d.content);
+          return apiPut('settings.json', data, S.settingsSha, 'New session: '+getDeviceInfo())
+            .then(function(r){
+              S.settingsSha = r.content.sha;
+              startSessionPolling();
+            })
+            .catch(function(){ startSessionPolling(); }); // poll even if write fails
+        }).catch(function(){ startSessionPolling(); });
+      });
     });
   }
 
@@ -2140,10 +2380,12 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   var btn = document.getElementById('refresh-btn');
   btn.disabled=true; btn.textContent='↻ Loading…';
   historyLoaded=false;
-  loadData().then(function(){
+  // Pass true = skip own-session-validity check so refresh never triggers a logout
+  loadData(true).then(function(){
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
     if (S.activeTab==='home') initHomeTab();
+    if (S.activeTab==='devices') renderDevicesTab();
     toast('Data refreshed', '✅');
   }).catch(function(e){
     toast('Refresh failed: '+e.message, '❌');
@@ -2161,17 +2403,24 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   var tok = sessionStorage.getItem('a_tok');
   var usr = sessionStorage.getItem('a_usr');
   var sid = sessionStorage.getItem('a_sid');
+  var tmp = sessionStorage.getItem('a_tmp');
   if (tok) {
     S.token=tok; S.ghUser=usr||'admin'; S.sessionId=sid||null;
+    S._loginedWithTemp = tmp === '1';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-panel').style.display='flex';
     document.getElementById('gh-user').textContent='Signed in as @'+S.ghUser;
     resetIdleTimer();
-    loadData();
-    // Ensure home tab is active visually on init
+    // Restore IP in background
+    fetchClientIp().then(function(ip){ S.clientIp = ip; });
+    loadData(true); // skipSessionCheck on init restore — polling handles revocation
+    startSessionPolling();
+    // Ensure home tab indicator positions correctly
     requestAnimationFrame(function(){
-      var active = document.querySelector('.tab-btn.active');
-      if (active) moveLiquidIndicator(active);
+      requestAnimationFrame(function(){
+        var active = document.querySelector('.tab-btn.active');
+        if (active) moveLiquidIndicator(active);
+      });
     });
   }
 })();
