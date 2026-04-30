@@ -132,6 +132,13 @@
       "short": "Prompt Engineering",
       "icon": "📦",
       "color": "#e21296"
+    },
+    {
+      "id": "website-builders",
+      "label": "Website Builders & Hosting",
+      "short": "Website Builders",
+      "icon": "📦",
+      "color": "#d8db14"
     }
   ],
   "tools": [
