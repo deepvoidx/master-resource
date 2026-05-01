@@ -48,7 +48,6 @@
     <button class="tab-btn" data-tab="tools">🛠 Tools <span id="tools-tab-count"></span></button>
     <button class="tab-btn" data-tab="categories">🗂 Categories <span id="cats-tab-count"></span></button>
     <button class="tab-btn" data-tab="preview">🌐 Site Preview</button>
-    <button class="tab-btn" data-tab="devices">📱 Devices</button>
     <button class="tab-btn" data-tab="history">📋 History</button>
     <button class="tab-btn" data-tab="stats">📊 Stats</button>
     <button class="tab-btn" data-tab="analytics">📈 Analytics</button>
@@ -81,28 +80,31 @@
         <div class="home-info-row"><span class="home-info-label">Signed in as</span><span id="home-gh-user" class="home-info-val">—</span></div>
         <div class="home-info-row"><span class="home-info-label">Repo</span><span class="home-info-val">deepvoidx/master-resource</span></div>
         <div class="home-info-row"><span class="home-info-label">Branch</span><span class="home-info-val">main</span></div>
-        <div class="home-info-row"><span class="home-info-label">My IP</span><span id="home-my-ip" class="home-info-val">—</span></div>
+      </div>
+
+      <!-- ── Active Devices ── -->
+      <div class="home-card glass home-card-full">
+        <div class="home-card-title">📱 Active Devices</div>
+        <p class="home-card-desc">All currently logged-in sessions. You can force-logout any device.</p>
+        <div id="sessions-list"><div class="home-empty-msg">Loading sessions…</div></div>
+      </div>
+
+      <!-- ── Login History ── -->
+      <div class="home-card glass home-card-full">
+        <div class="home-card-title">🕐 Login History</div>
+        <p class="home-card-desc">Past sign-ins across all devices. Useful for detecting unauthorized access. Keeps the last 50 entries.</p>
+        <div id="login-history-list"><div class="home-empty-msg">Loading history…</div></div>
       </div>
 
       <!-- ── Temporary Password ── -->
       <div class="home-card glass home-card-full">
         <div class="home-card-title">🔑 Temporary Password</div>
-        <p class="home-card-desc">Create a short-lived access password. Your GitHub token and temp password both work simultaneously. Stored as a hash only — plaintext is never saved.</p>
+        <p class="home-card-desc">Create a short-lived password for temporary access. Your GitHub token and temp password both work simultaneously. The temp password is stored as a hash only — never the plaintext.</p>
 
-        <!-- Active temp info block (shown when temp exists) -->
-        <div id="temp-active-block" style="display:none;margin-bottom:14px;">
-          <div class="temp-info-card">
-            <div class="temp-info-header">
-              <span class="temp-info-label">Temp 1</span>
-              <span id="temp-info-badge" class="session-badge temp">Active</span>
-            </div>
-            <div class="temp-info-row"><span>Created:</span><span id="temp-info-created">—</span></div>
-            <div class="temp-info-row"><span>Expires:</span><span id="temp-info-expiry">—</span></div>
-            <button class="btn btn-danger btn-sm" id="temp-delete-btn" style="margin-top:10px;width:100%;">🗑 Delete Temp Password</button>
-          </div>
-        </div>
+        <!-- Status banner -->
+        <div id="temp-status-banner" class="temp-status hidden"></div>
 
-        <!-- Create form (hidden when temp is active) -->
+        <!-- Create form -->
         <div id="temp-create-form">
           <div class="temp-row">
             <input type="password" id="temp-pass-input" placeholder="Enter new temporary password" autocomplete="new-password" maxlength="128"/>
@@ -116,7 +118,10 @@
             </select>
           </div>
           <div id="temp-pass-err" style="color:#f87171;font-size:.74rem;min-height:14px;margin-top:4px;"></div>
-          <button class="btn btn-primary btn-sm" id="temp-create-btn" style="margin-top:10px;">Create Temp Password</button>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" id="temp-create-btn">Create Temp Password</button>
+            <button class="btn btn-danger btn-sm hidden" id="temp-delete-btn">🗑 Delete Temp Password</button>
+          </div>
         </div>
         <div id="temp-saving-msg" style="font-size:.74rem;color:var(--mute);margin-top:8px;min-height:14px;"></div>
       </div>
@@ -207,29 +212,9 @@
     </div>
   </div>
 
-  <!-- ── DEVICES TAB ── -->
-  <div class="tab-content" id="tab-devices">
-    <div class="sec-hdr" style="flex-wrap:wrap;gap:8px;">
-      <h2>Devices</h2>
-      <span class="sec-count" id="devices-active-count">—</span>
-      <button class="btn btn-danger btn-sm ml-auto" id="signout-all-btn">⊗ Sign Out All Devices</button>
-    </div>
-    <p style="font-size:.76rem;color:var(--mute);margin:-4px 0 14px;">Active devices are currently logged in. Inactive entries are past sign-ins. IP address shown where available.</p>
-    <div id="devices-list"><div class="home-empty-msg">Loading…</div></div>
-    <div style="margin-top:20px;">
-      <div class="home-card-title" style="margin-bottom:8px;">🕐 Login History</div>
-      <p style="font-size:.74rem;color:var(--mute);margin:0 0 10px;">All sign-ins across devices. Last 50 kept.</p>
-      <div id="login-history-list"><div class="home-empty-msg">Loading history…</div></div>
-    </div>
-  </div>
-
   <!-- ── HISTORY TAB ── -->
   <div class="tab-content" id="tab-history">
-    <div class="sec-hdr">
-      <h2>Recent Changes</h2>
-      <div id="deploy-status-badge" class="deploy-badge" style="margin-left:8px;display:none;"></div>
-    </div>
-    <p style="font-size:.76rem;color:var(--mute);margin:-4px 0 12px;">Changes to tools.json. The coloured dot shows deploy status on GitHub Pages.</p>
+    <div class="sec-hdr"><h2>Recent Changes to tools.json</h2></div>
     <div id="history-loading" class="flex center gap8" style="padding:16px;justify-content:center;">
       <div class="spinner"></div><span style="color:var(--mute);">Loading history…</span>
     </div>
@@ -355,8 +340,8 @@
   <div class="modal-box">
     <div class="modal-title" id="cat-modal-title">Edit Category</div>
     <div style="display:grid;gap:12px;">
-      <div id="cm-id-row"><label>ID (slug, no spaces) *</label><input id="cm-id" type="text" maxlength="40" placeholder="ai-assistants"/></div>
-      <div><label>Label (full name) *</label><input id="cm-label" type="text" maxlength="60" placeholder="AI Assistants & Chatbots"/></div>
+      <div id="cm-id-row" style="display:none;"><label>ID (auto-generated)</label><input id="cm-id" type="text" maxlength="40" placeholder="ai-assistants"/></div>
+      <div><label>Category Name *</label><input id="cm-label" type="text" maxlength="60" placeholder="AI Assistants &amp; Chatbots"/></div>
       <div><label>Short label (for filter button)</label><input id="cm-short" type="text" maxlength="20" placeholder="Assistants"/></div>
       <div><label>Icon (emoji)</label><input id="cm-icon" type="text" maxlength="4" placeholder="🤖"/></div>
       <div>
