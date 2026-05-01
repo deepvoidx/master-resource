@@ -102,64 +102,53 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 /* ── Category filter panel ── */
 .fwrap-outer{width:100%;position:relative;}
 .fwrap{
-  display:flex;
-  flex-direction:row;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:6px;
+  display:flex;flex-wrap:wrap;
+  gap:clamp(4px,.6vw,8px);
   overflow:hidden;
-  max-height:calc(3 * (36px + 6px) + 6px);
+  max-height:calc(3 * (clamp(26px,2.6vw,36px) + clamp(4px,.6vw,8px)));
   transition:max-height .38s cubic-bezier(.4,0,.2,1);
 }
-.fwrap.expanded{max-height:800px;}
+.fwrap.expanded{max-height:600px;}
 
-/* Mobile: equal-width 3-column grid */
+/* Mobile: switch to CSS grid so every button is exactly equal width */
 @media(max-width:600px){
   .fwrap{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:5px;
-    max-height:calc(3 * (32px + 5px) + 5px);
+    gap:6px;
   }
-  .fwrap.expanded{max-height:800px;}
   .fb{
-    white-space:nowrap;
+    white-space:normal;
     text-align:center;
     width:100%;
-    padding:7px 6px;
+    padding:7px 4px;
     font-size:.68rem;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    justify-content:center;
-  }
-  /* Show-more button spans all 3 columns */
-  .fb-showmore{
-    grid-column:1/-1;
+    line-height:1.3;
   }
 }
 
 .fb-showmore{
   background:rgba(108,99,255,.12);
   border:1px solid rgba(108,99,255,.38);color:#b8b4ff;
-  padding:6px clamp(10px,1.3vw,18px);
+  padding:clamp(5px,.7vw,10px) clamp(10px,1.3vw,18px);
   border-radius:100px;font-size:var(--t-xs);
   font-family:'DM Sans',-apple-system,sans-serif;
   cursor:pointer;white-space:nowrap;
   -webkit-tap-highlight-color:transparent;
   transition:background .15s,border-color .15s,color .15s;
-  margin-top:2px;
+  width:100%;margin-top:6px;text-align:center;
 }
 .fb-showmore:hover{background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.55);}
 .fb{
-  display:inline-flex;align-items:center;justify-content:center;
   background:rgba(22,22,34,0.92);
   border:1px solid var(--g-bdr);color:var(--mute);
-  padding:6px clamp(10px,1.3vw,20px);
+  padding:clamp(5px,.7vw,10px) clamp(10px,1.3vw,20px);
   border-radius:100px;font-size:var(--t-xs);
   font-family:'DM Sans',-apple-system,sans-serif;
   cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;
   transition:background .15s,border-color .15s,color .15s,box-shadow .15s;
   box-shadow:inset 0 1px 0 var(--g-shine),0 1px 3px rgba(0,0,0,0.2);
+  /* GPU hint for button press animation */
   -webkit-transform:translateZ(0);transform:translateZ(0);
 }
 .fb:hover{border-color:rgba(255,255,255,0.18);color:#d8d8f0;background:rgba(255,255,255,0.06);}
