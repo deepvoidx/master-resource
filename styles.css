@@ -103,20 +103,23 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 .fwrap-outer{width:100%;position:relative;}
 .fwrap{
   display:flex;flex-wrap:wrap;
+  align-items:flex-start;
   gap:clamp(4px,.6vw,8px);
   overflow:hidden;
-  max-height:calc(3 * (clamp(26px,2.6vw,36px) + clamp(4px,.6vw,8px)));
+  max-height:124px; /* ~3 rows of pills + gaps */
   transition:max-height .38s cubic-bezier(.4,0,.2,1);
 }
-.fwrap.expanded{max-height:600px;}
+.fwrap.expanded{max-height:1000px;}
 
-/* Mobile: switch to CSS grid so every button is exactly equal width */
+/* Mobile: CSS grid for perfectly equal-width pills */
 @media(max-width:600px){
   .fwrap{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:6px;
+    max-height:150px; /* 3 rows of ~44px mobile pills + gaps */
   }
+  .fwrap.expanded{max-height:1000px;}
   .fb{
     white-space:normal;
     text-align:center;
