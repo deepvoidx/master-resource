@@ -23,6 +23,7 @@ var S = {
   settingsSha:null,
   sessionId:null,
   sessionTimer:null,
+  _loginedWithTemp: false,
   editToolIdx:-1,
   toolsSortMode:'default',
   bulkSelected:new Set(),
@@ -30,6 +31,9 @@ var S = {
   undoProgressAnim:null,
   _pendingAction:null
 };
+
+var _sessionPollInterval = null;
+var WORKER_URL = 'https://winter-art-8e2b.anshtripathi872.workers.dev';
 
 // ═══════════════════════════════════════════════════════
 // SECURITY: rate-limit login attempts
@@ -83,14 +87,14 @@ function startSession(token, user) {
 function resetIdleTimer() {
   clearTimeout(S.sessionTimer);
   SESSION_MS = getIdleTimeoutMs();
-  if (!SESSION_MS) return; // never timeout
+  if (!SESSION_MS) return; // 0 = never
   S.sessionTimer = setTimeout(function(){
-    toast('Session expired. Please sign in again.', '⚠️');
+    toast('Session expired due to inactivity.', '⚠️');
     setTimeout(logout, 1500);
   }, SESSION_MS);
 }
 
-// ── Cross-device session polling ─────────────────────────────
+// ── Cross-device session polling (every 25s) ─────────────────
 function startSessionPolling() {
   stopSessionPolling();
   _sessionPollInterval = setInterval(function(){
@@ -98,48 +102,43 @@ function startSessionPolling() {
     apiGet('settings.json').then(function(d){
       S.settingsSha = d.sha;
       var cfg = d.content || {};
-      // Check if our session was revoked
+      // Check if our session was force-revoked
       if (!checkOwnSessionValid(cfg)) {
         stopSessionPolling();
-        toast('Logged out from another device.', '⚠️');
+        toast('Your session was ended from another device.', '⚠️');
         setTimeout(logout, 1500);
         return;
       }
-      // Check if temp password was deleted/expired and we logged in with temp
+      // If logged in via temp password, check it's still valid
       if (S._loginedWithTemp) {
         var hasHash = !!cfg.tempPasswordHash;
-        var expiry = cfg.tempPasswordExpiry;
-        var isStillValid = hasHash && (expiry === 0 || expiry === -1 || (expiry > 0 && Date.now() < expiry));
-        if (!isStillValid) {
+        var expiry  = cfg.tempPasswordExpiry;
+        var stillValid = hasHash && (expiry === 0 || expiry === -1 || (expiry > 0 && Date.now() < expiry));
+        if (!stillValid) {
           stopSessionPolling();
-          toast('Temporary password expired or deleted. Signing out.', '⚠️');
+          toast('Temporary password expired or deleted — signing out.', '⚠️');
           setTimeout(logout, 1500);
         }
       }
     }).catch(function(){});
-  }, 25000); // poll every 25 seconds
+  }, 25000);
 }
 
 function stopSessionPolling() {
-  if (_sessionPollInterval) {
-    clearInterval(_sessionPollInterval);
-    _sessionPollInterval = null;
-  }
+  if (_sessionPollInterval) { clearInterval(_sessionPollInterval); _sessionPollInterval = null; }
 }
 
-// ── Get client IP from worker ────────────────────────────────
-function fetchClientIp() {
-  return fetch(WORKER_URL + '/my-ip', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: '{}'
-  }).then(function(r){ return r.json(); })
-    .then(function(d){ return d.ip || 'Unknown'; })
-    .catch(function(){ return 'Unknown'; });
-}
+// reset idle timer on any user interaction
+document.addEventListener('click',      function(){ if(S.token) resetIdleTimer(); }, {passive:true});
+document.addEventListener('keydown',    function(){ if(S.token) resetIdleTimer(); }, {passive:true});
+document.addEventListener('mousemove',  function(){ if(S.token) resetIdleTimer(); }, {passive:true});
+document.addEventListener('scroll',     function(){ if(S.token) resetIdleTimer(); }, {passive:true, capture:true});
+document.addEventListener('touchstart', function(){ if(S.token) resetIdleTimer(); }, {passive:true});
 
 function logout() {
   stopSessionPolling();
+  clearTimeout(S.sessionTimer);
+  S._loginedWithTemp = false;
   S.token = null; S.toolsData = null; S.pendingData = null;
   S.activeTab = 'home'; S.toolsSortMode = 'default';
   S.bulkSelected.clear();
@@ -147,7 +146,7 @@ function logout() {
   if (S.sessionId && S.settingsSha) {
     removeOwnSession().catch(function(){});
   }
-  S.sessionId = null; S._loginedWithTemp = false;
+  S.sessionId = null;
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   sessionStorage.removeItem('a_sid');
@@ -325,21 +324,27 @@ function registerSession(settingsData) {
   sessionStorage.setItem('a_sid', S.sessionId);
   if (!Array.isArray(settingsData.sessions)) settingsData.sessions = [];
   if (!Array.isArray(settingsData.loginHistory)) settingsData.loginHistory = [];
-  // Clean up expired temp-password sessions older than 7 days
-  var cutoff = Date.now() - 7 * 24 * 3600 * 1000;
+
+  var deviceStr = getDeviceInfo();
+  var now = new Date().toISOString();
+
+  // Deduplicate: remove any existing session from the same device type
   settingsData.sessions = settingsData.sessions.filter(function(s){
-    return !s.loginAt || new Date(s.loginAt).getTime() > cutoff;
+    return s.device !== deviceStr;
   });
-  settingsData.sessions.push({
+
+  // Add current session at front (most recent first)
+  settingsData.sessions.unshift({
     id: S.sessionId,
-    device: getDeviceInfo(),
-    loginAt: new Date().toISOString(),
+    device: deviceStr,
+    loginAt: now,
     isTemp: !!S._loginedWithTemp
   });
-  // Persistent login history — never removed on logout, capped at 50
+
+  // Login history — append, cap at 50, most recent first display handled in render
   settingsData.loginHistory.push({
-    device: getDeviceInfo(),
-    loginAt: new Date().toISOString(),
+    device: deviceStr,
+    loginAt: now,
     isTemp: !!S._loginedWithTemp
   });
   if (settingsData.loginHistory.length > 50) {
@@ -366,12 +371,14 @@ function forceLogoutSession(sessionId) {
     data.sessions = data.sessions.filter(function(s){ return s.id !== sessionId; });
     return apiPut('settings.json', data, S.settingsSha, 'Force logout session').then(function(r){
       S.settingsSha = r.content.sha;
+      toast('Device logged out', '✓');
+      initHomeTab();
     });
   });
 }
 
 function checkOwnSessionValid(settingsData) {
-  if (!S.sessionId) return true; // legacy session before tracking
+  if (!S.sessionId) return true;
   if (!Array.isArray(settingsData.sessions)) return true;
   return settingsData.sessions.some(function(s){ return s.id === S.sessionId; });
 }
@@ -379,20 +386,20 @@ function checkOwnSessionValid(settingsData) {
 // ═══════════════════════════════════════════════════════
 // TEMPORARY PASSWORD
 // ═══════════════════════════════════════════════════════
-var WORKER_URL = 'https://winter-art-8e2b.anshtripathi872.workers.dev';
 
 function createTempPassword(password, expiryMins) {
   var salt = randomHex(16);
   return sha256hex(salt + password).then(function(hash){
     var expiry = expiryMins > 0 ? Date.now() + expiryMins * 60000
-               : expiryMins === 0 ? 0  // never
-               : -1;                   // -1 = until deleted
+               : expiryMins === 0 ? 0
+               : -1;
     return apiGet('settings.json').then(function(d){
       var data = d.content;
       S.settingsSha = d.sha;
       data.tempPasswordHash = hash;
       data.tempPasswordSalt = salt;
       data.tempPasswordExpiry = expiry;
+      data.tempPasswordCreatedAt = new Date().toISOString();
       return apiPut('settings.json', data, S.settingsSha, 'Create temporary password').then(function(r){
         S.settingsSha = r.content.sha;
       });
@@ -407,6 +414,11 @@ function deleteTempPassword() {
     delete data.tempPasswordHash;
     delete data.tempPasswordSalt;
     delete data.tempPasswordExpiry;
+    delete data.tempPasswordCreatedAt;
+    // Kick all temp-logged-in sessions so polling auto-logs them out
+    if (Array.isArray(data.sessions)) {
+      data.sessions = data.sessions.filter(function(s){ return !s.isTemp; });
+    }
     return apiPut('settings.json', data, S.settingsSha, 'Delete temporary password').then(function(r){
       S.settingsSha = r.content.sha;
     });
@@ -459,34 +471,29 @@ function loadData(skipSessionCheck) {
   return Promise.all([
     apiGet('tools.json').then(function(d){ S.toolsData = d.content; S.toolsSha = d.sha; }),
     apiGet('pending.json').catch(function(){
-      // pending.json might not exist yet
       S.pendingData = { pending:[] }; S.pendingSha = null;
     }).then(function(d){ if(d){ S.pendingData = d.content; S.pendingSha = d.sha; } }),
-    // Fetch settings.json for cross-device sync
     apiGet('settings.json').then(function(d){
       S.settingsSha = d.sha;
       var cfg = d.content || {};
-      // Sync auto-logout
       var mins = cfg.autoLogoutMins !== undefined ? String(cfg.autoLogoutMins) : '30';
       localStorage.setItem('a_idle_mins', mins);
       SESSION_MS = getIdleTimeoutMs();
       resetIdleTimer();
-      // Only check session validity when NOT doing a manual refresh
       if (!skipSessionCheck && S.sessionId && !checkOwnSessionValid(cfg)) {
         toast('Your session was revoked from another device.', '⚠️');
         setTimeout(logout, 1800);
         return;
       }
-    }).catch(function(){ /* settings.json may not exist yet */ })
+    }).catch(function(){})
   ]).then(function(){
     renderPending();
     renderTools();
     renderCategories();
     updateTabCounts();
     if (S.activeTab==='stats') renderStats();
-    if (S.activeTab==='history') fetchHistory();
+    if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
     if (S.activeTab==='home') initHomeTab();
-    if (S.activeTab==='devices') renderDevicesTab();
   }).catch(function(e){
     toast('Failed to load data: ' + e.message, '❌');
   });
@@ -1576,9 +1583,9 @@ function openCatModal(idx) {
   document.getElementById('cm-err').textContent = '';
   var cat = isNew ? { id:'', label:'', short:'', icon:'📦', color:'#6c63ff' }
                   : S.toolsData.categories[idx];
-  // Show ID field only when creating — it's a permanent slug that can't change
+  // Show ID field read-only when editing (reference), hidden when creating (auto-generated)
   var idRow = document.getElementById('cm-id-row');
-  if (idRow) idRow.style.display = isNew ? '' : 'none';
+  if (idRow) idRow.style.display = isNew ? 'none' : '';
   document.getElementById('cm-id').value = cat.id||'';
   document.getElementById('cm-id').disabled = !isNew;
   document.getElementById('cm-label').value = cat.label||'';
@@ -1599,6 +1606,19 @@ function closeCatModal(){
 document.getElementById('cm-cancel').addEventListener('click', closeCatModal);
 document.getElementById('cat-modal').addEventListener('click', function(e){ if(e.target===this) closeCatModal(); });
 
+// Auto-generate category ID from label as user types
+document.getElementById('cm-label').addEventListener('input', function(){
+  var idField = document.getElementById('cm-id');
+  // Only auto-fill when creating a new category and ID hasn't been manually edited
+  if (editCatIdx !== -1) return;
+  idField.value = this.value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 40);
+});
+
 // Sync color picker and text
 document.getElementById('cm-color').addEventListener('input', function(){
   document.getElementById('cm-color-text').value = this.value;
@@ -1608,8 +1628,13 @@ document.getElementById('cm-color-text').addEventListener('input', function(){
 });
 
 document.getElementById('cm-save').addEventListener('click', function(){
-  var id    = sanitize(document.getElementById('cm-id').value,40).replace(/\s+/g,'-').toLowerCase();
   var label = sanitize(document.getElementById('cm-label').value,60);
+  // For new categories, auto-generate ID from label if field is empty/hidden
+  var idInput = document.getElementById('cm-id').value;
+  if (editCatIdx === -1 && !idInput) {
+    idInput = label.toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,40);
+  }
+  var id = sanitize(idInput,40).replace(/\s+/g,'-').toLowerCase();
   var short = sanitize(document.getElementById('cm-short').value,20);
   var icon  = sanitize(document.getElementById('cm-icon').value,4);
   var color = document.getElementById('cm-color').value;
@@ -1733,52 +1758,87 @@ function renderSessions(cfg) {
   var list = document.getElementById('sessions-list');
   if (!list) return;
   var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
-  if (!sessions.length) {
-    list.innerHTML = '<div class="home-empty-msg">No sessions recorded yet.</div>';
+
+  // Deduplicate by device — keep the most-recent entry per device
+  var seen = {};
+  var deduped = [];
+  // sessions are stored newest-first from registerSession (unshift)
+  sessions.forEach(function(s){
+    if (!seen[s.device]) { seen[s.device] = true; deduped.push(s); }
+  });
+
+  if (!deduped.length) {
+    list.innerHTML = '<div class="home-empty-msg">No active sessions recorded.</div>';
     return;
   }
-  list.innerHTML = sessions.map(function(s){
+
+  list.innerHTML = '';
+  deduped.forEach(function(s){
     var isCurrent = s.id === S.sessionId;
-    var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
-    return '<div class="session-card'+(isCurrent?' current':'')+'">'
-      +'<div style="flex:1;">'
-        +'<div class="session-device">'+esc(s.device||'Unknown device')+'</div>'
-        +'<div class="session-meta">Logged in: '+esc(loginTime)+'</div>'
-      +'</div>'
-      +(s.isTemp ? '<span class="session-badge temp">Temp</span>' : '')
-      +(isCurrent
-        ? '<span class="session-badge">This device</span>'
-        : '<button class="btn btn-danger btn-sm" onclick="doForceLogout(\''+esc(s.id)+'\')">Logout</button>'
-      )
-    +'</div>';
-  }).join('');
+    var loginTime  = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
+    var card = document.createElement('div');
+    card.className = 'session-card' + (isCurrent ? ' current' : '');
+    card.innerHTML =
+      '<div style="flex:1;">' +
+        '<div class="session-device">' + esc(s.device||'Unknown device') +
+          (isCurrent ? ' <span style="font-size:.68rem;color:#a0a0c8;">(this device)</span>' : '') + '</div>' +
+        '<div class="session-meta">Last login: ' + esc(loginTime) + '</div>' +
+      '</div>' +
+      (s.isTemp ? '<span class="session-badge temp">Temp</span>' : '') +
+      (isCurrent ? '<span class="session-badge">This device</span>' :
+        '<button class="btn btn-danger btn-sm session-logout-btn">Logout</button>');
+
+    if (!isCurrent) {
+      card.querySelector('.session-logout-btn').addEventListener('click', function(){
+        if (!confirm('Force logout "' + (s.device||'this device') + '"?')) return;
+        var btn = this; btn.disabled=true; btn.textContent='…';
+        forceLogoutSession(s.id)
+          .then(function(){ toast('Device logged out', '✓'); initHomeTab(); })
+          .catch(function(e){ toast('Error: '+e.message,'❌'); btn.disabled=false; btn.textContent='Logout'; });
+      });
+    }
+    list.appendChild(card);
+  });
 }
 
 function renderTempPassStatus(cfg) {
-  var banner = document.getElementById('temp-status-banner');
+  var banner    = document.getElementById('temp-status-banner');
   var deleteBtn = document.getElementById('temp-delete-btn');
+  var createForm = document.getElementById('temp-create-form');
   if (!banner) return;
 
-  var hasHash = !!cfg.tempPasswordHash;
-  var expiry = cfg.tempPasswordExpiry;
+  var hasHash   = !!cfg.tempPasswordHash;
+  var expiry    = cfg.tempPasswordExpiry;
   var isExpired = hasHash && expiry > 0 && Date.now() > expiry;
-  var isNeverExpires = hasHash && (expiry === 0 || expiry === -1);
-  var isUntilDeleted = hasHash && expiry === -1;
+  var createdAt = cfg.tempPasswordCreatedAt || null;
 
-  banner.className = 'temp-status';
   if (!hasHash) {
-    banner.classList.add('hidden');
-    if (deleteBtn) deleteBtn.classList.add('hidden');
-  } else if (isExpired) {
-    banner.textContent = '⚠ Temporary password has expired and is no longer valid.';
-    banner.classList.add('expired-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
-  } else {
-    var expiryStr = isNeverExpires ? 'Never expires' : isUntilDeleted ? 'Until deleted' : 'Expires: '+new Date(expiry).toLocaleString();
-    banner.textContent = '✓ Temporary password is active. '+expiryStr+'.';
-    banner.classList.add('active-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
+    // No temp — show create form, hide banner and delete button
+    banner.className = 'temp-status hidden';
+    banner.textContent = '';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (createForm) createForm.style.display = '';
+    return;
   }
+
+  // Has a temp password — show banner, hide create form, show delete
+  if (createForm) createForm.style.display = 'none';
+  if (deleteBtn) deleteBtn.style.display = '';
+
+  var expiryStr;
+  if (isExpired) {
+    expiryStr = '⚠ Expired ' + new Date(expiry).toLocaleString();
+    banner.className = 'temp-status expired-temp';
+  } else if (!expiry || expiry === 0 || expiry === -1) {
+    expiryStr = '✓ Active — Never expires';
+    banner.className = 'temp-status active-temp';
+  } else {
+    expiryStr = '✓ Active — Expires ' + new Date(expiry).toLocaleString();
+    banner.className = 'temp-status active-temp';
+  }
+
+  var createdStr = createdAt ? (' | Created: ' + new Date(createdAt).toLocaleString()) : '';
+  banner.textContent = expiryStr + createdStr;
 }
 
 function renderLoginHistory(cfg) {
@@ -1786,12 +1846,23 @@ function renderLoginHistory(cfg) {
   if (!list) return;
   var history = Array.isArray(cfg.loginHistory) ? cfg.loginHistory : [];
   if (!history.length) {
-    list.innerHTML = '<div class="home-empty-msg">No login history yet. It will be recorded from your next sign-in onwards.</div>';
+    list.innerHTML = '<div class="home-empty-msg">No login history yet.</div>';
     return;
   }
+
   // Most recent first
-  var reversed = history.slice().reverse();
-  list.innerHTML = reversed.map(function(s){
+  var sorted = history.slice().sort(function(a,b){
+    return new Date(b.loginAt||0) - new Date(a.loginAt||0);
+  });
+
+  // Deduplicate by device — keep the most recent login per device
+  var seen = {};
+  var deduped = [];
+  sorted.forEach(function(s){
+    if (!seen[s.device]) { seen[s.device] = true; deduped.push(s); }
+  });
+
+  list.innerHTML = deduped.map(function(s){
     var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
     return '<div class="session-card">'
       +'<div style="flex:1;">'
@@ -1808,123 +1879,8 @@ function renderLoginHistory(cfg) {
 
 function doForceLogout(sessionId) {
   if (!confirm('Force logout this device?')) return;
-  forceLogoutSession(sessionId)
-    .then(function(){ toast('Device logged out','✓'); renderDevicesTab(); })
-    .catch(function(e){ toast('Error: '+e.message,'❌'); });
+  forceLogoutSession(sessionId).then(function(){ initHomeTab(); }).catch(function(e){ toast('Error: '+e.message,'❌'); });
 }
-
-// ── Devices Tab ───────────────────────────────────────────────
-function renderDevicesTab() {
-  var list = document.getElementById('devices-list');
-  var histList = document.getElementById('login-history-list');
-  if (!list) return;
-  list.innerHTML = '<div class="home-empty-msg">Loading…</div>';
-  if (histList) histList.innerHTML = '<div class="home-empty-msg">Loading…</div>';
-
-  apiGet('settings.json').then(function(d){
-    S.settingsSha = d.sha;
-    var cfg = d.content || {};
-    var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
-    var history  = Array.isArray(cfg.loginHistory) ? cfg.loginHistory.slice().reverse() : [];
-
-    var countEl = document.getElementById('devices-active-count');
-    if (countEl) countEl.textContent = sessions.length;
-
-    if (!sessions.length) {
-      list.innerHTML = '<div class="home-empty-msg">No active sessions recorded.</div>';
-    } else {
-      list.innerHTML = '<div class="device-divider">🟢 Active Sessions ('+sessions.length+')</div>';
-      sessions.forEach(function(s){
-        var isCurrent = s.id === S.sessionId;
-        var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
-        var icon = (s.device||'').includes('iOS') || (s.device||'').includes('Android') ? '📱' : '🖥';
-        var card = document.createElement('div');
-        card.className = 'device-card active-device'+(isCurrent?' current-device':'');
-        card.innerHTML =
-          '<div class="device-status-dot online" title="Online"></div>'+
-          '<div class="device-card-icon">'+icon+'</div>'+
-          '<div class="device-card-body">'+
-            '<div class="device-card-name">'+esc(s.device||'Unknown')+(isCurrent?' <span style="font-size:.68rem;color:#a0a0c8;">(this device)</span>':'')+'</div>'+
-            '<div class="device-card-meta">'+
-              '<span>📅 '+esc(loginTime)+'</span>'+
-              '<span>🌐 '+esc(s.ip||'Unknown')+'</span>'+
-            '</div>'+
-            '<div class="device-card-badges">'+
-              (s.isTemp
-                ? '<span class="session-badge temp">Temp</span>'
-                : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.3);color:#b0b0ff;">PAT</span>'
-              )+
-              (isCurrent ? '<span class="session-badge">This device</span>' : '')+
-            '</div>'+
-          '</div>'+
-          (!isCurrent ? '<button class="btn btn-danger btn-sm" data-sid="'+esc(s.id)+'">Logout</button>' : '');
-        var logoutBtn = card.querySelector('[data-sid]');
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', function(){
-            if (!confirm('Force logout this device?')) return;
-            logoutBtn.disabled=true; logoutBtn.textContent='…';
-            forceLogoutSession(s.id)
-              .then(function(){ toast('Device logged out','✓'); renderDevicesTab(); })
-              .catch(function(e){ toast('Error: '+e.message,'❌'); logoutBtn.disabled=false; logoutBtn.textContent='Logout'; });
-          });
-        }
-        list.appendChild(card);
-      });
-    }
-
-    if (!histList) return;
-    if (!history.length) {
-      histList.innerHTML = '<div class="home-empty-msg">No login history yet.</div>';
-      return;
-    }
-    histList.innerHTML = '<div class="device-divider">🕐 Login History (most recent first)</div>';
-    history.forEach(function(s){
-      var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
-      var icon = (s.device||'').includes('iOS') || (s.device||'').includes('Android') ? '📱' : '🖥';
-      var card = document.createElement('div');
-      card.className = 'device-card inactive-device';
-      card.innerHTML =
-        '<div class="device-status-dot offline" title="Signed out"></div>'+
-        '<div class="device-card-icon">'+icon+'</div>'+
-        '<div class="device-card-body">'+
-          '<div class="device-card-name">'+esc(s.device||'Unknown')+'</div>'+
-          '<div class="device-card-meta">'+
-            '<span>📅 '+esc(loginTime)+'</span>'+
-            '<span>🌐 '+esc(s.ip||'Unknown')+'</span>'+
-          '</div>'+
-          '<div class="device-card-badges">'+
-            (s.isTemp
-              ? '<span class="session-badge temp">Temp</span>'
-              : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.3);color:#b0b0ff;">PAT</span>'
-            )+
-          '</div>'+
-        '</div>';
-      histList.appendChild(card);
-    });
-  }).catch(function(){
-    list.innerHTML = '<div class="home-empty-msg">Failed to load device data.</div>';
-  });
-}
-
-function signOutAllDevices() {
-  if (!confirm('Sign out ALL devices? This will immediately log out every active session including yours.')) return;
-  var btn = document.getElementById('signout-all-btn');
-  if (btn) { btn.disabled=true; btn.textContent='Signing out…'; }
-  apiGet('settings.json').then(function(d){
-    S.settingsSha = d.sha;
-    var data = d.content;
-    data.sessions = [];
-    return apiPut('settings.json', data, S.settingsSha, 'Sign out all devices');
-  }).then(function(){
-    toast('All devices signed out','✓');
-    setTimeout(logout, 800);
-  }).catch(function(e){
-    toast('Error: '+e.message,'❌');
-    if (btn) { btn.disabled=false; btn.textContent='⊗ Sign Out All Devices'; }
-  });
-}
-
-document.getElementById('signout-all-btn').addEventListener('click', signOutAllDevices);
 
 // Segmented selector click
 document.getElementById('timeout-seg').addEventListener('click', function(e){
@@ -1997,12 +1953,12 @@ document.getElementById('temp-create-btn').addEventListener('click', function(){
 
 // Delete temp password
 document.getElementById('temp-delete-btn').addEventListener('click', function(){
-  if (!confirm('Delete the temporary password? It will immediately stop working and all devices logged in via temp will be signed out.')) return;
+  if (!confirm('Delete the temporary password? It will immediately stop working.')) return;
   var btn = document.getElementById('temp-delete-btn');
   btn.disabled = true; btn.textContent = 'Deleting…';
   deleteTempPassword()
     .then(function(){
-      toast('Temporary password deleted — temp sessions removed', '🗑️');
+      toast('Temporary password deleted', '🗑️');
       initHomeTab();
     })
     .catch(function(e){ toast('Error: '+e.message,'❌'); })
@@ -2114,14 +2070,6 @@ function apiGetCommits() {
   }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
 }
 
-function apiGetPagesDeployments() {
-  // Fetch the latest GitHub Pages deployments to match against commit SHAs
-  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
-    headers:apiHeaders()
-  }).then(function(r){ return r.ok ? r.json() : null; })
-    .catch(function(){ return null; });
-}
-
 function fetchHistory() {
   if (historyLoaded) return;
   var loading = document.getElementById('history-loading');
@@ -2133,85 +2081,118 @@ function fetchHistory() {
     return;
   }
 
-  Promise.all([apiGetCommits(), apiGetPagesDeployments()])
-    .then(function(results){
-      var commits     = results[0] || [];
-      var deployments = results[1];
-      historyLoaded = true;
-      loading.classList.add('hidden');
-      list.classList.remove('hidden');
-      list.innerHTML = '';
+  // Fetch commits + GitHub Actions workflow runs (Pages deploys via GH Actions)
+  Promise.all([
+    apiGetCommits(),
+    fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/actions/runs?per_page=20', {
+      headers: apiHeaders()
+    }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
+    // Also try pages API (may 404 if Pages not on custom domain)
+    fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages', {
+      headers: apiHeaders()
+    }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+  ]).then(function(results){
+    var commits   = results[0] || [];
+    var runsData  = results[1];
+    var pagesData = results[2];
 
-      if (!commits.length) {
-        list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>';
-        return;
-      }
+    historyLoaded = true;
+    loading.classList.add('hidden');
+    list.classList.remove('hidden');
+    list.innerHTML = '';
 
-      // Build a map of commit SHA → deploy status from Pages API
-      // deployments come back newest first; first deployed commit = live
-      var deployMap = {};
-      if (deployments && Array.isArray(deployments)) {
-        deployments.forEach(function(dep, i){
-          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
-          if (!sha) return;
-          var status = dep.status_url || dep.status;
-          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
-          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
-            : succeeded ? 'live'
-            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
-            : 'failed';
-        });
-      }
+    if (!commits.length) {
+      list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>';
+      return;
+    }
 
-      // Update the top-bar badge with latest deploy state
-      var badge = document.getElementById('deploy-status-badge');
-      if (badge) {
-        var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
-        var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
-        if (latestStatus === 'live') {
-          badge.textContent = '🟢 Live'; badge.className='deploy-badge live'; badge.style.display='';
-        } else if (latestStatus === 'building') {
-          badge.textContent = '🟡 Deploying'; badge.className='deploy-badge building'; badge.style.display='';
-        } else if (latestStatus === 'failed') {
-          badge.textContent = '🔴 Deploy Failed'; badge.className='deploy-badge failed'; badge.style.display='';
+    // Build SHA → deploy status map from workflow runs
+    var deployMap = {};
+    if (runsData && Array.isArray(runsData.workflow_runs)) {
+      runsData.workflow_runs.forEach(function(run){
+        var sha = run.head_sha;
+        if (!sha) return;
+        // Only Pages-related workflows
+        var name = (run.name||'').toLowerCase();
+        if (!name.includes('page') && !name.includes('deploy') && !name.includes('jekyll')) return;
+        if (!deployMap[sha]) {
+          var status = run.conclusion;
+          deployMap[sha] = status === 'success' ? 'live'
+            : status === 'failure' ? 'failed'
+            : (run.status === 'in_progress' || run.status === 'queued') ? 'building'
+            : 'unknown';
+        }
+      });
+    }
+
+    // Determine the current live SHA from Pages API
+    var liveSha = pagesData && pagesData.build && pagesData.build.commit ? pagesData.build.commit : null;
+
+    // Status badge at top
+    var badge = document.getElementById('deploy-status-badge');
+    if (badge) {
+      badge.style.display = '';
+      if (liveSha) {
+        badge.textContent = '🟢 Live';
+        badge.className = 'deploy-badge live';
+      } else {
+        var firstRunStatus = commits[0] ? deployMap[commits[0].sha] : null;
+        if (firstRunStatus === 'building') {
+          badge.textContent = '🟡 Deploying…';
+          badge.className = 'deploy-badge building';
+        } else if (firstRunStatus === 'failed') {
+          badge.textContent = '🔴 Deploy Failed';
+          badge.className = 'deploy-badge failed';
+        } else if (firstRunStatus === 'live') {
+          badge.textContent = '🟢 Live';
+          badge.className = 'deploy-badge live';
         } else {
-          badge.style.display='none';
+          badge.style.display = 'none';
         }
       }
+    }
 
-      commits.forEach(function(c, idx){
-        var item = document.createElement('div');
-        item.className = 'history-item glass';
-        var sha    = (c.sha||'').slice(0,7);
-        var fullSha= c.sha||'';
-        var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
-        var author = c.commit&&c.commit.author ? c.commit.author.name : '';
-        var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+    commits.forEach(function(c, idx){
+      var item = document.createElement('div');
+      item.className = 'history-item glass';
+      var sha    = (c.sha||'').slice(0,7);
+      var fullSha = c.sha||'';
+      var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
+      var author = c.commit&&c.commit.author ? c.commit.author.name : '';
+      var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
 
-        // Determine deploy dot for this commit
-        var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
-        var dotColor  = depStatus === 'live' ? '#10b981'
-                      : depStatus === 'building' ? '#f59e0b'
-                      : depStatus === 'failed' ? '#ef4444'
-                      : '#6b7280';
-        var dotTitle  = depStatus === 'live' ? 'Live on GitHub Pages'
-                      : depStatus === 'building' ? 'Deploying…'
-                      : depStatus === 'failed' ? 'Deploy failed'
-                      : idx === 0 ? 'Pending deploy check'
-                      : 'Older commit';
+      // Determine dot
+      var isLive     = liveSha && (fullSha.startsWith(liveSha) || liveSha.startsWith(fullSha));
+      var depStatus  = isLive ? 'live' : (deployMap[fullSha] || (idx===0 ? 'unknown' : 'old'));
+      var dotColor   = depStatus==='live' ? '#10b981' : depStatus==='building' ? '#f59e0b' : depStatus==='failed' ? '#ef4444' : '#6b7280';
+      var dotGlow    = depStatus==='live' ? 'box-shadow:0 0 6px #10b981;' : '';
+      var dotTitle   = depStatus==='live' ? '✅ Live on GitHub Pages'
+                     : depStatus==='building' ? '🔄 Deploying…'
+                     : depStatus==='failed' ? '❌ Deploy failed'
+                     : idx===0 ? '⏳ Awaiting deploy info'
+                     : '⚫ Older commit';
 
-        item.innerHTML =
-          '<div class="deploy-dot" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
-          '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
-          '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
-          '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
-        list.appendChild(item);
-      });
-    })
-    .catch(function(e){
-      loading.classList.add('hidden'); list.classList.remove('hidden');
-      list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div>Failed: '+esc(e.message)+'</div></div>';
+      item.innerHTML =
+        '<div title="'+esc(dotTitle)+'" style="width:9px;height:9px;border-radius:50%;background:'+dotColor+';'+dotGlow+'flex-shrink:0;margin-top:5px;cursor:help;"></div>' +
+        '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
+        '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
+        '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
+      list.appendChild(item);
     });
+
+    // Auto-refresh history if a deploy is in progress
+    var anyBuilding = Object.values ? Object.values(deployMap).some(function(v){ return v==='building'; })
+      : Object.keys(deployMap).some(function(k){ return deployMap[k]==='building'; });
+    if (anyBuilding) {
+      setTimeout(function(){
+        historyLoaded = false;
+        if (S.activeTab==='history') fetchHistory();
+      }, 15000);
+    }
+  }).catch(function(e){
+    loading.classList.add('hidden'); list.classList.remove('hidden');
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div>Failed: '+esc(e.message)+'</div></div>';
+  });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2296,21 +2277,15 @@ function doLogin() {
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-panel').style.display='flex';
     document.getElementById('gh-user').textContent = 'Signed in as @'+(user ? user.login||user : 'admin');
-    // Fetch client IP then register session
-    return fetchClientIp().then(function(ip){
-      S.clientIp = ip;
-      return loadData().then(function(){
-        return apiGet('settings.json').then(function(d){
-          S.settingsSha = d.sha;
-          var data = registerSession(d.content);
-          return apiPut('settings.json', data, S.settingsSha, 'New session: '+getDeviceInfo())
-            .then(function(r){
-              S.settingsSha = r.content.sha;
-              startSessionPolling();
-            })
-            .catch(function(){ startSessionPolling(); }); // poll even if write fails
-        }).catch(function(){ startSessionPolling(); });
-      });
+    // Register this session in settings.json after data loads
+    return loadData().then(function(){
+      return apiGet('settings.json').then(function(d){
+        S.settingsSha = d.sha;
+        var data = registerSession(d.content);
+        return apiPut('settings.json', data, S.settingsSha, 'New session: '+getDeviceInfo())
+          .then(function(r){ S.settingsSha = r.content.sha; startSessionPolling(); })
+          .catch(function(){ startSessionPolling(); }); // poll even if write fails
+      }).catch(function(){});
     });
   }
 
@@ -2380,12 +2355,10 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   var btn = document.getElementById('refresh-btn');
   btn.disabled=true; btn.textContent='↻ Loading…';
   historyLoaded=false;
-  // Pass true = skip own-session-validity check so refresh never triggers a logout
   loadData(true).then(function(){
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
     if (S.activeTab==='home') initHomeTab();
-    if (S.activeTab==='devices') renderDevicesTab();
     toast('Data refreshed', '✅');
   }).catch(function(e){
     toast('Refresh failed: '+e.message, '❌');
@@ -2411,11 +2384,8 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
     document.getElementById('admin-panel').style.display='flex';
     document.getElementById('gh-user').textContent='Signed in as @'+S.ghUser;
     resetIdleTimer();
-    // Restore IP in background
-    fetchClientIp().then(function(ip){ S.clientIp = ip; });
-    loadData(true); // skipSessionCheck on init restore — polling handles revocation
     startSessionPolling();
-    // Ensure home tab indicator positions correctly
+    loadData();
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
         var active = document.querySelector('.tab-btn.active');
