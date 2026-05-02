@@ -2055,7 +2055,8 @@
       "categories": [
         "ai-assistants",
         "dev"
-      ]
+      ],
+      "newUntil": "2026-05-09T19:00:13.817Z"
     },
     {
       "name": "claude-mem",
