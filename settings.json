@@ -2,6 +2,12 @@
   "autoLogoutMins": 10,
   "sessions": [
     {
+      "id": "b8ccf39a06bd9bcb7e49ba62",
+      "device": "Chrome / Android",
+      "loginAt": "2026-05-02T18:56:24.758Z",
+      "isTemp": true
+    },
+    {
       "id": "b3bde396a0b5a66e81738cd2",
       "device": "Safari / macOS",
       "loginAt": "2026-05-02T18:52:48.003Z",
@@ -104,6 +110,11 @@
       "device": "Safari / macOS",
       "loginAt": "2026-05-02T18:52:48.004Z",
       "isTemp": false
+    },
+    {
+      "device": "Chrome / Android",
+      "loginAt": "2026-05-02T18:56:24.759Z",
+      "isTemp": true
     }
   ],
   "tempPasswordHash": "1ab54cb7bc58f3ec22665d5f465be98ddaf9f416ce538bdb8b8d1d055e6842be",
