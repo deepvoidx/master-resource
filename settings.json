@@ -2,6 +2,12 @@
   "autoLogoutMins": 30,
   "sessions": [
     {
+      "id": "b3bde396a0b5a66e81738cd2",
+      "device": "Safari / macOS",
+      "loginAt": "2026-05-02T18:52:48.003Z",
+      "isTemp": false
+    },
+    {
       "id": "58a484fcbf364260f5da5be4",
       "device": "Chrome / Windows",
       "loginAt": "2026-05-01T08:18:12.226Z",
@@ -92,6 +98,11 @@
     {
       "device": "Chrome / Windows",
       "loginAt": "2026-05-01T08:18:12.226Z",
+      "isTemp": false
+    },
+    {
+      "device": "Safari / macOS",
+      "loginAt": "2026-05-02T18:52:48.004Z",
       "isTemp": false
     }
   ],
