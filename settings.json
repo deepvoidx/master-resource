@@ -1,5 +1,5 @@
 {
-  "autoLogoutMins": 10,
+  "autoLogoutMins": 30,
   "sessions": [],
   "loginHistory": [
     {
