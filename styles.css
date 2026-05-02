@@ -111,21 +111,25 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 }
 .fwrap.expanded{max-height:1000px;}
 
-/* Mobile: CSS grid for perfectly equal-width pills — no height clipping */
+/* Mobile: CSS grid for perfectly equal-width pills */
 @media(max-width:600px){
   .fwrap{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     grid-auto-rows:auto;
     gap:6px;
-    max-height:none !important;
-    overflow:visible;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+    max-height:none;
+    overflow:hidden;
   }
-  .fwrap.expanded{max-height:none !important;}
+  .fwrap.expanded{max-height:none;}
   .fb{
     white-space:normal;
     text-align:center;
     width:100%;
+    max-width:100%;
     padding:7px 6px;
     font-size:.72rem;
     line-height:1.3;
@@ -134,8 +138,8 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
     justify-content:center;
     box-sizing:border-box;
     min-height:36px;
+    overflow:hidden;
   }
-  /* Hide showmore entirely on mobile — all pills visible */
   .fb-showmore{display:none !important;}
 }
 
@@ -501,7 +505,7 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
   .tags-row{width:100%;}
   .ctrl{flex-direction:column;gap:8px;}
   .sw{flex:none;width:100%;max-width:100%;}
-  .fwrap-outer,.fwrap{width:100%;}
+  .fwrap-outer,.fwrap{width:100%;max-width:100%;overflow:hidden;box-sizing:border-box;}
   .fb-showmore{border-radius:8px;}
 
   /* Modal */
