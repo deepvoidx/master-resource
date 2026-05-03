@@ -72,6 +72,12 @@
       "device": "Chrome / Windows",
       "loginAt": "2026-05-03T16:40:25.824Z",
       "isTemp": false
+    },
+    {
+      "id": "e2265260fcd427d99d03c834",
+      "device": "Chrome / Windows",
+      "loginAt": "2026-05-03T16:45:03.155Z",
+      "isTemp": false
     }
   ],
   "loginHistory": [
@@ -243,6 +249,11 @@
     {
       "device": "Chrome / Windows",
       "loginAt": "2026-05-03T16:40:25.824Z",
+      "isTemp": false
+    },
+    {
+      "device": "Chrome / Windows",
+      "loginAt": "2026-05-03T16:45:03.155Z",
       "isTemp": false
     }
   ],
