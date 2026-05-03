@@ -715,3 +715,25 @@ input[type=checkbox],input[type=radio]{
   .temp-row{flex-direction:column;}
   .temp-row select{width:100%;}
 }
+/* ── Temp password active card ── */
+.temp-info-card{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(16,185,129,.07);
+  border:1px solid rgba(16,185,129,.25);
+  margin-bottom:4px;
+}
+.temp-info-header{
+  display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;
+}
+.temp-info-label{
+  font-size:.8rem;font-weight:700;color:#d4d0ff;letter-spacing:.3px;
+}
+.temp-info-row{
+  display:flex;gap:6px;align-items:center;font-size:.75rem;color:var(--mute);white-space:nowrap;
+}
+.temp-info-row span:last-child{color:#e0e0f0;}
+@media(max-width:600px){
+  .temp-info-card{flex-direction:column;align-items:flex-start;}
+  .temp-info-card .btn{width:100%;}
+}
