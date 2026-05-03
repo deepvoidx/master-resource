@@ -1,13 +1,6 @@
 {
   "autoLogoutMins": 1,
-  "sessions": [
-    {
-      "id": "09f85e05f911615c6dcd89b6",
-      "device": "Safari / macOS",
-      "loginAt": "2026-05-03T09:04:23.978Z",
-      "isTemp": false
-    }
-  ],
+  "sessions": [],
   "loginHistory": [
     {
       "device": "Chrome / Windows",
