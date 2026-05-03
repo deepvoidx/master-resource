@@ -106,7 +106,9 @@ function startSessionPolling() {
       S.settingsSha = d.sha;
       var cfg = d.content || {};
       // Check if our session was revoked
-      if (!checkOwnSessionValid(cfg)) {
+      // Only log out if sessions array has entries — an empty array means file was reset, not a revocation
+      var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
+      if (sessions.length > 0 && !checkOwnSessionValid(cfg)) {
         stopSessionPolling();
         toast('Logged out from another device.', '⚠️');
         setTimeout(logout, 1500);
@@ -406,11 +408,12 @@ function createTempPassword(password, expiryMins) {
                : -1;                   // -1 = until deleted
     return apiGet('settings.json').then(function(d){
       var data = d.content;
-      S.settingsSha = d.sha;
+      // Use d.sha directly — avoids SHA race if polling mutated S.settingsSha between fetch and write
       data.tempPasswordHash = hash;
       data.tempPasswordSalt = salt;
       data.tempPasswordExpiry = expiry;
-      return apiPut('settings.json', data, S.settingsSha, 'Create temporary password').then(function(r){
+      data.tempPasswordCreatedAt = new Date().toISOString();
+      return apiPut('settings.json', data, d.sha, 'Create temporary password').then(function(r){
         S.settingsSha = r.content.sha;
       });
     });
@@ -420,11 +423,15 @@ function createTempPassword(password, expiryMins) {
 function deleteTempPassword() {
   return apiGet('settings.json').then(function(d){
     var data = d.content;
-    S.settingsSha = d.sha;
     delete data.tempPasswordHash;
     delete data.tempPasswordSalt;
     delete data.tempPasswordExpiry;
-    return apiPut('settings.json', data, S.settingsSha, 'Delete temporary password').then(function(r){
+    delete data.tempPasswordCreatedAt;
+    // Remove temp sessions so those devices get auto-logged-out via polling
+    if (Array.isArray(data.sessions)) {
+      data.sessions = data.sessions.filter(function(s){ return !s.isTemp; });
+    }
+    return apiPut('settings.json', data, d.sha, 'Delete temporary password').then(function(r){
       S.settingsSha = r.content.sha;
     });
   });
@@ -1737,13 +1744,11 @@ function initHomeTab() {
     btn.classList.toggle('active', btn.getAttribute('data-val') === saved);
   });
 
-  // Load sessions + temp-pass status from settings.json
+  // Load temp-pass status from settings.json
   apiGet('settings.json').then(function(d){
     S.settingsSha = d.sha;
-    renderSessions(d.content);
     renderTempPassStatus(d.content);
-    renderLoginHistory(d.content);
-  }).catch(function(){ renderSessions({}); renderTempPassStatus({}); renderLoginHistory({}); });
+  }).catch(function(){ renderTempPassStatus({}); });
 }
 
 function renderSessions(cfg) {
@@ -1772,29 +1777,57 @@ function renderSessions(cfg) {
 }
 
 function renderTempPassStatus(cfg) {
-  var banner = document.getElementById('temp-status-banner');
-  var deleteBtn = document.getElementById('temp-delete-btn');
-  if (!banner) return;
+  var activeBlock = document.getElementById('temp-active-block');
+  var createForm  = document.getElementById('temp-create-form');
+  if (!activeBlock || !createForm) return;
 
-  var hasHash = !!cfg.tempPasswordHash;
-  var expiry = cfg.tempPasswordExpiry;
+  var hasHash   = !!cfg.tempPasswordHash;
+  var expiry    = cfg.tempPasswordExpiry;
+  var createdAt = cfg.tempPasswordCreatedAt;
   var isExpired = hasHash && expiry > 0 && Date.now() > expiry;
-  var isNeverExpires = hasHash && (expiry === 0 || expiry === -1);
-  var isUntilDeleted = hasHash && expiry === -1;
 
-  banner.className = 'temp-status';
   if (!hasHash) {
-    banner.classList.add('hidden');
-    if (deleteBtn) deleteBtn.classList.add('hidden');
-  } else if (isExpired) {
-    banner.textContent = '⚠ Temporary password has expired and is no longer valid.';
-    banner.classList.add('expired-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
+    // No temp password — show create form, hide active block
+    activeBlock.style.display = 'none';
+    createForm.style.display  = '';
   } else {
-    var expiryStr = isNeverExpires ? 'Never expires' : isUntilDeleted ? 'Until deleted' : 'Expires: '+new Date(expiry).toLocaleString();
-    banner.textContent = '✓ Temporary password is active. '+expiryStr+'.';
-    banner.classList.add('active-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
+    // Temp password exists — show active block, hide create form
+    activeBlock.style.display = '';
+    createForm.style.display  = 'none';
+
+    // Populate created date
+    var createdEl = document.getElementById('temp-info-created');
+    if (createdEl) createdEl.textContent = createdAt ? new Date(createdAt).toLocaleString() : '—';
+
+    // Populate expiry
+    var expiryEl = document.getElementById('temp-info-expiry');
+    if (expiryEl) {
+      if (expiry === 0 || expiry === -1) {
+        expiryEl.textContent = 'Never';
+      } else if (isExpired) {
+        expiryEl.textContent = 'Expired — ' + new Date(expiry).toLocaleString();
+        expiryEl.style.color = '#f87171';
+      } else {
+        expiryEl.textContent = new Date(expiry).toLocaleString();
+        expiryEl.style.color = '#6ee7b7';
+      }
+    }
+
+    // Update badge
+    var badgeEl = document.getElementById('temp-info-badge');
+    if (badgeEl) {
+      if (isExpired) {
+        badgeEl.textContent = 'Expired';
+        badgeEl.style.background = 'rgba(225,29,72,.12)';
+        badgeEl.style.borderColor = 'rgba(225,29,72,.35)';
+        badgeEl.style.color = '#fca5a5';
+      } else {
+        badgeEl.textContent = 'Active';
+        badgeEl.style.background = '';
+        badgeEl.style.borderColor = '';
+        badgeEl.style.color = '';
+      }
+    }
   }
 }
 
@@ -1967,10 +2000,10 @@ document.getElementById('save-timeout-btn').addEventListener('click', function()
 
   btn.disabled = true; btn.textContent = 'Saving…';
   apiGet('settings.json').then(function(d){
-    S.settingsSha = d.sha;
     var data = d.content;
     data.autoLogoutMins = parseInt(minsVal, 10);
-    return apiPut('settings.json', data, S.settingsSha, 'Update auto-logout setting');
+    // Use d.sha directly — prevents SHA conflict if polling mutated S.settingsSha between fetch and write
+    return apiPut('settings.json', data, d.sha, 'Update auto-logout setting');
   }).then(function(res){
     S.settingsSha = res.content.sha;
     msg.textContent = '✓ Saved — '+label;
