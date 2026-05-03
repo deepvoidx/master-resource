@@ -77,7 +77,6 @@ function startSession(token, user) {
   S.token = token; S.ghUser = user;
   sessionStorage.setItem('a_tok', token);
   sessionStorage.setItem('a_usr', user);
-  // Guarantee a default so idle timer always starts on first login
   if (localStorage.getItem('a_idle_mins') === null) {
     localStorage.setItem('a_idle_mins', '30');
   }
@@ -87,9 +86,9 @@ function startSession(token, user) {
 function resetIdleTimer() {
   clearTimeout(S.sessionTimer);
   SESSION_MS = getIdleTimeoutMs();
-  if (!SESSION_MS || SESSION_MS <= 0) return; // 0 = never
+  if (!SESSION_MS || SESSION_MS <= 0) return;
   S.sessionTimer = setTimeout(function(){
-    if (!S.token) return; // already logged out
+    if (!S.token) return;
     toast('Signed out due to inactivity.', '⚠️');
     setTimeout(logout, 1500);
   }, SESSION_MS);
@@ -147,7 +146,7 @@ function logout() {
   stopSessionPolling();
   clearTimeout(S.sessionTimer);
 
-  // Save before clearing — needed for the best-effort session cleanup API call
+  // Save before clearing so session cleanup can still use the token
   var _tok = S.token, _sid = S.sessionId, _sha = S.settingsSha;
 
   S.token = null; S.toolsData = null; S.pendingData = null;
@@ -159,16 +158,16 @@ function logout() {
   sessionStorage.removeItem('a_sid');
   sessionStorage.removeItem('a_tmp');
 
-  // Best-effort: remove own session using the saved (pre-null) token
-  if (_tok && _sid && _sha) {
-    fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json?ref='+GH.branch,{
+  // Best-effort cleanup using saved token (not S.token which is now null)
+  if (_tok && _sid) {
+    fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json?ref='+GH.branch, {
       headers:{'Authorization':'Bearer '+_tok,'Accept':'application/vnd.github.v3+json'}
     }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
       if (!d) return;
       var c; try { c=JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))); } catch(e){ return; }
       if (!Array.isArray(c.sessions)) return;
       c.sessions = c.sessions.filter(function(s){ return s.id !== _sid; });
-      return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json',{
+      fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json', {
         method:'PUT',
         headers:{'Authorization':'Bearer '+_tok,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
         body:JSON.stringify({message:'Session ended',content:btoa(unescape(encodeURIComponent(JSON.stringify(c,null,2)))),sha:d.sha,branch:GH.branch})
@@ -177,42 +176,35 @@ function logout() {
   }
 
   historyLoaded = false;
-
   var spinner = '<div class="flex center gap8" style="padding:20px;justify-content:center;"><div class="spinner"></div><span style="color:var(--mute);">Loading\u2026</span></div>';
   ['pending-list','tools-list','cats-list','history-list'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) { el.innerHTML = ''; el.classList.add('hidden'); }
+    var el=document.getElementById(id); if(el){el.innerHTML='';el.classList.add('hidden');}
   });
   ['pending-loading','tools-loading','cats-loading','history-loading'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) { el.innerHTML = spinner; el.classList.remove('hidden'); }
+    var el=document.getElementById(id); if(el){el.innerHTML=spinner;el.classList.remove('hidden');}
   });
-  var se = document.getElementById('stats-content');
-  if (se) se.innerHTML = spinner;
-  var pe = document.getElementById('pending-empty');
-  if (pe) pe.classList.add('hidden');
+  var se=document.getElementById('stats-content'); if(se) se.innerHTML=spinner;
+  var pe=document.getElementById('pending-empty'); if(pe) pe.classList.add('hidden');
 
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
-  var homeBtn = document.querySelector('.tab-btn[data-tab="home"]');
-  var homeTab = document.getElementById('tab-home');
-  if (homeBtn) homeBtn.classList.add('active');
-  if (homeTab) homeTab.classList.add('active');
+  var homeBtn=document.querySelector('.tab-btn[data-tab="home"]');
+  var homeTab=document.getElementById('tab-home');
+  if(homeBtn) homeBtn.classList.add('active');
+  if(homeTab) homeTab.classList.add('active');
   requestAnimationFrame(function(){
-    var active = document.querySelector('.tab-btn.active');
-    if (active) moveLiquidIndicator(active);
+    var a=document.querySelector('.tab-btn.active'); if(a) moveLiquidIndicator(a);
   });
-
   ['pending-count','tools-tab-count','cats-tab-count','tools-count','cats-count'].forEach(function(id){
-    var el = document.getElementById(id); if (el) el.innerHTML = '';
+    var el=document.getElementById(id); if(el) el.innerHTML='';
   });
 
-  document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('pat-input').value = '';
-  var lb = document.getElementById('login-btn');
-  if (lb) { lb.disabled = false; lb.textContent = 'Sign In'; }
-  document.getElementById('login-err').textContent = '';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pat-input').value='';
+  var lb=document.getElementById('login-btn');
+  if(lb){lb.disabled=false;lb.textContent='Sign In';}
+  document.getElementById('login-err').textContent='';
 }
 
 // Reset idle timer on ANY user activity
@@ -2384,28 +2376,7 @@ document.getElementById('pat-input').addEventListener('keydown', function(e){
   if (e.key==='Enter') doLogin();
 });
 
-document.getElementById('logout-btn').addEventListener('click', function(){
-  var btn = this;
-  if (btn.getAttribute('data-confirming') === '1') {
-    // Second click — do it
-    btn.removeAttribute('data-confirming');
-    btn.textContent = 'Sign Out';
-    btn.classList.remove('btn-danger');
-    logout();
-    return;
-  }
-  // First click — ask inline (no confirm() — blocked on GitHub Pages)
-  btn.setAttribute('data-confirming', '1');
-  btn.textContent = 'Tap again to confirm';
-  btn.classList.add('btn-danger');
-  setTimeout(function(){
-    if (btn.getAttribute('data-confirming') === '1') {
-      btn.removeAttribute('data-confirming');
-      btn.textContent = 'Sign Out';
-      btn.classList.remove('btn-danger');
-    }
-  }, 4000);
-});
+document.getElementById('logout-btn').addEventListener('click', function(){ logout(); });
 document.getElementById('pat-input').addEventListener('input', function(){
   this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'');
 });
