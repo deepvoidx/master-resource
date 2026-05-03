@@ -6,6 +6,12 @@
       "device": "Safari / macOS",
       "loginAt": "2026-05-03T10:11:44.487Z",
       "isTemp": false
+    },
+    {
+      "id": "8f191f20ddebc5d64e7a2771",
+      "device": "Safari / macOS",
+      "loginAt": "2026-05-03T10:23:13.728Z",
+      "isTemp": false
     }
   ],
   "loginHistory": [
@@ -117,6 +123,11 @@
     {
       "device": "Safari / macOS",
       "loginAt": "2026-05-03T10:11:44.487Z",
+      "isTemp": false
+    },
+    {
+      "device": "Safari / macOS",
+      "loginAt": "2026-05-03T10:23:13.728Z",
       "isTemp": false
     }
   ]
