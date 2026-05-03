@@ -48,6 +48,12 @@
       "device": "Chrome / Windows",
       "loginAt": "2026-05-03T16:29:32.821Z",
       "isTemp": false
+    },
+    {
+      "id": "c523775b7a5e6e1bd1205c1b",
+      "device": "Chrome / Windows",
+      "loginAt": "2026-05-03T16:30:35.054Z",
+      "isTemp": false
     }
   ],
   "loginHistory": [
@@ -199,6 +205,11 @@
     {
       "device": "Chrome / Windows",
       "loginAt": "2026-05-03T16:29:32.821Z",
+      "isTemp": false
+    },
+    {
+      "device": "Chrome / Windows",
+      "loginAt": "2026-05-03T16:30:35.054Z",
       "isTemp": false
     }
   ],
