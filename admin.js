@@ -77,19 +77,15 @@ function startSession(token, user) {
   S.token = token; S.ghUser = user;
   sessionStorage.setItem('a_tok', token);
   sessionStorage.setItem('a_usr', user);
-  if (localStorage.getItem('a_idle_mins') === null) {
-    localStorage.setItem('a_idle_mins', '30');
-  }
   resetIdleTimer();
 }
 
 function resetIdleTimer() {
   clearTimeout(S.sessionTimer);
   SESSION_MS = getIdleTimeoutMs();
-  if (!SESSION_MS || SESSION_MS <= 0) return;
+  if (!SESSION_MS) return; // never timeout
   S.sessionTimer = setTimeout(function(){
-    if (!S.token) return;
-    toast('Signed out due to inactivity.', '⚠️');
+    toast('Session expired. Please sign in again.', '⚠️');
     setTimeout(logout, 1500);
   }, SESSION_MS);
 }
@@ -144,70 +140,63 @@ function fetchClientIp() {
 
 function logout() {
   stopSessionPolling();
-  clearTimeout(S.sessionTimer);
-
-  // Save before clearing so session cleanup can still use the token
-  var _tok = S.token, _sid = S.sessionId, _sha = S.settingsSha;
-
   S.token = null; S.toolsData = null; S.pendingData = null;
   S.activeTab = 'home'; S.toolsSortMode = 'default';
   S.bulkSelected.clear();
+  // Remove own session from settings on clean logout (best-effort)
+  if (S.sessionId && S.settingsSha) {
+    removeOwnSession().catch(function(){});
+  }
   S.sessionId = null; S._loginedWithTemp = false;
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   sessionStorage.removeItem('a_sid');
   sessionStorage.removeItem('a_tmp');
+  clearTimeout(S.sessionTimer);
 
-  // Best-effort cleanup using saved token (not S.token which is now null)
-  if (_tok && _sid) {
-    fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json?ref='+GH.branch, {
-      headers:{'Authorization':'Bearer '+_tok,'Accept':'application/vnd.github.v3+json'}
-    }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
-      if (!d) return;
-      var c; try { c=JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))); } catch(e){ return; }
-      if (!Array.isArray(c.sessions)) return;
-      c.sessions = c.sessions.filter(function(s){ return s.id !== _sid; });
-      fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json', {
-        method:'PUT',
-        headers:{'Authorization':'Bearer '+_tok,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-        body:JSON.stringify({message:'Session ended',content:btoa(unescape(encodeURIComponent(JSON.stringify(c,null,2)))),sha:d.sha,branch:GH.branch})
-      });
-    }).catch(function(){});
-  }
-
+  // Reset historyLoaded so it reloads fresh on next login
   historyLoaded = false;
-  var spinner = '<div class="flex center gap8" style="padding:20px;justify-content:center;"><div class="spinner"></div><span style="color:var(--mute);">Loading\u2026</span></div>';
+
+  // Reset all rendered lists back to loading spinners
+  var spinner = '<div class="flex center gap8" style="padding:20px;justify-content:center;"><div class="spinner"></div><span style="color:var(--mute);">Loading…</span></div>';
   ['pending-list','tools-list','cats-list','history-list'].forEach(function(id){
-    var el=document.getElementById(id); if(el){el.innerHTML='';el.classList.add('hidden');}
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = ''; el.classList.add('hidden'); }
   });
   ['pending-loading','tools-loading','cats-loading','history-loading'].forEach(function(id){
-    var el=document.getElementById(id); if(el){el.innerHTML=spinner;el.classList.remove('hidden');}
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = spinner; el.classList.remove('hidden'); }
   });
-  var se=document.getElementById('stats-content'); if(se) se.innerHTML=spinner;
-  var pe=document.getElementById('pending-empty'); if(pe) pe.classList.add('hidden');
+  var se = document.getElementById('stats-content');
+  if (se) se.innerHTML = spinner;
+  document.getElementById('pending-empty').classList.add('hidden');
 
+  // Reset tabs UI back to Home
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
-  var homeBtn=document.querySelector('.tab-btn[data-tab="home"]');
-  var homeTab=document.getElementById('tab-home');
-  if(homeBtn) homeBtn.classList.add('active');
-  if(homeTab) homeTab.classList.add('active');
+  var homeBtn = document.querySelector('.tab-btn[data-tab="home"]');
+  var homeTab = document.getElementById('tab-home');
+  if (homeBtn) homeBtn.classList.add('active');
+  if (homeTab) homeTab.classList.add('active');
   requestAnimationFrame(function(){
-    var a=document.querySelector('.tab-btn.active'); if(a) moveLiquidIndicator(a);
-  });
-  ['pending-count','tools-tab-count','cats-tab-count','tools-count','cats-count'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.innerHTML='';
+    var active = document.querySelector('.tab-btn.active');
+    if (active) moveLiquidIndicator(active);
   });
 
-  document.getElementById('admin-panel').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('pat-input').value='';
-  var lb=document.getElementById('login-btn');
-  if(lb){lb.disabled=false;lb.textContent='Sign In';}
-  document.getElementById('login-err').textContent='';
+  // Reset counts
+  ['pending-count','tools-tab-count','cats-tab-count','tools-count','cats-count'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
+
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pat-input').value = '';
+  var lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled = false; lb.textContent = 'Sign In'; }
+  document.getElementById('login-err').textContent = '';
 }
 
-// Reset idle timer on ANY user activity
+// reset timer on any interaction
 document.addEventListener('click',      function(){ if(S.token) resetIdleTimer(); }, {passive:true});
 document.addEventListener('keydown',    function(){ if(S.token) resetIdleTimer(); }, {passive:true});
 document.addEventListener('mousemove',  function(){ if(S.token) resetIdleTimer(); }, {passive:true});
@@ -339,18 +328,18 @@ function registerSession(settingsData) {
   sessionStorage.setItem('a_sid', S.sessionId);
   if (!Array.isArray(settingsData.sessions)) settingsData.sessions = [];
   if (!Array.isArray(settingsData.loginHistory)) settingsData.loginHistory = [];
-  // Clean up expired temp-password sessions older than 7 days
-  var cutoff = Date.now() - 7 * 24 * 3600 * 1000;
-  settingsData.sessions = settingsData.sessions.filter(function(s){
-    return !s.loginAt || new Date(s.loginAt).getTime() > cutoff;
-  });
-  settingsData.sessions.push({
+  var deviceStr = getDeviceInfo();
+  var now = new Date().toISOString();
+  // Dedup by device: remove any prior session from this same device
+  settingsData.sessions = settingsData.sessions.filter(function(s){ return s.device !== deviceStr; });
+  // Put newest first
+  settingsData.sessions.unshift({
     id: S.sessionId,
-    device: getDeviceInfo(),
-    loginAt: new Date().toISOString(),
+    device: deviceStr,
+    loginAt: now,
     isTemp: !!S._loginedWithTemp
   });
-  // Persistent login history — never removed on logout, capped at 50
+  // Login history — never removed on logout, capped at 50
   settingsData.loginHistory.push({
     device: getDeviceInfo(),
     loginAt: new Date().toISOString(),
@@ -399,14 +388,15 @@ function createTempPassword(password, expiryMins) {
   var salt = randomHex(16);
   return sha256hex(salt + password).then(function(hash){
     var expiry = expiryMins > 0 ? Date.now() + expiryMins * 60000
-               : expiryMins === 0 ? 0  // never
-               : -1;                   // -1 = until deleted
+               : expiryMins === 0 ? 0
+               : -1;
     return apiGet('settings.json').then(function(d){
       var data = d.content;
       S.settingsSha = d.sha;
       data.tempPasswordHash = hash;
       data.tempPasswordSalt = salt;
       data.tempPasswordExpiry = expiry;
+      data.tempPasswordCreatedAt = new Date().toISOString();
       return apiPut('settings.json', data, S.settingsSha, 'Create temporary password').then(function(r){
         S.settingsSha = r.content.sha;
       });
@@ -421,6 +411,11 @@ function deleteTempPassword() {
     delete data.tempPasswordHash;
     delete data.tempPasswordSalt;
     delete data.tempPasswordExpiry;
+    delete data.tempPasswordCreatedAt;
+    // Remove all temp sessions so polling auto-logs them out
+    if (Array.isArray(data.sessions)) {
+      data.sessions = data.sessions.filter(function(s){ return !s.isTemp; });
+    }
     return apiPut('settings.json', data, S.settingsSha, 'Delete temporary password').then(function(r){
       S.settingsSha = r.content.sha;
     });
@@ -1747,51 +1742,99 @@ function renderSessions(cfg) {
   var list = document.getElementById('sessions-list');
   if (!list) return;
   var sessions = Array.isArray(cfg.sessions) ? cfg.sessions : [];
-  if (!sessions.length) {
-    list.innerHTML = '<div class="home-empty-msg">No sessions recorded yet.</div>';
+
+  // Dedup by device — sessions are stored newest-first, so first seen per device wins
+  var seen = {};
+  var deduped = sessions.filter(function(s) {
+    if (seen[s.device]) return false;
+    seen[s.device] = true;
+    return true;
+  });
+
+  if (!deduped.length) {
+    list.innerHTML = '<div class="home-empty-msg">No active sessions recorded yet.</div>';
     return;
   }
-  list.innerHTML = sessions.map(function(s){
+
+  list.innerHTML = '';
+  deduped.forEach(function(s) {
     var isCurrent = s.id === S.sessionId;
     var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
-    return '<div class="session-card'+(isCurrent?' current':'')+'">'
-      +'<div style="flex:1;">'
-        +'<div class="session-device">'+esc(s.device||'Unknown device')+'</div>'
-        +'<div class="session-meta">Logged in: '+esc(loginTime)+'</div>'
-      +'</div>'
-      +(s.isTemp ? '<span class="session-badge temp">Temp</span>' : '')
-      +(isCurrent
-        ? '<span class="session-badge">This device</span>'
-        : '<button class="btn btn-danger btn-sm" onclick="doForceLogout(\''+esc(s.id)+'\')">Logout</button>'
-      )
-    +'</div>';
-  }).join('');
+    var card = document.createElement('div');
+    card.className = 'session-card' + (isCurrent ? ' current' : '');
+    card.innerHTML =
+      '<div style="flex:1;">'
+      + '<div class="session-device">' + esc(s.device || 'Unknown device')
+      + (isCurrent ? ' <span style="font-size:.68rem;color:#a0a0c8;">(this device)</span>' : '')
+      + '</div>'
+      + '<div class="session-meta">Last login: ' + esc(loginTime) + '</div>'
+      + '</div>'
+      + (s.isTemp ? '<span class="session-badge temp">Temp</span>' : '')
+      + (isCurrent
+          ? '<span class="session-badge">This device</span>'
+          : '<button class="btn btn-danger btn-sm rs-logout-btn">Logout</button>');
+    if (!isCurrent) {
+      var btn = card.querySelector('.rs-logout-btn');
+      (function(sid, deviceName) {
+        btn.addEventListener('click', function() {
+          if (!confirm('Force logout "' + deviceName + '"?')) return;
+          btn.disabled = true; btn.textContent = '…';
+          forceLogoutSession(sid)
+            .then(function() { toast('Device logged out', '✓'); initHomeTab(); })
+            .catch(function(e) { toast('Error: ' + e.message, '❌'); btn.disabled = false; btn.textContent = 'Logout'; });
+        });
+      })(s.id, s.device || 'this device');
+    }
+    list.appendChild(card);
+  });
 }
 
 function renderTempPassStatus(cfg) {
-  var banner = document.getElementById('temp-status-banner');
-  var deleteBtn = document.getElementById('temp-delete-btn');
-  if (!banner) return;
+  var activeBlock  = document.getElementById('temp-active-block');
+  var createForm   = document.getElementById('temp-create-form');
+  var deleteBtn    = document.getElementById('temp-delete-btn');
+  var badge        = document.getElementById('temp-info-badge');
+  var createdEl    = document.getElementById('temp-info-created');
+  var expiryEl     = document.getElementById('temp-info-expiry');
 
-  var hasHash = !!cfg.tempPasswordHash;
-  var expiry = cfg.tempPasswordExpiry;
+  var hasHash   = !!cfg.tempPasswordHash;
+  var expiry    = cfg.tempPasswordExpiry;
   var isExpired = hasHash && expiry > 0 && Date.now() > expiry;
-  var isNeverExpires = hasHash && (expiry === 0 || expiry === -1);
-  var isUntilDeleted = hasHash && expiry === -1;
+  var createdAt = cfg.tempPasswordCreatedAt || null;
 
-  banner.className = 'temp-status';
+  if (!activeBlock || !createForm) return;
+
   if (!hasHash) {
-    banner.classList.add('hidden');
-    if (deleteBtn) deleteBtn.classList.add('hidden');
-  } else if (isExpired) {
-    banner.textContent = '⚠ Temporary password has expired and is no longer valid.';
-    banner.classList.add('expired-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
-  } else {
-    var expiryStr = isNeverExpires ? 'Never expires' : isUntilDeleted ? 'Until deleted' : 'Expires: '+new Date(expiry).toLocaleString();
-    banner.textContent = '✓ Temporary password is active. '+expiryStr+'.';
-    banner.classList.add('active-temp');
-    if (deleteBtn) deleteBtn.classList.remove('hidden');
+    // No temp password — show create form only
+    activeBlock.style.display = 'none';
+    createForm.style.display  = '';
+    return;
+  }
+
+  // Has a temp password — show info card, hide create form
+  activeBlock.style.display = '';
+  createForm.style.display  = 'none';
+
+  if (createdEl) createdEl.textContent = createdAt ? new Date(createdAt).toLocaleString() : 'Unknown';
+
+  if (expiryEl) {
+    if (isExpired) {
+      expiryEl.textContent = 'Expired — ' + new Date(expiry).toLocaleString();
+      expiryEl.style.color = '#f87171';
+    } else if (!expiry || expiry === 0 || expiry === -1) {
+      expiryEl.textContent = 'Never';
+      expiryEl.style.color = '#6ee7b7';
+    } else {
+      expiryEl.textContent = new Date(expiry).toLocaleString();
+      expiryEl.style.color = '';
+    }
+  }
+
+  if (badge) {
+    badge.textContent  = isExpired ? 'Expired' : 'Active';
+    badge.style.background  = isExpired ? 'rgba(225,29,72,.12)' : '';
+    badge.style.borderColor = isExpired ? 'rgba(225,29,72,.35)' : '';
+    badge.style.color       = isExpired ? '#fca5a5' : '';
   }
 }
 
@@ -1800,23 +1843,30 @@ function renderLoginHistory(cfg) {
   if (!list) return;
   var history = Array.isArray(cfg.loginHistory) ? cfg.loginHistory : [];
   if (!history.length) {
-    list.innerHTML = '<div class="home-empty-msg">No login history yet. It will be recorded from your next sign-in onwards.</div>';
+    list.innerHTML = '<div class="home-empty-msg">No login history yet.</div>';
     return;
   }
-  // Most recent first
-  var reversed = history.slice().reverse();
-  list.innerHTML = reversed.map(function(s){
+  // Sort newest first, then dedup by device
+  var sorted = history.slice().sort(function(a,b){ return new Date(b.loginAt||0) - new Date(a.loginAt||0); });
+  var seen = {};
+  var deduped = sorted.filter(function(s) {
+    if (seen[s.device]) return false;
+    seen[s.device] = true;
+    return true;
+  });
+
+  list.innerHTML = deduped.map(function(s) {
     var loginTime = s.loginAt ? new Date(s.loginAt).toLocaleString() : '—';
     return '<div class="session-card">'
-      +'<div style="flex:1;">'
-        +'<div class="session-device">'+esc(s.device||'Unknown device')+'</div>'
-        +'<div class="session-meta">'+esc(loginTime)+'</div>'
-      +'</div>'
-      +(s.isTemp
-        ? '<span class="session-badge temp">Temp</span>'
-        : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.32);color:#b0b0ff;">PAT</span>'
-      )
-    +'</div>';
+      + '<div style="flex:1;">'
+        + '<div class="session-device">' + esc(s.device || 'Unknown device') + '</div>'
+        + '<div class="session-meta">' + esc(loginTime) + '</div>'
+      + '</div>'
+      + (s.isTemp
+          ? '<span class="session-badge temp">Temp</span>'
+          : '<span class="session-badge" style="background:rgba(108,99,255,.1);border-color:rgba(108,99,255,.32);color:#b0b0ff;">PAT</span>'
+        )
+    + '</div>';
   }).join('');
 }
 
@@ -2128,18 +2178,11 @@ function apiGetCommits() {
   }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
 }
 
-function apiGetPagesDeployments() {
-  // Fetch the latest GitHub Pages deployments to match against commit SHAs
-  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
-    headers:apiHeaders()
-  }).then(function(r){ return r.ok ? r.json() : null; })
-    .catch(function(){ return null; });
-}
-
 function fetchHistory() {
   if (historyLoaded) return;
   var loading = document.getElementById('history-loading');
   var list    = document.getElementById('history-list');
+  if (!loading || !list) return;
   loading.classList.remove('hidden'); list.classList.add('hidden');
   if (!S.token) {
     list.innerHTML='<div class="empty-state"><div>Sign in first.</div></div>';
@@ -2147,86 +2190,134 @@ function fetchHistory() {
     return;
   }
 
-  Promise.all([apiGetCommits(), apiGetPagesDeployments()])
-    .then(function(results){
-      var commits     = results[0] || [];
-      var deployments = results[1];
-      historyLoaded = true;
-      loading.classList.add('hidden');
-      list.classList.remove('hidden');
-      list.innerHTML = '';
+  var baseUrl = 'https://api.github.com/repos/'+GH.owner+'/'+GH.repo;
+  var hdrs = apiHeaders();
 
-      if (!commits.length) {
-        list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>';
-        return;
-      }
+  Promise.all([
+    // commits to tools.json
+    fetch(baseUrl+'/commits?path=tools.json&per_page=15', {headers:hdrs})
+      .then(function(r){ return r.ok ? r.json() : []; }).catch(function(){ return []; }),
+    // GitHub Actions runs (contains Pages deploy jobs)
+    fetch(baseUrl+'/actions/runs?per_page=30', {headers:hdrs})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
+    // Pages info (current live SHA)
+    fetch(baseUrl+'/pages', {headers:hdrs})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+  ]).then(function(results){
+    var commits   = results[0] || [];
+    var runsData  = results[1];
+    var pagesData = results[2];
 
-      // Build a map of commit SHA → deploy status from Pages API
-      // deployments come back newest first; first deployed commit = live
-      var deployMap = {};
-      if (deployments && Array.isArray(deployments)) {
-        deployments.forEach(function(dep, i){
-          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
-          if (!sha) return;
-          var status = dep.status_url || dep.status;
-          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
-          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
-            : succeeded ? 'live'
-            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
-            : 'failed';
-        });
-      }
+    historyLoaded = true;
+    loading.classList.add('hidden');
+    list.classList.remove('hidden');
+    list.innerHTML = '';
 
-      // Update the top-bar badge with latest deploy state
-      var badge = document.getElementById('deploy-status-badge');
-      if (badge) {
-        var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
-        var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
-        if (latestStatus === 'live') {
-          badge.textContent = '🟢 Live'; badge.className='deploy-badge live'; badge.style.display='';
-        } else if (latestStatus === 'building') {
-          badge.textContent = '🟡 Deploying'; badge.className='deploy-badge building'; badge.style.display='';
-        } else if (latestStatus === 'failed') {
-          badge.textContent = '🔴 Deploy Failed'; badge.className='deploy-badge failed'; badge.style.display='';
-        } else {
-          badge.style.display='none';
+    if (!commits.length) {
+      list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div>No commits found</div></div>';
+      return;
+    }
+
+    // Build SHA → status from Actions runs
+    var deployMap = {};
+    if (runsData && Array.isArray(runsData.workflow_runs)) {
+      runsData.workflow_runs.forEach(function(run) {
+        var sha = run.head_sha;
+        if (!sha || deployMap[sha]) return;
+        var wname = (run.name || run.display_title || '').toLowerCase();
+        // Only care about Pages-related workflows
+        if (!wname.includes('page') && !wname.includes('deploy') && !wname.includes('jekyll') && !wname.includes('build')) return;
+        var s = run.status; var c = run.conclusion;
+        deployMap[sha] = (s === 'in_progress' || s === 'queued' || s === 'waiting') ? 'building'
+          : c === 'success' ? 'live'
+          : c === 'failure' ? 'failed'
+          : 'unknown';
+      });
+    }
+
+    // Get current live SHA from Pages API
+    var liveSha = pagesData && pagesData.build_type
+      ? (pagesData.source && pagesData.source.branch ? null : null) // Pages API v3
+      : null;
+    // Try latest_pages_build
+    if (pagesData && pagesData.url) {
+      // fall through to Actions-based detection
+    }
+
+    // Top badge
+    var badge = document.getElementById('deploy-status-badge');
+    if (badge && commits[0]) {
+      var topSha = commits[0].sha;
+      var topStatus = deployMap[topSha];
+      if (!topStatus) {
+        // If no Actions run found, check if all runs succeeded (site is live)
+        var anyRun = runsData && runsData.workflow_runs && runsData.workflow_runs.length > 0;
+        if (anyRun) {
+          var latestRun = runsData.workflow_runs[0];
+          topStatus = latestRun.conclusion === 'success' ? 'live'
+            : (latestRun.status === 'in_progress' || latestRun.status === 'queued') ? 'building'
+            : latestRun.conclusion === 'failure' ? 'failed' : 'unknown';
         }
       }
+      badge.style.display = '';
+      if (topStatus === 'live') {
+        badge.textContent = '🟢 Live'; badge.className = 'deploy-badge live';
+      } else if (topStatus === 'building') {
+        badge.textContent = '🟡 Deploying…'; badge.className = 'deploy-badge building';
+      } else if (topStatus === 'failed') {
+        badge.textContent = '🔴 Failed'; badge.className = 'deploy-badge failed';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
 
-      commits.forEach(function(c, idx){
-        var item = document.createElement('div');
-        item.className = 'history-item glass';
-        var sha    = (c.sha||'').slice(0,7);
-        var fullSha= c.sha||'';
-        var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
-        var author = c.commit&&c.commit.author ? c.commit.author.name : '';
-        var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+    commits.forEach(function(c, idx) {
+      var item    = document.createElement('div');
+      item.className = 'history-item glass';
+      var sha    = (c.sha||'').slice(0,7);
+      var fullSha = c.sha||'';
+      var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
+      var author = c.commit&&c.commit.author ? c.commit.author.name : '';
+      var date   = '';
+      try { date = new Date(c.commit.author.date).toLocaleString(); } catch(e) {}
 
-        // Determine deploy dot for this commit
-        var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
-        var dotColor  = depStatus === 'live' ? '#10b981'
-                      : depStatus === 'building' ? '#f59e0b'
-                      : depStatus === 'failed' ? '#ef4444'
-                      : '#6b7280';
-        var dotTitle  = depStatus === 'live' ? 'Live on GitHub Pages'
-                      : depStatus === 'building' ? 'Deploying…'
-                      : depStatus === 'failed' ? 'Deploy failed'
-                      : idx === 0 ? 'Pending deploy check'
-                      : 'Older commit';
+      var depStatus = deployMap[fullSha];
+      // Fallback: newest commit with no explicit status gets 'unknown'
+      if (!depStatus) depStatus = idx === 0 ? 'unknown' : 'old';
 
-        item.innerHTML =
-          '<div class="deploy-dot" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
-          '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
-          '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
-          '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
-        list.appendChild(item);
-      });
-    })
-    .catch(function(e){
-      loading.classList.add('hidden'); list.classList.remove('hidden');
-      list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div>Failed: '+esc(e.message)+'</div></div>';
+      var dotColor = depStatus === 'live'     ? '#10b981'
+                   : depStatus === 'building' ? '#f59e0b'
+                   : depStatus === 'failed'   ? '#ef4444'
+                   : depStatus === 'unknown'  ? '#94a3b8'
+                   : '#4b5563';
+      var dotGlow  = depStatus === 'live' ? 'box-shadow:0 0 6px #10b981;' : '';
+      var dotTitle = depStatus === 'live'     ? '✅ Live on GitHub Pages'
+                   : depStatus === 'building' ? '🔄 Deploying…'
+                   : depStatus === 'failed'   ? '❌ Deploy failed'
+                   : depStatus === 'unknown'  ? '⏳ Deploy status unknown'
+                   : '⚫ Older commit';
+
+      item.innerHTML =
+        '<div title="'+esc(dotTitle)+'" style="width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px;cursor:help;background:'+dotColor+';'+dotGlow+'"></div>'+
+        '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
+        '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
+        '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;&middot;&nbsp;'+esc(date)+'</div></div>';
+      list.appendChild(item);
     });
+
+    // Auto-refresh if a deploy is in progress
+    var anyBuilding = Object.keys(deployMap).some(function(k){ return deployMap[k]==='building'; });
+    if (anyBuilding) {
+      setTimeout(function(){
+        if (S.activeTab === 'history') { historyLoaded = false; fetchHistory(); }
+      }, 12000);
+    }
+  }).catch(function(e){
+    loading.classList.add('hidden'); list.classList.remove('hidden');
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div>Failed: '+esc(e.message)+'</div></div>';
+  });
 }
+
 
 // ═══════════════════════════════════════════════════════
 // ── STATS TAB ──
@@ -2376,7 +2467,9 @@ document.getElementById('pat-input').addEventListener('keydown', function(e){
   if (e.key==='Enter') doLogin();
 });
 
-document.getElementById('logout-btn').addEventListener('click', function(){ logout(); });
+document.getElementById('logout-btn').addEventListener('click', function(){
+  if (confirm('Sign out?')) logout();
+});
 document.getElementById('pat-input').addEventListener('input', function(){
   this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'');
 });
