@@ -77,15 +77,21 @@ function startSession(token, user) {
   S.token = token; S.ghUser = user;
   sessionStorage.setItem('a_tok', token);
   sessionStorage.setItem('a_usr', user);
+  // Ensure a default is stored so idle timer always starts on first login
+  if (localStorage.getItem('a_idle_mins') === null) {
+    localStorage.setItem('a_idle_mins', '30');
+  }
   resetIdleTimer();
 }
 
 function resetIdleTimer() {
   clearTimeout(S.sessionTimer);
+  // Always read fresh from localStorage so changes take effect immediately
   SESSION_MS = getIdleTimeoutMs();
-  if (!SESSION_MS) return; // never timeout
+  if (!SESSION_MS || SESSION_MS <= 0) return; // 0 = never timeout
   S.sessionTimer = setTimeout(function(){
-    toast('Session expired. Please sign in again.', '⚠️');
+    if (!S.token) return; // already logged out
+    toast('Signed out due to inactivity.', '⚠️');
     setTimeout(logout, 1500);
   }, SESSION_MS);
 }
@@ -140,19 +146,44 @@ function fetchClientIp() {
 
 function logout() {
   stopSessionPolling();
+  clearTimeout(S.sessionTimer);
+
+  // Save token before clearing so removeOwnSession can still call the API
+  var savedToken = S.token;
+  var savedSessionId = S.sessionId;
+  var savedSha = S.settingsSha;
+
+  // Clear all state immediately
   S.token = null; S.toolsData = null; S.pendingData = null;
   S.activeTab = 'home'; S.toolsSortMode = 'default';
   S.bulkSelected.clear();
-  // Remove own session from settings on clean logout (best-effort)
-  if (S.sessionId && S.settingsSha) {
-    removeOwnSession().catch(function(){});
-  }
   S.sessionId = null; S._loginedWithTemp = false;
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
   sessionStorage.removeItem('a_sid');
   sessionStorage.removeItem('a_tmp');
-  clearTimeout(S.sessionTimer);
+
+  // Best-effort: remove own session using the saved token
+  if (savedSessionId && savedSha && savedToken) {
+    (function(tok, sid, sha){
+      fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json?ref='+GH.branch, {
+        headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'}
+      }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+        if (!d) return;
+        var content;
+        try { content = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))))); }
+        catch(e){ content = JSON.parse(atob(d.content.replace(/\n/g,''))); }
+        if (!Array.isArray(content.sessions)) return;
+        content.sessions = content.sessions.filter(function(s){ return s.id !== sid; });
+        var str = JSON.stringify(content, null, 2);
+        return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/contents/settings.json', {
+          method:'PUT',
+          headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+          body: JSON.stringify({ message:'Session ended', content: btoa(unescape(encodeURIComponent(str))), sha: d.sha, branch: GH.branch })
+        });
+      }).catch(function(){});
+    })(savedToken, savedSessionId, savedSha);
+  }
 
   // Reset historyLoaded so it reloads fresh on next login
   historyLoaded = false;
@@ -169,7 +200,8 @@ function logout() {
   });
   var se = document.getElementById('stats-content');
   if (se) se.innerHTML = spinner;
-  document.getElementById('pending-empty').classList.add('hidden');
+  var pe = document.getElementById('pending-empty');
+  if (pe) pe.classList.add('hidden');
 
   // Reset tabs UI back to Home
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -2468,7 +2500,26 @@ document.getElementById('pat-input').addEventListener('keydown', function(e){
 });
 
 document.getElementById('logout-btn').addEventListener('click', function(){
-  if (confirm('Sign out?')) logout();
+  var btn = this;
+  // Replace button text with inline confirm — avoids browser-blocked confirm() dialogs
+  if (btn.getAttribute('data-confirming') === '1') {
+    btn.removeAttribute('data-confirming');
+    btn.textContent = 'Sign Out';
+    btn.classList.remove('btn-danger');
+    logout();
+    return;
+  }
+  btn.setAttribute('data-confirming', '1');
+  btn.textContent = 'Confirm sign out?';
+  btn.classList.add('btn-danger');
+  // Auto-cancel after 4 seconds
+  setTimeout(function(){
+    if (btn.getAttribute('data-confirming') === '1') {
+      btn.removeAttribute('data-confirming');
+      btn.textContent = 'Sign Out';
+      btn.classList.remove('btn-danger');
+    }
+  }, 4000);
 });
 document.getElementById('pat-input').addEventListener('input', function(){
   this.value = this.value.replace(/[\x00-\x1F\x7F]/g,'');
