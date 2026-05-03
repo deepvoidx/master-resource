@@ -16,6 +16,8 @@ var SESSION_MS = getIdleTimeoutMs();
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
+var _sessionPollInterval = null; // MUST be declared — used by stopSessionPolling inside logout()
+
 var S = {
   token:null, ghUser:'', activeTab:'home',
   toolsData:null, toolsSha:null,
@@ -23,6 +25,7 @@ var S = {
   settingsSha:null,
   sessionId:null,
   sessionTimer:null,
+  _loginedWithTemp:false,
   editToolIdx:-1,
   toolsSortMode:'default',
   bulkSelected:new Set(),
