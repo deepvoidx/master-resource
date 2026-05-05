@@ -116,12 +116,17 @@
     <div class="sec-hdr">
       <h2>Categories</h2>
       <span class="sec-count" id="cats-count">–</span>
-      <button class="btn btn-primary btn-sm ml-auto" id="add-cat-btn">+ Add Category</button>
     </div>
     <div id="cats-loading" class="flex center gap8" style="padding:20px;justify-content:center;">
       <div class="spinner"></div><span style="color:var(--mute);">Loading categories…</span>
     </div>
     <div id="cats-list" class="hidden"></div>
+    <!-- Category FAB — same style as Tools FAB -->
+    <button id="add-cat-fab" title="Add Category" aria-label="Add Category">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="22" height="22">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
 
   <!-- ── SITE PREVIEW TAB ── -->
