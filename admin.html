@@ -48,7 +48,6 @@
     <button class="tab-btn" data-tab="tools">🛠 Tools <span id="tools-tab-count"></span></button>
     <button class="tab-btn" data-tab="categories">🗂 Categories <span id="cats-tab-count"></span></button>
     <button class="tab-btn" data-tab="preview">🌐 Site Preview</button>
-    <button class="tab-btn" data-tab="devices">📱 Devices</button>
     <button class="tab-btn" data-tab="history">📋 History</button>
     <button class="tab-btn" data-tab="stats">📊 Stats</button>
     <button class="tab-btn" data-tab="analytics">📈 Analytics</button>
@@ -56,71 +55,12 @@
 
   <!-- ── HOME TAB ── -->
   <div class="tab-content active" id="tab-home">
-    <div class="home-grid">
-
-      <!-- ── Auto-Logout ── -->
-      <div class="home-card glass">
-        <div class="home-card-title">⏱ Auto-Logout</div>
-        <p class="home-card-desc">Sign out automatically after inactivity. Synced across all devices.</p>
-        <div class="timeout-seg" id="timeout-seg">
-          <button class="tseg-btn" data-val="1">1 min</button>
-          <button class="tseg-btn" data-val="10">10 min</button>
-          <button class="tseg-btn" data-val="30">30 min</button>
-          <button class="tseg-btn" data-val="60">1 hr</button>
-          <button class="tseg-btn" data-val="0">Never</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-          <button class="btn btn-primary btn-sm" id="save-timeout-btn">Save</button>
-          <span id="timeout-saved-msg" style="font-size:.74rem;color:#6ee7b7;opacity:0;transition:opacity .3s;"></span>
-        </div>
-      </div>
-
-      <!-- ── Session Info ── -->
-      <div class="home-card glass">
-        <div class="home-card-title">ℹ️ Session</div>
-        <div class="home-info-row"><span class="home-info-label">Signed in as</span><span id="home-gh-user" class="home-info-val">—</span></div>
-        <div class="home-info-row"><span class="home-info-label">Repo</span><span class="home-info-val">deepvoidx/master-resource</span></div>
-        <div class="home-info-row"><span class="home-info-label">Branch</span><span class="home-info-val">main</span></div>
-        <div class="home-info-row"><span class="home-info-label">My IP</span><span id="home-my-ip" class="home-info-val">—</span></div>
-      </div>
-
-      <!-- ── Temporary Password ── -->
-      <div class="home-card glass home-card-full">
-        <div class="home-card-title">🔑 Temporary Password</div>
-        <p class="home-card-desc">Create a short-lived access password. Your GitHub token and temp password both work simultaneously. Stored as a hash only — plaintext is never saved.</p>
-
-        <!-- Active temp info block (shown when temp exists) -->
-        <div id="temp-active-block" style="display:none;margin-bottom:14px;">
-          <div class="temp-info-card">
-            <div class="temp-info-header">
-              <span class="temp-info-label">Temp 1</span>
-              <span id="temp-info-badge" class="session-badge temp">Active</span>
-            </div>
-            <div class="temp-info-row"><span>Created:</span><span id="temp-info-created">—</span></div>
-            <div class="temp-info-row"><span>Expires:</span><span id="temp-info-expiry">—</span></div>
-            <button class="btn btn-danger btn-sm" id="temp-delete-btn" style="margin-top:10px;width:100%;">🗑 Delete Temp Password</button>
-          </div>
-        </div>
-
-        <!-- Create form (hidden when temp is active) -->
-        <div id="temp-create-form">
-          <div class="temp-row">
-            <input type="password" id="temp-pass-input" placeholder="Enter new temporary password" autocomplete="new-password" maxlength="128"/>
-            <select id="temp-expiry-sel">
-              <option value="1">Expires in 1 minute</option>
-              <option value="10">Expires in 10 minutes</option>
-              <option value="30">Expires in 30 minutes</option>
-              <option value="60">Expires in 1 hour</option>
-              <option value="0">Never expires</option>
-              <option value="-1">Until I delete it</option>
-            </select>
-          </div>
-          <div id="temp-pass-err" style="color:#f87171;font-size:.74rem;min-height:14px;margin-top:4px;"></div>
-          <button class="btn btn-primary btn-sm" id="temp-create-btn" style="margin-top:10px;">Create Temp Password</button>
-        </div>
-        <div id="temp-saving-msg" style="font-size:.74rem;color:var(--mute);margin-top:8px;min-height:14px;"></div>
-      </div>
-
+    <div style="padding:48px 24px;text-align:center;">
+      <div style="font-size:2.4rem;margin-bottom:16px;">⚡</div>
+      <h2 style="font-size:1.4rem;font-weight:700;color:#eeeef8;margin:0 0 10px;">Welcome to Master Resource Admin</h2>
+      <p style="font-size:.88rem;color:var(--mute);max-width:420px;margin:0 auto;line-height:1.7;">
+        Use the tabs above to manage tools, review pending submissions, edit categories, and monitor site changes.
+      </p>
     </div>
   </div>
 
@@ -204,22 +144,6 @@
         loading="lazy"
         title="Site Preview"
       ></iframe>
-    </div>
-  </div>
-
-  <!-- ── DEVICES TAB ── -->
-  <div class="tab-content" id="tab-devices">
-    <div class="sec-hdr" style="flex-wrap:wrap;gap:8px;">
-      <h2>Devices</h2>
-      <span class="sec-count" id="devices-active-count">—</span>
-      <button class="btn btn-danger btn-sm ml-auto" id="signout-all-btn">⊗ Sign Out All Devices</button>
-    </div>
-    <p style="font-size:.76rem;color:var(--mute);margin:-4px 0 14px;">Active devices are currently logged in. Inactive entries are past sign-ins. IP address shown where available.</p>
-    <div id="devices-list"><div class="home-empty-msg">Loading…</div></div>
-    <div style="margin-top:20px;">
-      <div class="home-card-title" style="margin-bottom:8px;">🕐 Login History</div>
-      <p style="font-size:.74rem;color:var(--mute);margin:0 0 10px;">All sign-ins across devices. Last 50 kept.</p>
-      <div id="login-history-list"><div class="home-empty-msg">Loading history…</div></div>
     </div>
   </div>
 
