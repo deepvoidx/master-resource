@@ -1458,11 +1458,14 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     window.scrollTo(0, 0);
     // Move liquid glass indicator
     moveLiquidIndicator(btn);
-    // Show FAB only on tools tab
-    var fab = document.getElementById('add-tool-fab');
-    if (fab) fab.classList.toggle('visible', tab === 'tools');
+    // Show FAB only on tools tab; cat FAB on categories tab
+    var fab    = document.getElementById('add-tool-fab');
+    var catFab = document.getElementById('add-cat-fab');
+    if (fab)    fab.classList.toggle('visible', tab === 'tools');
+    if (catFab) catFab.classList.toggle('visible', tab === 'categories');
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
+    if (tab !== 'history') stopDeployPoll();
     if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
       requestAnimationFrame(function(){
@@ -1496,6 +1499,24 @@ requestAnimationFrame(function(){
 
 
 
+
+// ── Devices Tab ───────────────────────────────────────────────
+
+
+
+// Segmented selector click
+document.getElementById('timeout-seg').addEventListener('click', function(e){
+  var btn = e.target.closest('.tseg-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tseg-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+});
+
+// Save auto-logout
+
+// Create temp password
+
+// Delete temp password
 
 // ── FAB: Add Tool floating button ─────────────────────────────
 (function(){
@@ -1602,16 +1623,74 @@ function apiGetCommits() {
   }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
 }
 
+var _deployPollTimer = null;
+
+function stopDeployPoll() {
+  if (_deployPollTimer) { clearInterval(_deployPollTimer); _deployPollTimer = null; }
+}
+
 function apiGetPagesDeployments() {
-  // Fetch the latest GitHub Pages deployments to match against commit SHAs
-  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
-    headers:apiHeaders()
-  }).then(function(r){ return r.ok ? r.json() : null; })
-    .catch(function(){ return null; });
+  // Use the Deployments API with environment=github-pages — this returns objects WITH sha fields.
+  // /pages/deployments has no sha field, so it can never be matched to commits (was the old bug).
+  return fetch(
+    'https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/deployments?environment=github-pages&per_page=10',
+    { headers: apiHeaders() }
+  ).then(function(r){ return r.ok ? r.json() : []; })
+  .then(function(deps){
+    if (!Array.isArray(deps) || !deps.length) return {};
+    // Fetch status of the most recent deployment only (one extra call)
+    return fetch(deps[0].statuses_url, { headers: apiHeaders() })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(statuses){
+        var state = (statuses && statuses[0]) ? statuses[0].state : 'pending';
+        var map = {};
+        deps.forEach(function(dep, i){
+          if (!dep.sha) return;
+          if (i === 0) {
+            map[dep.sha] = state === 'success'     ? 'live'
+                         : state === 'failure' || state === 'error' ? 'failed'
+                         : 'building'; // pending / in_progress / queued
+          } else {
+            map[dep.sha] = 'live'; // older completed deployments were live at some point
+          }
+        });
+        return map;
+      });
+  })
+  .catch(function(){ return {}; });
+}
+
+function updateDeployDots(deployMap, commits, list) {
+  // Update the coloured dot + badge on each commit row in place (no full re-render)
+  var badge = document.getElementById('deploy-status-badge');
+  commits.forEach(function(c, idx){
+    var fullSha = c.sha || '';
+    var depStatus = deployMap[fullSha] || (idx === 0 ? 'building' : 'old');
+    var dot = list.querySelector('[data-sha="'+fullSha+'"] .deploy-dot');
+    if (!dot) return;
+    var dotColor = depStatus === 'live'     ? '#10b981'
+                 : depStatus === 'building' ? '#f59e0b'
+                 : depStatus === 'failed'   ? '#ef4444'
+                 : '#6b7280';
+    var dotTitle = depStatus === 'live'     ? 'Live on GitHub Pages'
+                 : depStatus === 'building' ? 'Deploying…'
+                 : depStatus === 'failed'   ? 'Deploy failed'
+                 : 'Older commit';
+    dot.style.background = dotColor;
+    dot.style.boxShadow  = depStatus === 'live' ? '0 0 6px '+dotColor : '';
+    dot.title = dotTitle;
+    if (idx === 0 && badge) {
+      if (depStatus === 'live')     { badge.textContent='🟢 Live';           badge.className='deploy-badge live';     badge.style.display=''; }
+      else if (depStatus==='building'){ badge.textContent='🟡 Deploying…';   badge.className='deploy-badge building'; badge.style.display=''; }
+      else if (depStatus==='failed'){ badge.textContent='🔴 Deploy Failed';  badge.className='deploy-badge failed';   badge.style.display=''; }
+      else                          { badge.style.display='none'; }
+    }
+  });
 }
 
 function fetchHistory() {
   if (historyLoaded) return;
+  stopDeployPoll();
   var loading = document.getElementById('history-loading');
   var list    = document.getElementById('history-list');
   loading.classList.remove('hidden'); list.classList.add('hidden');
@@ -1623,8 +1702,8 @@ function fetchHistory() {
 
   Promise.all([apiGetCommits(), apiGetPagesDeployments()])
     .then(function(results){
-      var commits     = results[0] || [];
-      var deployments = results[1];
+      var commits    = results[0] || [];
+      var deployMap  = results[1] || {};
       historyLoaded = true;
       loading.classList.add('hidden');
       list.classList.remove('hidden');
@@ -1635,38 +1714,6 @@ function fetchHistory() {
         return;
       }
 
-      // Build a map of commit SHA → deploy status from Pages API
-      // deployments come back newest first; first deployed commit = live
-      var deployMap = {};
-      if (deployments && Array.isArray(deployments)) {
-        deployments.forEach(function(dep, i){
-          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
-          if (!sha) return;
-          var status = dep.status_url || dep.status;
-          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
-          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
-            : succeeded ? 'live'
-            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
-            : 'failed';
-        });
-      }
-
-      // Update the top-bar badge with latest deploy state
-      var badge = document.getElementById('deploy-status-badge');
-      if (badge) {
-        var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
-        var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
-        if (latestStatus === 'live') {
-          badge.textContent = '🟢 Live'; badge.className='deploy-badge live'; badge.style.display='';
-        } else if (latestStatus === 'building') {
-          badge.textContent = '🟡 Deploying'; badge.className='deploy-badge building'; badge.style.display='';
-        } else if (latestStatus === 'failed') {
-          badge.textContent = '🔴 Deploy Failed'; badge.className='deploy-badge failed'; badge.style.display='';
-        } else {
-          badge.style.display='none';
-        }
-      }
-
       commits.forEach(function(c, idx){
         var item = document.createElement('div');
         item.className = 'history-item glass';
@@ -1675,26 +1722,42 @@ function fetchHistory() {
         var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
         var author = c.commit&&c.commit.author ? c.commit.author.name : '';
         var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+        item.setAttribute('data-sha', fullSha);
 
-        // Determine deploy dot for this commit
-        var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
-        var dotColor  = depStatus === 'live' ? '#10b981'
+        var depStatus = deployMap[fullSha] || (idx === 0 ? 'building' : 'old');
+        var dotColor  = depStatus === 'live'     ? '#10b981'
                       : depStatus === 'building' ? '#f59e0b'
-                      : depStatus === 'failed' ? '#ef4444'
+                      : depStatus === 'failed'   ? '#ef4444'
                       : '#6b7280';
-        var dotTitle  = depStatus === 'live' ? 'Live on GitHub Pages'
+        var dotTitle  = depStatus === 'live'     ? 'Live on GitHub Pages'
                       : depStatus === 'building' ? 'Deploying…'
-                      : depStatus === 'failed' ? 'Deploy failed'
-                      : idx === 0 ? 'Pending deploy check'
+                      : depStatus === 'failed'   ? 'Deploy failed'
                       : 'Older commit';
 
         item.innerHTML =
-          '<div class="deploy-dot" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
+          '<div class="deploy-dot" title="'+dotTitle+'" style="background:'+dotColor+';'+(depStatus==='live'?'box-shadow:0 0 6px '+dotColor+';':'')+'"></div>'+
           '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
           '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
           '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
         list.appendChild(item);
       });
+
+      // Update top badge now
+      updateDeployDots(deployMap, commits, list);
+
+      // If most recent commit is still deploying, poll every 8s until it resolves
+      var latestSha = (commits[0] && commits[0].sha) || '';
+      var latestStatus = deployMap[latestSha] || 'building';
+      if (latestStatus === 'building') {
+        _deployPollTimer = setInterval(function(){
+          if (S.activeTab !== 'history') { stopDeployPoll(); return; }
+          apiGetPagesDeployments().then(function(freshMap){
+            updateDeployDots(freshMap, commits, list);
+            var newStatus = freshMap[latestSha] || 'building';
+            if (newStatus !== 'building') stopDeployPoll(); // resolved — stop polling
+          });
+        }, 8000);
+      }
     })
     .catch(function(e){
       loading.classList.add('hidden'); list.classList.remove('hidden');
