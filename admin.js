@@ -1432,7 +1432,17 @@ function deleteCat(idx) {
   );
 }
 
-document.getElementById('add-cat-btn').addEventListener('click', function(){ openCatModal(-1); });
+document.getElementById('add-cat-fab').addEventListener('click', function(){
+  var fab = this;
+  fab.classList.remove('water-pop');
+  void fab.offsetWidth;
+  fab.classList.add('water-pop');
+  fab.addEventListener('animationend', function onEnd(){
+    fab.classList.remove('water-pop');
+    fab.removeEventListener('animationend', onEnd);
+  });
+  openCatModal(-1);
+});
 
 // ═══════════════════════════════════════════════════════
 // TABS
@@ -1448,9 +1458,11 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     window.scrollTo(0, 0);
     // Move liquid glass indicator
     moveLiquidIndicator(btn);
-    // Show FAB only on tools tab
-    var fab = document.getElementById('add-tool-fab');
-    if (fab) fab.classList.toggle('visible', tab === 'tools');
+    // Show FAB only on tools tab; show cat FAB on categories tab
+    var fab    = document.getElementById('add-tool-fab');
+    var catFab = document.getElementById('add-cat-fab');
+    if (fab)    fab.classList.toggle('visible', tab === 'tools');
+    if (catFab) catFab.classList.toggle('visible', tab === 'categories');
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
     if (tab === 'analytics') initAnalyticsTab();
@@ -1490,6 +1502,20 @@ requestAnimationFrame(function(){
 // ── Devices Tab ───────────────────────────────────────────────
 
 
+
+// Segmented selector click
+document.getElementById('timeout-seg').addEventListener('click', function(e){
+  var btn = e.target.closest('.tseg-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tseg-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+});
+
+// Save auto-logout
+
+// Create temp password
+
+// Delete temp password
 
 // ── FAB: Add Tool floating button ─────────────────────────────
 (function(){
@@ -1597,38 +1623,11 @@ function apiGetCommits() {
 }
 
 function apiGetPagesDeployments() {
-  // Use the Deployments API with github-pages environment — this returns objects WITH sha fields.
-  // /pages/deployments has NO sha, so it can't be matched to commits (that was the bug).
-  return fetch(
-    'https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/deployments?environment=github-pages&per_page=10',
-    { headers: apiHeaders() }
-  ).then(function(r){ return r.ok ? r.json() : []; })
-   .then(function(deps){
-     if (!Array.isArray(deps) || !deps.length) return null;
-     // Fetch status of only the most recent deployment (avoid hammering API)
-     return fetch(deps[0].statuses_url, { headers: apiHeaders() })
-       .then(function(r){ return r.ok ? r.json() : []; })
-       .then(function(statuses){
-         var latestState = (statuses && statuses[0]) ? statuses[0].state : 'pending';
-         // Build sha→status map
-         // Most recent deployment gets real status; older ones are assumed live (they deployed successfully at some point)
-         var map = {};
-         deps.forEach(function(dep, i){
-           if (!dep.sha) return;
-           if (i === 0) {
-             map[dep.sha] = latestState === 'success'                       ? 'live'
-                          : (latestState === 'pending' || latestState === 'in_progress') ? 'building'
-                          : (latestState === 'failure' || latestState === 'error')       ? 'failed'
-                          : 'building';
-           } else {
-             map[dep.sha] = 'live'; // older completed deployments
-           }
-         });
-         return map;
-       })
-       .catch(function(){ return null; });
-   })
-   .catch(function(){ return null; });
+  // Fetch the latest GitHub Pages deployments to match against commit SHAs
+  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
+    headers:apiHeaders()
+  }).then(function(r){ return r.ok ? r.json() : null; })
+    .catch(function(){ return null; });
 }
 
 function fetchHistory() {
@@ -1656,9 +1655,21 @@ function fetchHistory() {
         return;
       }
 
-      // deployMap is built inside apiGetPagesDeployments — use it directly
-      var deployMap = (deployments && typeof deployments === 'object' && !Array.isArray(deployments))
-        ? deployments : {};
+      // Build a map of commit SHA → deploy status from Pages API
+      // deployments come back newest first; first deployed commit = live
+      var deployMap = {};
+      if (deployments && Array.isArray(deployments)) {
+        deployments.forEach(function(dep, i){
+          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
+          if (!sha) return;
+          var status = dep.status_url || dep.status;
+          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
+          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
+            : succeeded ? 'live'
+            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
+            : 'failed';
+        });
+      }
 
       // Update the top-bar badge with latest deploy state
       var badge = document.getElementById('deploy-status-badge');
