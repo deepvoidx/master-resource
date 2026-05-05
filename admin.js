@@ -1432,7 +1432,6 @@ function deleteCat(idx) {
   );
 }
 
-// Category FAB — add category (mirrors tools FAB behaviour)
 (function(){
   var catFab = document.getElementById('add-cat-fab');
   if (!catFab) return;
@@ -1464,12 +1463,11 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     moveLiquidIndicator(btn);
     // Show FAB on relevant tab
     var fab    = document.getElementById('add-tool-fab');
-    var catFab = document.getElementById('add-cat-fab');
-    if (fab)    fab.classList.toggle('visible', tab === 'tools');
-    if (catFab) catFab.classList.toggle('visible', tab === 'categories');
+    var catFab2 = document.getElementById('add-cat-fab');
+    if (fab)     fab.classList.toggle('visible', tab === 'tools');
+    if (catFab2) catFab2.classList.toggle('visible', tab === 'categories');
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
-    if (tab !== 'history') { if(typeof stopDeployPoll==='function') stopDeployPoll(); }
     if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
       requestAnimationFrame(function(){
