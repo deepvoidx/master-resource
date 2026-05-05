@@ -661,6 +661,13 @@ input[type=checkbox],input[type=radio]{
 #add-cat-fab.water-pop{animation:water-blob .55s cubic-bezier(.36,.07,.19,.97) both;}
 #add-cat-fab.visible{display:flex;}
 
+/* ── Deploy dot in history list ── */
+.deploy-dot{
+  width:9px;height:9px;border-radius:50%;
+  flex-shrink:0;margin-top:6px;
+  transition:background .4s,box-shadow .4s;
+}
+
 /* ── Tabs-bar gap fix ───────────────────── */
 .tab-content{padding-top:14px;}
 @media(max-width:600px){
