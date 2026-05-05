@@ -1458,11 +1458,9 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     window.scrollTo(0, 0);
     // Move liquid glass indicator
     moveLiquidIndicator(btn);
-    // Show FAB only on tools tab; show cat FAB on categories tab
-    var fab    = document.getElementById('add-tool-fab');
-    var catFab = document.getElementById('add-cat-fab');
-    if (fab)    fab.classList.toggle('visible', tab === 'tools');
-    if (catFab) catFab.classList.toggle('visible', tab === 'categories');
+    // Show FAB only on tools tab
+    var fab = document.getElementById('add-tool-fab');
+    if (fab) fab.classList.toggle('visible', tab === 'tools');
     if (tab === 'stats') renderStats();
     if (tab === 'history') fetchHistory();
     if (tab === 'analytics') initAnalyticsTab();
@@ -1498,24 +1496,6 @@ requestAnimationFrame(function(){
 
 
 
-
-// ── Devices Tab ───────────────────────────────────────────────
-
-
-
-// Segmented selector click
-document.getElementById('timeout-seg').addEventListener('click', function(e){
-  var btn = e.target.closest('.tseg-btn');
-  if (!btn) return;
-  document.querySelectorAll('.tseg-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-});
-
-// Save auto-logout
-
-// Create temp password
-
-// Delete temp password
 
 // ── FAB: Add Tool floating button ─────────────────────────────
 (function(){
