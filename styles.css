@@ -165,16 +165,16 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 .fb:hover{border-color:rgba(255,255,255,0.18);color:#d8d8f0;background:rgba(255,255,255,0.06);}
 .fb:active{transform:scale(0.97) translateZ(0);}
 .fb.active{
-  background:rgba(255,255,255,0.1);
-  border-color:rgba(255,255,255,0.22);color:#f0eeff;font-weight:600;
+  background:rgba(255,255,255,0.13);
+  border-color:rgba(255,255,255,0.40);color:#f5f2ff;font-weight:600;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    inset 0 -1px 0 rgba(0,0,0,0.12),
-    0 4px 20px rgba(108,99,255,0.18),
-    0 1px 6px rgba(0,0,0,0.25);
-  backdrop-filter:blur(20px) saturate(220%);
-  -webkit-backdrop-filter:blur(20px) saturate(220%);
-  text-shadow:0 0 10px rgba(220,215,255,0.3);
+    inset 0 1.5px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.18),
+    0 6px 28px rgba(108,99,255,0.30),
+    0 2px 8px rgba(0,0,0,0.30);
+  backdrop-filter:blur(28px) saturate(280%);
+  -webkit-backdrop-filter:blur(28px) saturate(280%);
+  text-shadow:0 0 14px rgba(230,225,255,0.65),0 0 4px rgba(200,195,255,0.4);
 }
 
 /* ── ctrl-meta ── */
@@ -361,20 +361,34 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 #topbtn.vis{opacity:1;}
 #topbtn:hover{transform:translateY(-2px) translateZ(0);}
 
-/* ── Submit (+) floating button ── */
+/* ── Submit (+) floating button — matches admin FAB style ── */
 #submit-btn{
   position:fixed;bottom:clamp(60px,8vw,82px);right:clamp(14px,2vw,28px);z-index:90;
-  width:clamp(40px,4vw,52px);height:clamp(40px,4vw,52px);border-radius:50%;
-  background:rgba(70,62,180,0.55);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(108,99,255,0.54);color:#d0ccff;
-  cursor:pointer;font-size:clamp(20px,2vw,26px);line-height:1;
+  width:clamp(48px,4vw,56px);height:clamp(48px,4vw,56px);border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(24px) saturate(220%);
+  -webkit-backdrop-filter:blur(24px) saturate(220%);
+  border:1.5px solid rgba(255,255,255,0.32);
+  color:#ffffff;
+  cursor:pointer;font-size:clamp(22px,2vw,28px);line-height:1;
   display:flex;align-items:center;justify-content:center;
-  transition:transform .22s var(--ease),background .15s,box-shadow .15s;
-  box-shadow:0 4px 18px rgba(108,99,255,0.22),inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow:
+    0 4px 24px rgba(255,255,255,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    inset 0 -1px 0 rgba(0,0,0,0.20);
+  transition:background .2s,box-shadow .2s,border-color .2s,transform .18s;
+  -webkit-tap-highlight-color:transparent;
   -webkit-transform:translateZ(0);transform:translateZ(0);
+  text-shadow:0 0 8px rgba(255,255,255,0.55);
 }
-#submit-btn:hover{background:rgba(90,80,210,0.65);transform:translateY(-2px) translateZ(0);}
+#submit-btn:hover{
+  background:rgba(255,255,255,0.18);
+  border-color:rgba(255,255,255,0.48);
+  box-shadow:
+    0 6px 32px rgba(255,255,255,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.30);
+  transform:translateY(-2px) translateZ(0);
+}
 
 /* ── Modal overlay — backdrop-filter OK (covers full screen, 1 layer) ── */
 .modal-overlay{
