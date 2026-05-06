@@ -2056,7 +2056,7 @@
         "ai-assistants",
         "dev"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "claude-mem",
@@ -2071,7 +2071,7 @@
         "memory",
         "claude"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "MemPalace",
@@ -2090,7 +2090,7 @@
         "dev",
         "research"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Meta AI",
@@ -2107,7 +2107,7 @@
         "ai-assistants",
         "image-gen"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Ollama",
@@ -2127,7 +2127,7 @@
         "dev",
         "security"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "iLovePDF — PDF to Word",
@@ -2139,7 +2139,7 @@
         "utilities",
         "pdf"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "iLovePDF — Word to PDF",
@@ -2151,7 +2151,7 @@
         "utilities",
         "pdf"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "ImageCompressor.com",
@@ -2168,7 +2168,7 @@
         "design",
         "utilities"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Squoosh",
@@ -2188,7 +2188,7 @@
         "dev",
         "utilities"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "ImageResizer — Compressor",
@@ -2200,7 +2200,7 @@
         "utilities",
         "images"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Compress-or-Die",
@@ -2217,7 +2217,7 @@
         "design",
         "utilities"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "TinyFish",
@@ -2230,7 +2230,7 @@
         "automation",
         "agents"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "GoatCounter",
@@ -2249,7 +2249,7 @@
         "dev",
         "security"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Awesome NotebookLM Prompts",
@@ -2267,7 +2267,7 @@
         "writing",
         "research"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Google Colab",
@@ -2287,7 +2287,7 @@
         "research",
         "study"
       ],
-      "newUntil": "2026-06-05T07:11:45.192Z"
+      "newUntil": "2026-05-13T07:12:44.648Z"
     },
     {
       "name": "Google AI Studio",
