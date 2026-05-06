@@ -366,6 +366,9 @@ function updateBulkBar() {
   document.getElementById('bulk-count').textContent = n + ' selected';
   var allCb = document.getElementById('bulk-all');
   if (allCb) { allCb.checked = n > 0 && n === totalCbs; allCb.indeterminate = n > 0 && n < totalCbs; }
+  // Show / hide bulk action bar
+  var bar = document.getElementById('bulk-bar');
+  if (bar) bar.classList.toggle('show', n > 0);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1704,39 +1707,33 @@ function fetchHistory() {
         return;
       }
 
-      // Build a map of commit SHA → deploy status from /pages/builds
-      // builds[0] = most recent build; status: "built" | "building" | "errored" | "queued"
-      var deployMap = {};
-      if (deployments && Array.isArray(deployments)) {
-        deployments.forEach(function(build, i){
-          // /pages/builds: build.commit.sha is the commit that triggered this build
-          var sha = build.commit && build.commit.sha ? build.commit.sha : null;
-          if (!sha) return;
-          var status = build.status; // "built", "building", "queued", "errored"
-          var mapped = status === 'built' ? 'live'
-                     : (status === 'building' || status === 'queued') ? 'building'
-                     : status === 'errored' ? 'failed'
-                     : 'old';
-          deployMap[sha.slice(0,40)] = mapped;
-        });
-      }
+      // ── Deploy status via latest build only (no SHA matching) ────────────────
+      // Root cause of old bug: /pages/builds returns build.commit as a plain SHA
+      // STRING (not an object), so build.commit.sha was always undefined → deployMap
+      // always empty. Additionally, pages builds are triggered by ANY push to main,
+      // while our commit list is filtered to path=tools.json — SHAs almost never match.
+      // Fix: use the latest build status directly for the badge, and compare
+      // commit timestamps vs. build timestamp for per-row dots (always reliable).
+      var latestBuild = (deployments && Array.isArray(deployments) && deployments.length)
+        ? deployments[0] : null;
+      var latestBuildStatus = latestBuild ? latestBuild.status : null;
+      var latestBuildTime   = latestBuild
+        ? (latestBuild.updated_at || latestBuild.created_at || null) : null;
 
       // Update the top-bar badge with latest deploy state
       var badge = document.getElementById('deploy-status-badge');
       if (badge) {
-        var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
-        var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
-        if (latestStatus === 'live') {
+        if (latestBuildStatus === 'built') {
           badge.innerHTML = '<span class="badge-dot" style="background:#10b981;box-shadow:0 0 5px #10b981;"></span> Live';
-          badge.className='deploy-badge live'; badge.style.display='inline-flex';
-        } else if (latestStatus === 'building') {
+          badge.className = 'deploy-badge live'; badge.style.display = 'inline-flex';
+        } else if (latestBuildStatus === 'building' || latestBuildStatus === 'queued') {
           badge.innerHTML = '<span class="badge-dot deploy-dot-pulse" style="background:#f59e0b;"></span> Deploying…';
-          badge.className='deploy-badge building'; badge.style.display='inline-flex';
-        } else if (latestStatus === 'failed') {
+          badge.className = 'deploy-badge building'; badge.style.display = 'inline-flex';
+        } else if (latestBuildStatus === 'errored') {
           badge.innerHTML = '<span class="badge-dot" style="background:#ef4444;"></span> Deploy Failed';
-          badge.className='deploy-badge failed'; badge.style.display='inline-flex';
+          badge.className = 'deploy-badge failed'; badge.style.display = 'inline-flex';
         } else {
-          badge.style.display='none';
+          badge.style.display = 'none';
         }
       }
 
@@ -1760,7 +1757,25 @@ function fetchHistory() {
         } catch(e){}
 
         // Determine deploy dot for this commit
-        var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
+        // Time-based deploy status: compare commit timestamp to latest build timestamp
+        var commitDate = null;
+        try { commitDate = c.commit && c.commit.author ? new Date(c.commit.author.date) : null; } catch(e){}
+        var buildDate  = latestBuildTime ? new Date(latestBuildTime) : null;
+
+        var depStatus;
+        if (latestBuildStatus === 'built' && buildDate && commitDate) {
+          // If commit was made at or before the build finished → it's live
+          depStatus = commitDate <= buildDate ? 'live' : 'old';
+        } else if ((latestBuildStatus === 'building' || latestBuildStatus === 'queued') && idx === 0) {
+          depStatus = 'building';
+        } else if (latestBuildStatus === 'errored' && idx === 0) {
+          depStatus = 'failed';
+        } else if (latestBuildStatus === 'built') {
+          // Build exists but no time data — assume most-recent commit is live
+          depStatus = idx === 0 ? 'live' : 'old';
+        } else {
+          depStatus = 'old';
+        }
         var dotColor  = depStatus === 'live'     ? '#10b981'
                       : depStatus === 'building' ? '#f59e0b'
                       : depStatus === 'failed'   ? '#ef4444'
