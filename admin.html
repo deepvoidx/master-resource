@@ -121,11 +121,6 @@
       <div class="spinner"></div><span style="color:var(--mute);">Loading categories…</span>
     </div>
     <div id="cats-list" class="hidden"></div>
-    <button id="add-cat-fab" title="Add Category" aria-label="Add Category">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="22" height="22">
-        <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
-      </svg>
-    </button>
   </div>
 
   <!-- ── SITE PREVIEW TAB ── -->
@@ -205,6 +200,12 @@
       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
   </button>
+  <!-- ── Floating Add Category button (must be outside .tab-content to keep position:fixed) ── -->
+  <button id="add-cat-fab" title="Add Category" aria-label="Add Category">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="22" height="22">
+      <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+    </svg>
+  </button>
 </div>
 
 <!-- ── bulk add modal ── -->
@@ -250,7 +251,7 @@
       <div>
         <label>New Tag</label>
         <div class="new-tag-row">
-          <label class="cat-check" id="tm-new-lbl" style="flex-shrink:0;" onclick="(function(lbl){var cb=lbl.querySelector('input');setTimeout(function(){lbl.classList.toggle('checked',cb.checked);},0);})(this)">
+          <label class="cat-check" id="tm-new-lbl" style="flex-shrink:0;">
             <input type="checkbox" id="tm-new-check"/> Mark as New
           </label>
           <select id="tm-new-expires">
