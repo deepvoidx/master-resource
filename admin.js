@@ -144,6 +144,8 @@ function apiPut(path, content, sha, message) {
     method:'PUT', headers:apiHeaders(), body:JSON.stringify(body)
   }).then(function(r){
     if (!r.ok) return r.text().then(function(t){ throw new Error(r.status+': '+t); });
+    // Any write to GitHub means a new commit → history is stale
+    historyLoaded = false;
     return r.json();
   });
 }
@@ -680,6 +682,16 @@ function renderTools(q) {
         '<div style="grid-column:1/-1"><label>Description</label><input class="ie-desc" type="text" value="'+esc(tool.description||'')+'" maxlength="200"/></div>' +
         '<div style="grid-column:1/-1"><label>Tags</label><input class="ie-tags" type="text" value="'+esc((tool.tags||[]).join(', '))+'"/></div>' +
         '<div style="grid-column:1/-1"><label>Categories</label><div class="pend-cats ie-cats">'+catOpts+'</div></div>' +
+        '<div style="grid-column:1/-1"><label>New Tag</label>' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;">' +
+            '<label class="cat-check ie-new-lbl'+(tool.newUntil && new Date(tool.newUntil) > new Date() ? ' checked' : '')+'">' +
+              '<input type="checkbox" class="ie-new-check"'+(tool.newUntil && new Date(tool.newUntil) > new Date() ? ' checked' : '')+'/> Mark as New' +
+            '</label>' +
+            '<select class="ie-new-expires" style="font-size:.74rem;padding:3px 6px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--g-bdr);color:var(--txt);">' +
+              '<option value="7">1 week</option><option value="14">2 weeks</option><option value="30" selected>1 month</option><option value="90">3 months</option><option value="99999">Never</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="ie-err" style="color:#f87171;font-size:.76rem;min-height:14px;margin-bottom:6px;"></div>' +
       '<div class="ie-actions"><button class="btn btn-ghost btn-sm ie-cancel">Cancel</button><button class="btn btn-primary btn-sm ie-save">Save</button></div>';
@@ -719,7 +731,14 @@ function renderTools(q) {
       var tags=tv.split(',').map(function(t){return t.trim().replace(/^#/,'').toLowerCase().slice(0,30);}).filter(Boolean).slice(0,15);
       var updated={name:nv,description:dv,url:ur.url,category:cats[0],tags:tags};
       if(cats.length>1) updated.categories=cats;
-      if(S.toolsData.tools[idx]&&S.toolsData.tools[idx].newUntil) updated.newUntil=S.toolsData.tools[idx].newUntil;
+      // Handle new-tag toggle in inline edit
+      var ieNewChk = inlineEdit.querySelector('.ie-new-check');
+      var ieNewExp = inlineEdit.querySelector('.ie-new-expires');
+      if(ieNewChk && ieNewChk.checked && ieNewExp){
+        var ieDays = parseInt(ieNewExp.value,10)||30;
+        updated.newUntil = ieDays>=99999 ? '9999-12-31T23:59:59.000Z' : new Date(Date.now()+ieDays*86400000).toISOString();
+      }
+      // If checkbox unchecked, newUntil is intentionally omitted (removes tag)
       ee.textContent='';
       var original=JSON.parse(JSON.stringify(S.toolsData.tools[idx]));
       S.toolsData.tools[idx]=updated;
@@ -885,6 +904,21 @@ function tmAddRow() {
 document.getElementById('tm-cancel').addEventListener('click', closeToolModal);
 document.getElementById('tm-close-x').addEventListener('click', closeToolModal);
 document.getElementById('tool-modal').addEventListener('click', function(e){ if(e.target===this) closeToolModal(); });
+
+// Fix: tm-new-lbl needs the same e.preventDefault() pattern as every other cat-check label.
+// Without it, clicking the label fires the handler AND bubbles from the checkbox,
+// double-toggling the checked state and preventing tag removal.
+(function(){
+  var lbl = document.getElementById('tm-new-lbl');
+  if (!lbl) return;
+  lbl.addEventListener('click', function(e){
+    if (e.target.tagName === 'INPUT') { lbl.classList.toggle('checked', e.target.checked); return; }
+    e.preventDefault();
+    var cb = lbl.querySelector('input');
+    cb.checked = !cb.checked;
+    lbl.classList.toggle('checked', cb.checked);
+  });
+})();
 
 document.getElementById('tm-save').addEventListener('click', function(){
   var errEl = document.getElementById('tm-err');
@@ -1486,9 +1520,36 @@ function moveLiquidIndicator(activeBtn) {
   if (!ind || !bar || !activeBtn) return;
   var barRect = bar.getBoundingClientRect();
   var btnRect = activeBtn.getBoundingClientRect();
-  var left = btnRect.left - barRect.left + bar.scrollLeft;
-  ind.style.left = left + 'px';
-  ind.style.width = btnRect.width + 'px';
+  var newLeft  = btnRect.left - barRect.left + bar.scrollLeft;
+  var newWidth = btnRect.width;
+
+  // Read current rendered position (parseFloat handles 'px' suffix)
+  var curLeft  = parseFloat(ind.style.left)  || newLeft;
+  var curWidth = parseFloat(ind.style.width) || newWidth;
+
+  // Phase 1: instantly stretch the pill to span from its current left edge
+  // to the far edge of the target button (liquid glass "pull" effect)
+  var isRight   = newLeft > curLeft;
+  var stretchL  = isRight ? curLeft           : newLeft;
+  var stretchW  = isRight
+    ? (newLeft + newWidth) - curLeft          // extend right
+    : (curLeft + curWidth) - newLeft;         // extend left
+
+  ind.style.transition = 'none';
+  ind.style.left  = stretchL + 'px';
+  ind.style.width = stretchW + 'px';
+
+  // Phase 2: spring-contract to final position
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      // Left snaps fast; width contracts with a springy overshoot
+      ind.style.transition =
+        'left 0.26s cubic-bezier(0.25, 1.0, 0.5, 1), ' +
+        'width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      ind.style.left  = newLeft  + 'px';
+      ind.style.width = newWidth + 'px';
+    });
+  });
 }
 // Set initial position after DOM ready
 requestAnimationFrame(function(){
@@ -1571,8 +1632,16 @@ function loadAnalyticsFrame(url) {
   var wrap     = document.getElementById('analytics-frame-wrap');
   var setup    = document.getElementById('analytics-setup');
   if (!frame || !url) return;
-  // Clean URL
+  // Sanitize: only allow https:// goatcounter.com URLs (no XSS via localStorage)
   url = url.trim().replace(/\/+$/, '');
+  try {
+    var parsed = new URL(/^https?:\/\//i.test(url) ? url : 'https://' + url);
+    if (parsed.protocol !== 'https:') throw new Error('https only');
+    url = parsed.href;
+  } catch(e) {
+    toast('Invalid analytics URL — must be https://', '⚠️');
+    return;
+  }
   frame.src = url;
   wrap.classList.remove('hidden');
   setup.style.display = 'none';
@@ -1602,8 +1671,9 @@ function apiGetCommits() {
 }
 
 function apiGetPagesDeployments() {
-  // Fetch the latest GitHub Pages deployments to match against commit SHAs
-  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/deployments?per_page=10',{
+  // /pages/builds is the stable GitHub Pages API — returns status:"built"|"building"|"errored"
+  // and commit.sha for reliable SHA matching against commit history
+  return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/pages/builds?per_page=10',{
     headers:apiHeaders()
   }).then(function(r){ return r.ok ? r.json() : null; })
     .catch(function(){ return null; });
@@ -1634,19 +1704,20 @@ function fetchHistory() {
         return;
       }
 
-      // Build a map of commit SHA → deploy status from Pages API
-      // deployments come back newest first; first deployed commit = live
+      // Build a map of commit SHA → deploy status from /pages/builds
+      // builds[0] = most recent build; status: "built" | "building" | "errored" | "queued"
       var deployMap = {};
       if (deployments && Array.isArray(deployments)) {
-        deployments.forEach(function(dep, i){
-          var sha = dep.oid || (dep.deployment && dep.deployment.sha);
+        deployments.forEach(function(build, i){
+          // /pages/builds: build.commit.sha is the commit that triggered this build
+          var sha = build.commit && build.commit.sha ? build.commit.sha : null;
           if (!sha) return;
-          var status = dep.status_url || dep.status;
-          var succeeded = (dep.conclusion === 'success' || dep.status === 'success' || status === 'built');
-          deployMap[sha.slice(0,40)] = i === 0 && succeeded ? 'live'
-            : succeeded ? 'live'
-            : (dep.status === 'in_progress' || dep.conclusion === null) ? 'building'
-            : 'failed';
+          var status = build.status; // "built", "building", "queued", "errored"
+          var mapped = status === 'built' ? 'live'
+                     : (status === 'building' || status === 'queued') ? 'building'
+                     : status === 'errored' ? 'failed'
+                     : 'old';
+          deployMap[sha.slice(0,40)] = mapped;
         });
       }
 
@@ -1688,10 +1759,10 @@ function fetchHistory() {
                       : 'Older commit';
 
         item.innerHTML =
-          '<div class="deploy-dot" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
+          '<div class="deploy-dot'+(depStatus==='building'?' deploy-dot-pulse':'')+'" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
           '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
           '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
-          '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+'</div></div>';
+          '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+(depStatus==='building'?'&nbsp;·&nbsp;<span style="color:#f59e0b;font-size:.7rem;">⏳ Deploying…</span>':depStatus==='live'?'&nbsp;·&nbsp;<span style="color:#10b981;font-size:.7rem;">✓ Live</span>':depStatus==='failed'?'&nbsp;·&nbsp;<span style="color:#ef4444;font-size:.7rem;">✗ Failed</span>':'')+'</div></div>';
         list.appendChild(item);
       });
     })
