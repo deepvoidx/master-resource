@@ -2305,7 +2305,7 @@
         "ai-assistants",
         "dev"
       ],
-      "newUntil": "2026-05-05T11:36:09.817Z"
+      "newUntil": "2026-05-13T07:11:12.283Z"
     },
     {
       "name": "Google Earth Engine",
@@ -2324,7 +2324,7 @@
         "dev",
         "research"
       ],
-      "newUntil": "2026-05-05T11:36:03.197Z"
+      "newUntil": "2026-05-13T07:11:06.497Z"
     },
     {
       "name": "Google Labs",
@@ -2341,7 +2341,8 @@
       "categories": [
         "ai-directories",
         "fun"
-      ]
+      ],
+      "newUntil": "2026-05-13T07:10:59.897Z"
     }
   ]
 }
