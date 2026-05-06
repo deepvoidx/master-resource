@@ -678,6 +678,17 @@ input[type=checkbox],input[type=radio]{
 .deploy-badge.live    { background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.4); color:#6ee7b7; }
 .deploy-badge.building{ background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.4); color:#fcd34d; }
 .deploy-badge.failed  { background:rgba(225,29,72,.10);  border-color:rgba(225,29,72,.4);  color:#fca5a5; }
+/* dot inside badge */
+.badge-dot {
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block;
+}
+/* ── inline deploy label inside history meta row ── */
+.history-deploy-label {
+  font-size:.68rem;font-weight:600;padding:1px 6px;border-radius:4px;border:1px solid;
+}
+.history-deploy-label.live    { color:#6ee7b7; background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.35); }
+.history-deploy-label.building{ color:#fcd34d; background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.35); }
+.history-deploy-label.failed  { color:#fca5a5; background:rgba(225,29,72,.10);  border-color:rgba(225,29,72,.35); }
 
 /* ── Tabs-bar gap fix ───────────────────── */
 .tab-content{padding-top:14px;}
