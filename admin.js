@@ -1727,11 +1727,14 @@ function fetchHistory() {
         var firstSha = (commits[0] && commits[0].sha) ? commits[0].sha : '';
         var latestStatus = deployMap[firstSha] || (deployments === null ? null : 'old');
         if (latestStatus === 'live') {
-          badge.textContent = '🟢 Live'; badge.className='deploy-badge live'; badge.style.display='';
+          badge.innerHTML = '<span class="badge-dot" style="background:#10b981;box-shadow:0 0 5px #10b981;"></span> Live';
+          badge.className='deploy-badge live'; badge.style.display='inline-flex';
         } else if (latestStatus === 'building') {
-          badge.textContent = '🟡 Deploying'; badge.className='deploy-badge building'; badge.style.display='';
+          badge.innerHTML = '<span class="badge-dot deploy-dot-pulse" style="background:#f59e0b;"></span> Deploying…';
+          badge.className='deploy-badge building'; badge.style.display='inline-flex';
         } else if (latestStatus === 'failed') {
-          badge.textContent = '🔴 Deploy Failed'; badge.className='deploy-badge failed'; badge.style.display='';
+          badge.innerHTML = '<span class="badge-dot" style="background:#ef4444;"></span> Deploy Failed';
+          badge.className='deploy-badge failed'; badge.style.display='inline-flex';
         } else {
           badge.style.display='none';
         }
@@ -1744,25 +1747,51 @@ function fetchHistory() {
         var fullSha= c.sha||'';
         var msg    = c.commit&&c.commit.message ? c.commit.message.split('\n')[0] : '';
         var author = c.commit&&c.commit.author ? c.commit.author.name : '';
-        var date   = ''; try{ date=new Date(c.commit.author.date).toLocaleString(); }catch(e){}
+        // DD/MM/YY HH:MM format
+        var date = '';
+        try {
+          var d = new Date(c.commit.author.date);
+          var dd  = String(d.getDate()).padStart(2,'0');
+          var mm  = String(d.getMonth()+1).padStart(2,'0');
+          var yy  = String(d.getFullYear()).slice(2);
+          var hh  = String(d.getHours()).padStart(2,'0');
+          var min = String(d.getMinutes()).padStart(2,'0');
+          date = dd+'/'+mm+'/'+yy+' '+hh+':'+min;
+        } catch(e){}
 
         // Determine deploy dot for this commit
         var depStatus = deployMap[fullSha] || (idx === 0 ? 'pending' : 'old');
-        var dotColor  = depStatus === 'live' ? '#10b981'
+        var dotColor  = depStatus === 'live'     ? '#10b981'
                       : depStatus === 'building' ? '#f59e0b'
-                      : depStatus === 'failed' ? '#ef4444'
+                      : depStatus === 'failed'   ? '#ef4444'
                       : '#6b7280';
-        var dotTitle  = depStatus === 'live' ? 'Live on GitHub Pages'
+        var dotTitle  = depStatus === 'live'     ? 'Live on GitHub Pages'
                       : depStatus === 'building' ? 'Deploying…'
-                      : depStatus === 'failed' ? 'Deploy failed'
+                      : depStatus === 'failed'   ? 'Deploy failed'
                       : idx === 0 ? 'Pending deploy check'
                       : 'Older commit';
 
+        // Build deploy label as DOM so HTML is not escaped
+        var deployLabel = '';
+        if (depStatus === 'building') {
+          deployLabel = '<span class="history-deploy-label building">⏳ Deploying…</span>';
+        } else if (depStatus === 'live') {
+          deployLabel = '<span class="history-deploy-label live">✓ Live</span>';
+        } else if (depStatus === 'failed') {
+          deployLabel = '<span class="history-deploy-label failed">✗ Failed</span>';
+        }
+
         item.innerHTML =
-          '<div class="deploy-dot'+(depStatus==='building'?' deploy-dot-pulse':'')+'" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 5px '+dotColor+';':'')+'"></div>'+
+          '<div class="deploy-dot'+(depStatus==='building'?' deploy-dot-pulse':'')+'" title="'+dotTitle+'" style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0;margin-top:6px;'+(depStatus==='live'?'box-shadow:0 0 6px '+dotColor+';':'')+'"></div>'+
           '<a href="'+safeHref(c.html_url||'#')+'" target="_blank" rel="noopener noreferrer" class="history-sha">'+esc(sha)+'</a>'+
-          '<div style="flex:1;"><div class="history-msg">'+esc(msg)+'</div>'+
-          '<div class="history-meta"><span class="history-author">'+esc(author)+'</span>&nbsp;·&nbsp;'+esc(date)+(depStatus==='building'?'&nbsp;·&nbsp;<span style="color:#f59e0b;font-size:.7rem;">⏳ Deploying…</span>':depStatus==='live'?'&nbsp;·&nbsp;<span style="color:#10b981;font-size:.7rem;">✓ Live</span>':depStatus==='failed'?'&nbsp;·&nbsp;<span style="color:#ef4444;font-size:.7rem;">✗ Failed</span>':'')+'</div></div>';
+          '<div style="flex:1;min-width:0;">'+
+            '<div class="history-msg">'+esc(msg)+'</div>'+
+            '<div class="history-meta">'+
+              '<span class="history-author">'+esc(author)+'</span>'+
+              '&nbsp;·&nbsp;'+esc(date)+
+              (deployLabel ? '&nbsp;·&nbsp;'+deployLabel : '')+
+            '</div>'+
+          '</div>';
         list.appendChild(item);
       });
     })
