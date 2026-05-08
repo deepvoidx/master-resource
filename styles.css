@@ -165,16 +165,14 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 .fb:hover{border-color:rgba(255,255,255,0.18);color:#d8d8f0;background:rgba(255,255,255,0.06);}
 .fb:active{transform:scale(0.97) translateZ(0);}
 .fb.active{
-  background:rgba(255,255,255,0.13);
-  border-color:rgba(255,255,255,0.40);color:#f5f2ff;font-weight:600;
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.35),
-    inset 0 -1px 0 rgba(0,0,0,0.18),
-    0 6px 28px rgba(108,99,255,0.30),
-    0 2px 8px rgba(0,0,0,0.30);
-  backdrop-filter:blur(28px) saturate(280%);
-  -webkit-backdrop-filter:blur(28px) saturate(280%);
-  text-shadow:0 0 14px rgba(230,225,255,0.65),0 0 4px rgba(200,195,255,0.4);
+  background:rgba(108,99,255,0.22);
+  border-color:rgba(108,99,255,0.70);
+  color:#f0eeff;
+  font-weight:600;
+  /* No backdrop-filter — iOS compositor creates a separate blur layer
+     behind the button border, which reads as two stacked boxes */
+  box-shadow:0 0 0 1px rgba(108,99,255,0.22),0 4px 18px rgba(108,99,255,0.20);
+  /* No text-shadow — glow at high opacity hurts readability on mobile */
 }
 
 /* ── ctrl-meta ── */
@@ -207,11 +205,11 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 }
 .tag-pill:hover{border-color:rgba(255,255,255,0.18);color:#d8d8f0;}
 .tag-pill.active{
-  background:rgba(255,255,255,0.1);
-  border-color:rgba(255,255,255,0.22);color:#f0eeff;font-weight:600;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),0 4px 14px rgba(108,99,255,0.15);
-  backdrop-filter:blur(20px) saturate(220%);
-  -webkit-backdrop-filter:blur(20px) saturate(220%);
+  background:rgba(108,99,255,0.20);
+  border-color:rgba(108,99,255,0.58);
+  color:#ede9ff;
+  font-weight:600;
+  box-shadow:0 0 0 1px rgba(108,99,255,0.18),0 3px 12px rgba(108,99,255,0.15);
 }
 
 /* ── Sort row ── */
@@ -403,6 +401,7 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
 
 .modal-box{
   width:min(420px,100%);
+  position:relative;
   background:rgba(12,12,20,0.97);
   border:1px solid rgba(255,255,255,0.10);border-radius:20px;padding:28px;
   box-shadow:0 24px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.065);
@@ -410,6 +409,23 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
   transition:transform .25s var(--ease);
 }
 .modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+
+/* ── Modal close (×) button ── */
+.modal-close{
+  position:absolute;top:12px;right:12px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.10);
+  color:var(--mute);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;line-height:1;
+  transition:background .15s,color .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  flex-shrink:0;
+}
+.modal-close:hover{background:rgba(255,255,255,0.11);color:var(--txt);border-color:rgba(255,255,255,0.22);}
+.modal-close:active{transform:scale(0.93);}
 .modal-title{font-family:'Syne','Trebuchet MS',system-ui,sans-serif;font-size:var(--t-md);font-weight:700;color:#eaeaf4;margin-bottom:6px;}
 .modal-sub{font-size:var(--t-xs);color:var(--mute);margin-bottom:20px;line-height:1.55;}
 .modal-field{margin-bottom:14px;}
