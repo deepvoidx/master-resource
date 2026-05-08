@@ -2355,7 +2355,8 @@
         "image",
         "creative",
         "free"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Sansad TV",
@@ -2370,7 +2371,8 @@
       "categories": [
         "india",
         "public-knowledge"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Bolt.new",
@@ -2385,7 +2387,8 @@
       "categories": [
         "dev",
         "website-builders"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "VibeVoice",
@@ -2402,7 +2405,8 @@
       "categories": [
         "audio",
         "dev"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "VibeVoice (GitHub)",
@@ -2419,7 +2423,8 @@
       "categories": [
         "dev",
         "audio"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "OpenClaw AI",
@@ -2434,7 +2439,8 @@
       "categories": [
         "legal-ai",
         "professional"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "NVIDIA NemoClaw",
@@ -2449,7 +2455,8 @@
       "categories": [
         "legal-ai",
         "professional"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Paperclip",
@@ -2459,7 +2466,8 @@
       "tags": [
         "utilities",
         "free"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "OpenFang",
@@ -2476,7 +2484,8 @@
       "categories": [
         "dev",
         "security"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Google Sites",
@@ -2487,7 +2496,8 @@
         "website",
         "free",
         "no-code"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Netlify",
@@ -2502,7 +2512,8 @@
       "categories": [
         "dev",
         "website-builders"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "OpenAI Privacy Filter",
@@ -2519,7 +2530,8 @@
       "categories": [
         "security",
         "dev"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "GodPrompter",
@@ -2530,7 +2542,8 @@
         "ai",
         "prompts",
         "free"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Career Ops",
@@ -2542,7 +2555,8 @@
         "ai",
         "free",
         "opensource"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "JobSync",
@@ -2554,7 +2568,8 @@
         "jobs",
         "free",
         "opensource"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "National Digital Library of India",
@@ -2572,7 +2587,8 @@
         "india",
         "study",
         "research"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Drafted AI",
@@ -2587,7 +2603,8 @@
       "categories": [
         "career-&-jobs",
         "professional"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "ChatGPT Codex",
@@ -2602,7 +2619,8 @@
       "categories": [
         "dev",
         "ai-agents"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Cloudflare",
@@ -2618,7 +2636,8 @@
       "categories": [
         "dev",
         "security"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Google Pomelli",
@@ -2634,7 +2653,8 @@
       "categories": [
         "design",
         "ai-assistants"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Manus",
@@ -2649,7 +2669,8 @@
       "categories": [
         "ai-agents",
         "ai-assistants"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "NCS Beta Cloud",
@@ -2665,7 +2686,8 @@
       "categories": [
         "india",
         "career-&-jobs"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Skill India Digital",
@@ -2681,7 +2703,8 @@
       "categories": [
         "india",
         "study"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "There's An AI For That",
@@ -2692,7 +2715,8 @@
         "ai",
         "directory",
         "free"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Handshake",
@@ -2703,7 +2727,8 @@
         "career",
         "jobs",
         "students"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Data Annotation Tech",
@@ -2717,7 +2742,8 @@
       ],
       "categories": [
         "career-&-jobs"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Alignerr",
@@ -2731,7 +2757,8 @@
       ],
       "categories": [
         "career-&-jobs"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "Git Reverse",
@@ -2742,7 +2769,8 @@
         "dev",
         "git",
         "free"
-      ]
+      ],
+      "newUntil": "2026-05-22T11:09:22.194Z"
     }
   ]
 }
