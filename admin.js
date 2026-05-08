@@ -77,6 +77,7 @@ function logout() {
   S.bulkSelected.clear();
   sessionStorage.removeItem('a_tok');
   sessionStorage.removeItem('a_usr');
+  stopDeployPolling();
 
 
   historyLoaded = false;
@@ -366,7 +367,7 @@ function updateBulkBar() {
   document.getElementById('bulk-count').textContent = n + ' selected';
   var allCb = document.getElementById('bulk-all');
   if (allCb) { allCb.checked = n > 0 && n === totalCbs; allCb.indeterminate = n > 0 && n < totalCbs; }
-  // Show / hide bulk action bar
+  // Show / hide bulk action bar based on selection count
   var bar = document.getElementById('bulk-bar');
   if (bar) bar.classList.toggle('show', n > 0);
 }
@@ -1496,6 +1497,8 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.getElementById('tab-'+tab).classList.add('active');
     S.activeTab = tab;
     window.scrollTo(0, 0);
+    // Stop deploy polling whenever we leave the History tab
+    if (tab !== 'history') stopDeployPolling();
     // Move liquid glass indicator
     moveLiquidIndicator(btn);
     // Show FAB on relevant tab
@@ -1504,7 +1507,11 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     if (fab)     fab.classList.toggle('visible', tab === 'tools');
     if (catFab2) catFab2.classList.toggle('visible', tab === 'categories');
     if (tab === 'stats') renderStats();
-    if (tab === 'history') fetchHistory();
+    if (tab === 'history') {
+      // Always fetch fresh — deploy status changes over time
+      historyLoaded = false;
+      fetchHistory();
+    }
     if (tab === 'analytics') initAnalyticsTab();
     if (tab === 'preview') {
       requestAnimationFrame(function(){
@@ -1665,7 +1672,22 @@ document.getElementById('analytics-url').addEventListener('keydown', function(e)
 // ═══════════════════════════════════════════════════════
 // ── HISTORY TAB ──
 // ═══════════════════════════════════════════════════════
-var historyLoaded = false;
+var historyLoaded    = false;
+var deployPollTimer  = null;        // auto-refresh timer while a deploy is in progress
+var DEPLOY_POLL_MS   = 18000;       // poll every 18 s while building; stops once settled
+
+function startDeployPolling() {
+  if (deployPollTimer) return;      // already running
+  deployPollTimer = setInterval(function() {
+    if (S.activeTab !== 'history') { stopDeployPolling(); return; }
+    historyLoaded = false;
+    fetchHistory();
+  }, DEPLOY_POLL_MS);
+}
+
+function stopDeployPolling() {
+  if (deployPollTimer) { clearInterval(deployPollTimer); deployPollTimer = null; }
+}
 
 function apiGetCommits() {
   return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/commits?path=tools.json&per_page=15',{
@@ -1707,20 +1729,18 @@ function fetchHistory() {
         return;
       }
 
-      // ── Deploy status via latest build only (no SHA matching) ────────────────
-      // Root cause of old bug: /pages/builds returns build.commit as a plain SHA
-      // STRING (not an object), so build.commit.sha was always undefined → deployMap
-      // always empty. Additionally, pages builds are triggered by ANY push to main,
-      // while our commit list is filtered to path=tools.json — SHAs almost never match.
-      // Fix: use the latest build status directly for the badge, and compare
-      // commit timestamps vs. build timestamp for per-row dots (always reliable).
-      var latestBuild = (deployments && Array.isArray(deployments) && deployments.length)
-        ? deployments[0] : null;
+      // ── Deploy status: use latest build directly (no SHA matching) ──────────
+      // /pages/builds returns build.commit as a plain SHA string, not an object,
+      // so build.commit.sha was always undefined. Also, pages builds fire on ANY
+      // push to main, not just tools.json — SHAs almost never matched anyway.
+      // Fix: read latestBuild status directly for the badge; compare timestamps
+      // for per-commit dots (100 % reliable regardless of which file triggered it).
+      var latestBuild       = (deployments && Array.isArray(deployments) && deployments.length) ? deployments[0] : null;
       var latestBuildStatus = latestBuild ? latestBuild.status : null;
-      var latestBuildTime   = latestBuild
-        ? (latestBuild.updated_at || latestBuild.created_at || null) : null;
+      // updated_at = when the build finished; created_at = when it started
+      var latestBuildTime   = latestBuild ? (latestBuild.updated_at || latestBuild.created_at || null) : null;
 
-      // Update the top-bar badge with latest deploy state
+      // ── Top-bar badge ──────────────────────────────────────────────────────
       var badge = document.getElementById('deploy-status-badge');
       if (badge) {
         if (latestBuildStatus === 'built') {
@@ -1735,6 +1755,13 @@ function fetchHistory() {
         } else {
           badge.style.display = 'none';
         }
+      }
+
+      // ── Auto-poll while a build is in progress, stop once settled ──────────
+      if (latestBuildStatus === 'building' || latestBuildStatus === 'queued') {
+        startDeployPolling();
+      } else {
+        stopDeployPolling();
       }
 
       commits.forEach(function(c, idx){
@@ -1756,42 +1783,43 @@ function fetchHistory() {
           date = dd+'/'+mm+'/'+yy+' '+hh+':'+min;
         } catch(e){}
 
-        // Determine deploy dot for this commit
-        // Time-based deploy status: compare commit timestamp to latest build timestamp
+        // ── Per-commit deploy dot: time-based comparison ─────────────────────
+        // Compare when the commit was authored vs when the latest Pages build finished.
         var commitDate = null;
         try { commitDate = c.commit && c.commit.author ? new Date(c.commit.author.date) : null; } catch(e){}
         var buildDate  = latestBuildTime ? new Date(latestBuildTime) : null;
 
         var depStatus;
         if (latestBuildStatus === 'built' && buildDate && commitDate) {
-          // If commit was made at or before the build finished → it's live
+          // Commits authored at or before the finished build → deployed
           depStatus = commitDate <= buildDate ? 'live' : 'old';
         } else if ((latestBuildStatus === 'building' || latestBuildStatus === 'queued') && idx === 0) {
           depStatus = 'building';
         } else if (latestBuildStatus === 'errored' && idx === 0) {
           depStatus = 'failed';
         } else if (latestBuildStatus === 'built') {
-          // Build exists but no time data — assume most-recent commit is live
+          // Build exists but no timestamp available — assume most recent is live
           depStatus = idx === 0 ? 'live' : 'old';
         } else {
           depStatus = 'old';
         }
+
         var dotColor  = depStatus === 'live'     ? '#10b981'
                       : depStatus === 'building' ? '#f59e0b'
                       : depStatus === 'failed'   ? '#ef4444'
                       : '#6b7280';
-        var dotTitle  = depStatus === 'live'     ? 'Live on GitHub Pages'
+        var dotTitle  = depStatus === 'live'     ? 'Deployed to GitHub Pages'
                       : depStatus === 'building' ? 'Deploying…'
                       : depStatus === 'failed'   ? 'Deploy failed'
-                      : idx === 0 ? 'Pending deploy check'
+                      : idx === 0 ? 'Awaiting deploy'
                       : 'Older commit';
 
-        // Build deploy label as DOM so HTML is not escaped
+        // Build deploy label — "Deployed" on commit rows, "Live" only on the header badge
         var deployLabel = '';
         if (depStatus === 'building') {
           deployLabel = '<span class="history-deploy-label building">⏳ Deploying…</span>';
         } else if (depStatus === 'live') {
-          deployLabel = '<span class="history-deploy-label live">✓ Live</span>';
+          deployLabel = '<span class="history-deploy-label live">✓ Deployed</span>';
         } else if (depStatus === 'failed') {
           deployLabel = '<span class="history-deploy-label failed">✗ Failed</span>';
         }
