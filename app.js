@@ -302,6 +302,7 @@
     overlay.setAttribute('aria-label', 'Suggest a tool');
     overlay.innerHTML =
       '<div class="modal-box" id="submit-modal">' +
+        '<button class="modal-close" id="s-close" aria-label="Close">\u00d7</button>' +
         '<div class="modal-title">Suggest a Tool</div>' +
         '<div class="modal-sub">Seen something useful? Share it — the developer will review it before adding.</div>' +
         '<div id="submit-form">' +
@@ -332,6 +333,7 @@
       if (e.target === overlay) closeSubmitModal();
     });
     document.getElementById('s-cancel').addEventListener('click', closeSubmitModal);
+    document.getElementById('s-close').addEventListener('click', closeSubmitModal);
     document.getElementById('s-submit').addEventListener('click', handleSubmit);
     overlay.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeSubmitModal();
