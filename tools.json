@@ -2073,8 +2073,7 @@
       "categories": [
         "ai-assistants",
         "dev"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "claude-mem",
@@ -2088,8 +2087,7 @@
         "opensource",
         "memory",
         "claude"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "MemPalace",
@@ -2107,8 +2105,7 @@
       "categories": [
         "dev",
         "research"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Meta AI",
@@ -2124,8 +2121,7 @@
       "categories": [
         "ai-assistants",
         "image-gen"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Ollama",
@@ -2144,8 +2140,7 @@
       "categories": [
         "dev",
         "security"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "iLovePDF — PDF to Word",
@@ -2156,8 +2151,7 @@
         "free",
         "utilities",
         "pdf"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "iLovePDF — Word to PDF",
@@ -2168,8 +2162,7 @@
         "free",
         "utilities",
         "pdf"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "ImageCompressor.com",
@@ -2185,8 +2178,7 @@
       "categories": [
         "design",
         "utilities"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Squoosh",
@@ -2205,8 +2197,7 @@
         "design",
         "dev",
         "utilities"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "ImageResizer — Compressor",
@@ -2217,8 +2208,7 @@
         "free",
         "utilities",
         "images"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Compress-or-Die",
@@ -2234,8 +2224,7 @@
       "categories": [
         "design",
         "utilities"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "TinyFish",
@@ -2247,8 +2236,7 @@
         "dev",
         "automation",
         "agents"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "GoatCounter",
@@ -2266,8 +2254,7 @@
       "categories": [
         "dev",
         "security"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Awesome NotebookLM Prompts",
@@ -2284,8 +2271,7 @@
       "categories": [
         "writing",
         "research"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Google Colab",
@@ -2304,8 +2290,7 @@
         "dev",
         "research",
         "study"
-      ],
-      "newUntil": "2026-05-13T07:12:44.648Z"
+      ]
     },
     {
       "name": "Google AI Studio",
@@ -2323,8 +2308,7 @@
       "categories": [
         "ai-assistants",
         "dev"
-      ],
-      "newUntil": "2026-05-13T07:11:12.283Z"
+      ]
     },
     {
       "name": "Google Earth Engine",
@@ -2342,8 +2326,7 @@
       "categories": [
         "dev",
         "research"
-      ],
-      "newUntil": "2026-05-13T07:11:06.497Z"
+      ]
     },
     {
       "name": "Google Labs",
