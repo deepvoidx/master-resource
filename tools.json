@@ -130,36 +130,50 @@
       "id": "prompt",
       "label": "Prompt Engineering",
       "short": "Prompt Engineering",
-      "icon": "📦",
+      "icon": "💡",
       "color": "#e21296"
     },
     {
       "id": "website-builders",
       "label": "Website Builders & Hosting",
       "short": "Website Builders",
-      "icon": "📦",
+      "icon": "🌐",
       "color": "#d8db14"
     },
     {
       "id": "career-&-jobs",
       "label": "Career & Jobs",
       "short": "Career & Jobs",
-      "icon": "💼",
+      "icon": "🎯",
       "color": "#14d011"
     },
     {
       "id": "ai-agents",
       "label": "AI Agents & Automation",
       "short": "AI Agents",
-      "icon": "📦",
+      "icon": "⚙️",
       "color": "#551029"
     },
     {
       "id": "public-knowledge",
       "label": "News & Public Knowledge",
       "short": "Public Knowledge",
-      "icon": "📦",
+      "icon": "📰",
       "color": "#0674db"
+    },
+    {
+      "id": "legal-ai",
+      "label": "Legal & Law AI",
+      "short": "Legal AI",
+      "icon": "⚖️",
+      "color": "#7f5af0"
+    },
+    {
+      "id": "india",
+      "label": "India Resources",
+      "short": "India",
+      "icon": "🇮🇳",
+      "color": "#ff9933"
     }
   ],
   "tools": [
@@ -230,6 +244,10 @@
         "chatbot",
         "india",
         "free"
+      ],
+      "categories": [
+        "ai-assistants",
+        "india"
       ]
     },
     {
@@ -2344,6 +2362,405 @@
         "fun"
       ],
       "newUntil": "2026-05-15T09:31:47.782Z"
+    },
+    {
+      "name": "Qwen Image Layered",
+      "description": "Qwen's layered image generation playground on HuggingFace — create and edit images with independently controllable layers for precise AI image composition",
+      "url": "https://huggingface.co/spaces/Qwen/Qwen-Image-Layered",
+      "category": "image-gen",
+      "tags": [
+        "ai",
+        "image",
+        "creative",
+        "free"
+      ]
+    },
+    {
+      "name": "Sansad TV",
+      "description": "India's official parliamentary TV channel — live Parliament sessions, Lok Sabha & Rajya Sabha debates, committees, and public affairs programming",
+      "url": "https://sansadtv.nic.in/",
+      "category": "india",
+      "tags": [
+        "india",
+        "news",
+        "free"
+      ],
+      "categories": [
+        "india",
+        "public-knowledge"
+      ]
+    },
+    {
+      "name": "Bolt.new",
+      "description": "AI-powered full-stack web app builder by StackBlitz — describe your app, get working code with live preview, and deploy instantly inside the browser",
+      "url": "https://bolt.new/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "no-code"
+      ],
+      "categories": [
+        "dev",
+        "website-builders"
+      ]
+    },
+    {
+      "name": "VibeVoice",
+      "description": "Microsoft's open-source 1.5B parameter text-to-speech model — expressive, emotion-aware voice synthesis with style and tone control via HuggingFace",
+      "url": "https://huggingface.co/microsoft/VibeVoice-1.5B",
+      "category": "audio",
+      "tags": [
+        "ai",
+        "audio",
+        "tts",
+        "free",
+        "opensource"
+      ],
+      "categories": [
+        "audio",
+        "dev"
+      ]
+    },
+    {
+      "name": "VibeVoice (GitHub)",
+      "description": "Source code and integration docs for Microsoft's VibeVoice expressive TTS model — embed high-quality controllable voice synthesis into your own apps",
+      "url": "https://github.com/microsoft/VibeVoice",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "audio",
+        "dev",
+        "free",
+        "opensource"
+      ],
+      "categories": [
+        "dev",
+        "audio"
+      ]
+    },
+    {
+      "name": "OpenClaw AI",
+      "description": "AI-powered legal research and contract analysis platform — search case law, review documents, spot risky clauses, and automate legal workflows",
+      "url": "https://openclaw.ai/",
+      "category": "legal-ai",
+      "tags": [
+        "ai",
+        "legal",
+        "professional"
+      ],
+      "categories": [
+        "legal-ai",
+        "professional"
+      ]
+    },
+    {
+      "name": "NVIDIA NemoClaw",
+      "description": "NVIDIA's enterprise legal AI platform — specialised LLMs for contract analysis, compliance automation, and legal document processing at scale",
+      "url": "https://www.nvidia.com/en-us/ai/nemoclaw/",
+      "category": "legal-ai",
+      "tags": [
+        "ai",
+        "legal",
+        "professional"
+      ],
+      "categories": [
+        "legal-ai",
+        "professional"
+      ]
+    },
+    {
+      "name": "Paperclip",
+      "description": "Minimal peer-to-peer file sharing tool — send files directly between browsers with no upload size limits and no account required",
+      "url": "https://paperclip.ing/",
+      "category": "utilities",
+      "tags": [
+        "utilities",
+        "free"
+      ]
+    },
+    {
+      "name": "OpenFang",
+      "description": "Open-source alternative firmware for Xiaofang and compatible smart cameras — gives developers and security researchers full local control over IoT devices",
+      "url": "https://www.openfang.sh/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "security",
+        "opensource",
+        "iot",
+        "free"
+      ],
+      "categories": [
+        "dev",
+        "security"
+      ]
+    },
+    {
+      "name": "Google Sites",
+      "description": "Free no-code website builder by Google — create professional multi-page sites with drag-and-drop editor, fully integrated with Google Workspace",
+      "url": "https://sites.google.com",
+      "category": "website-builders",
+      "tags": [
+        "website",
+        "free",
+        "no-code"
+      ]
+    },
+    {
+      "name": "Netlify",
+      "description": "Frontend cloud platform for deploying static sites and web apps — git-push deployment, global CDN, serverless functions, forms, and edge network built in",
+      "url": "https://www.netlify.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "hosting",
+        "free"
+      ],
+      "categories": [
+        "dev",
+        "website-builders"
+      ]
+    },
+    {
+      "name": "OpenAI Privacy Filter",
+      "description": "Open-source PII detection and redaction tool by OpenAI — scan and clean datasets of personal information before using in AI training pipelines",
+      "url": "https://github.com/openai/privacy-filter",
+      "category": "security",
+      "tags": [
+        "security",
+        "privacy",
+        "ai",
+        "free",
+        "opensource"
+      ],
+      "categories": [
+        "security",
+        "dev"
+      ]
+    },
+    {
+      "name": "GodPrompter",
+      "description": "AI prompt engineering platform — generate, test, and refine high-quality prompts for ChatGPT, Claude, Gemini and other LLMs across various use cases",
+      "url": "https://godprompter.com/",
+      "category": "prompt",
+      "tags": [
+        "ai",
+        "prompts",
+        "free"
+      ]
+    },
+    {
+      "name": "Career Ops",
+      "description": "Open-source AI-powered career toolkit — automates resume tailoring, job tracking, and cover letter generation for faster and smarter job applications",
+      "url": "https://github.com/santifer/career-ops",
+      "category": "career-&-jobs",
+      "tags": [
+        "career",
+        "ai",
+        "free",
+        "opensource"
+      ]
+    },
+    {
+      "name": "JobSync",
+      "description": "Open-source job application manager — sync and track your applications across multiple job boards from a single organised dashboard",
+      "url": "https://github.com/Gsync/jobsync",
+      "category": "career-&-jobs",
+      "tags": [
+        "career",
+        "jobs",
+        "free",
+        "opensource"
+      ]
+    },
+    {
+      "name": "National Digital Library of India",
+      "description": "India's largest free digital learning repository — 90M+ academic resources including books, papers, theses, and journals from thousands of institutions",
+      "url": "https://www.ndl.gov.in/",
+      "category": "india",
+      "tags": [
+        "india",
+        "study",
+        "books",
+        "research",
+        "free"
+      ],
+      "categories": [
+        "india",
+        "study",
+        "research"
+      ]
+    },
+    {
+      "name": "Drafted AI",
+      "description": "AI-powered hiring and recruiting platform — automates candidate sourcing, screening, and outreach to help teams hire faster with less manual effort",
+      "url": "https://www.drafted.ai/",
+      "category": "career-&-jobs",
+      "tags": [
+        "ai",
+        "career",
+        "hiring"
+      ],
+      "categories": [
+        "career-&-jobs",
+        "professional"
+      ]
+    },
+    {
+      "name": "ChatGPT Codex",
+      "description": "OpenAI's cloud-based AI coding agent — runs autonomously in a sandboxed environment to write, test, debug, and execute multi-file code tasks",
+      "url": "https://chatgpt.com/codex/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "code"
+      ],
+      "categories": [
+        "dev",
+        "ai-agents"
+      ]
+    },
+    {
+      "name": "Cloudflare",
+      "description": "Global cloud platform — CDN, DDoS protection, DNS, Zero Trust security, serverless Workers, R2 storage, and developer infrastructure with a generous free tier",
+      "url": "https://www.cloudflare.com/en-in/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "security",
+        "hosting",
+        "free"
+      ],
+      "categories": [
+        "dev",
+        "security"
+      ]
+    },
+    {
+      "name": "Google Pomelli",
+      "description": "Google Labs' experimental AI interior design assistant — describe a room or space and get AI-generated visual style concepts and decor suggestions",
+      "url": "https://labs.google.com/pomelli/",
+      "category": "design",
+      "tags": [
+        "ai",
+        "design",
+        "creative",
+        "free"
+      ],
+      "categories": [
+        "design",
+        "ai-assistants"
+      ]
+    },
+    {
+      "name": "Manus",
+      "description": "General-purpose autonomous AI agent — executes complex multi-step tasks including research, coding, data analysis, and web browsing with minimal human input",
+      "url": "https://manus.im/",
+      "category": "ai-agents",
+      "tags": [
+        "ai",
+        "agents",
+        "automation"
+      ],
+      "categories": [
+        "ai-agents",
+        "ai-assistants"
+      ]
+    },
+    {
+      "name": "NCS Beta Cloud",
+      "description": "India's National Career Service cloud portal — connects job seekers, employers, training partners, and career advisors under a single government platform",
+      "url": "https://betacloud.ncs.gov.in/",
+      "category": "india",
+      "tags": [
+        "india",
+        "career",
+        "jobs",
+        "free"
+      ],
+      "categories": [
+        "india",
+        "career-&-jobs"
+      ]
+    },
+    {
+      "name": "Skill India Digital",
+      "description": "India's official digital skills hub — free government-backed short courses, industry certifications, and job placement programmes across hundreds of sectors",
+      "url": "https://www.skillindiadigital.gov.in/home",
+      "category": "india",
+      "tags": [
+        "india",
+        "study",
+        "courses",
+        "free"
+      ],
+      "categories": [
+        "india",
+        "study"
+      ]
+    },
+    {
+      "name": "There's An AI For That",
+      "description": "The largest AI tools database — 10,000+ tools across 2,000+ tasks, updated daily to surface the best new AI releases by use case",
+      "url": "https://theresanaiforthat.com/",
+      "category": "ai-directories",
+      "tags": [
+        "ai",
+        "directory",
+        "free"
+      ]
+    },
+    {
+      "name": "Handshake",
+      "description": "Student and early-career job marketplace — connect with 1,400+ top employers for internships, entry-level roles, and on-campus recruiting events",
+      "url": "https://joinhandshake.com/",
+      "category": "career-&-jobs",
+      "tags": [
+        "career",
+        "jobs",
+        "students"
+      ]
+    },
+    {
+      "name": "Data Annotation Tech",
+      "description": "Freelance AI data annotation platform — earn money by labeling datasets, writing and rating prompts, and providing expert human feedback to train AI models",
+      "url": "https://dataannotation.tech/",
+      "category": "career-&-jobs",
+      "tags": [
+        "career",
+        "ai",
+        "freelance"
+      ],
+      "categories": [
+        "career-&-jobs"
+      ]
+    },
+    {
+      "name": "Alignerr",
+      "description": "Freelance AI model training and evaluation jobs — review AI responses, write expert prompts, and provide domain-specific feedback to improve AI systems",
+      "url": "https://www.alignerr.com/jobs",
+      "category": "career-&-jobs",
+      "tags": [
+        "career",
+        "ai",
+        "freelance"
+      ],
+      "categories": [
+        "career-&-jobs"
+      ]
+    },
+    {
+      "name": "Git Reverse",
+      "description": "Reverse-engineer and explore Git commit history visually — trace changes, recover deleted code, undo commits, and understand project evolution over time",
+      "url": "https://www.gitreverse.com/",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "git",
+        "free"
+      ]
     }
   ]
 }
