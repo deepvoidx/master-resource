@@ -447,7 +447,7 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none;}
     0 0 0 3px rgba(255,255,255,0.07);
 }
 .modal-close:active{transform:scale(0.90);}
-.modal-title{font-family:'Syne','Trebuchet MS',system-ui,sans-serif;font-size:var(--t-md);font-weight:700;color:#eaeaf4;margin-bottom:6px;}
+.modal-title{font-family:'Syne','Trebuchet MS',system-ui,sans-serif;font-size:var(--t-md);font-weight:700;color:#eaeaf4;margin-bottom:6px;padding-right:42px;}
 .modal-sub{font-size:var(--t-xs);color:var(--mute);margin-bottom:20px;line-height:1.55;}
 .modal-field{margin-bottom:14px;}
 .modal-label{display:block;font-size:var(--t-xs);color:#8080a2;margin-bottom:5px;letter-spacing:.3px;}

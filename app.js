@@ -337,7 +337,9 @@
     document.getElementById('s-submit').addEventListener('click', handleSubmit);
     overlay.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeSubmitModal();
-      if (e.key === 'Enter' && e.target.closest('.modal-box')) handleSubmit();
+      // Guard: skip when focus is already on a button (submit/cancel/close) — they
+      // fire their own click handler, calling handleSubmit twice causes double-submit
+      if (e.key === 'Enter' && e.target.closest('.modal-box') && e.target.tagName !== 'BUTTON') handleSubmit();
     });
   }
 
@@ -364,6 +366,10 @@
     var overlay = document.getElementById('submit-overlay');
     if (overlay) overlay.classList.remove('open');
     document.body.style.overflow = '';
+    // Restore focus to the FAB — without this keyboard/screen-reader users
+    // are left with no active focus point after the modal closes
+    var fab = document.getElementById('submit-btn');
+    if (fab) setTimeout(function () { fab.focus(); }, 50);
   }
 
   function clearModalErrors() {
@@ -719,5 +725,10 @@
   window.addEventListener('scroll', function () {
     document.getElementById('topbtn').classList[window.scrollY > 300 ? 'add' : 'remove']('vis');
   }, { passive: true });
+
+  // Click handler lives here — inline onclick removed from index.html
+  document.getElementById('topbtn').addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
 })();

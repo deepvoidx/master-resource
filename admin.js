@@ -854,6 +854,7 @@ function closeToolModal(){
 }
 
 var tmRowCount = 0;
+var bmRowCount = 0; // fix: was an implicit global (missing var declaration)
 function tmAddRow() {
   tmRowCount++;
   var rowEl = document.createElement('div');
@@ -1968,8 +1969,7 @@ document.getElementById('refresh-btn').addEventListener('click', function(){
   var btn = document.getElementById('refresh-btn');
   btn.disabled=true; btn.textContent='↻ Loading…';
   historyLoaded=false;
-  // Pass true = skip own-session-validity check so refresh never triggers a logout
-  loadData(true).then(function(){
+  loadData().then(function(){
     if (S.activeTab==='stats') renderStats();
     if (S.activeTab==='history') { historyLoaded=false; fetchHistory(); }
     toast('Data refreshed', '✅');
