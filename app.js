@@ -513,6 +513,10 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
+      // Don't intercept Enter on buttons or links — they handle it natively.
+      // Without this guard, pressing Enter on the Share button inside a card
+      // would simultaneously trigger the share action AND open the card URL.
+      if (e.target.closest('button') || e.target.closest('a')) return;
       var card = e.target.closest('.card[data-url]');
       if (card) window.open(card.getAttribute('data-url'), '_blank', 'noopener,noreferrer');
     }
@@ -520,7 +524,12 @@
     if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
       e.preventDefault(); document.getElementById('srch').focus();
     }
-    if (e.key === 'Escape') document.activeElement.blur();
+    if (e.key === 'Escape') {
+      // Close any open modal first (handles case where focus drifted outside the modal)
+      var openOverlay = document.querySelector('.modal-overlay.open');
+      if (openOverlay) { closeSubmitModal(); return; }
+      document.activeElement.blur();
+    }
   });
 
   // ── Count ────────────────────────────────────────────────────
