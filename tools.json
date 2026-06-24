@@ -162,13 +162,6 @@
       "color": "#0674db"
     },
     {
-      "id": "legal-ai",
-      "label": "Legal & Law AI",
-      "short": "Legal AI",
-      "icon": "⚖️",
-      "color": "#7f5af0"
-    },
-    {
       "id": "india",
       "label": "India Resources",
       "short": "India",
@@ -190,7 +183,7 @@
     },
     {
       "name": "ChatGPT Pro (Unofficial)",
-      "description": "Unofficial mirror site for ChatGPT Pro access",
+      "description": "SECURITY WARNING: Unverified third-party Chinese mirror site claiming to offer ChatGPT Pro access — not affiliated with OpenAI. Flagged by multiple security vendors (34/100 trust score). Do not enter credentials or personal data.",
       "url": "https://chatgptplus.cn/",
       "category": "ai-assistants",
       "tags": [
@@ -210,8 +203,7 @@
       ],
       "categories": [
         "ai-assistants",
-        "research",
-        "ai-directories"
+        "research"
       ]
     },
     {
@@ -252,7 +244,7 @@
     },
     {
       "name": "Character AI",
-      "description": "Chat with custom AI characters and personas",
+      "description": "Chat, roleplay, and build custom AI characters and personas — immersive creative storytelling and interactive fiction platform",
       "url": "https://character.ai/",
       "category": "ai-assistants",
       "tags": [
@@ -262,7 +254,7 @@
       ],
       "categories": [
         "ai-assistants",
-        "video-gen"
+        "social"
       ]
     },
     {
@@ -316,17 +308,17 @@
     },
     {
       "name": "SEO Studio",
-      "description": "AI-powered SEO tools collection",
+      "description": "Suite of AI-powered SEO tools — keyword research, meta-tag generators, SERP analysis, and on-page optimisation utilities for marketers and content creators",
       "url": "https://seostudio.tools/",
-      "category": "ai-directories",
+      "category": "content",
       "tags": [
         "ai",
         "directory",
         "content"
       ],
       "categories": [
-        "ai-directories",
-        "content"
+        "content",
+        "utilities"
       ]
     },
     {
@@ -346,13 +338,17 @@
     },
     {
       "name": "Open Directory",
-      "description": "Search open directories on the web",
+      "description": "Browser-based tool to search publicly accessible open directory indexes on the web using custom search operators — no AI, pure utility",
       "url": "https://ewasion.github.io/opendirectory-finder/",
-      "category": "ai-directories",
+      "category": "utilities",
       "tags": [
         "ai",
         "directory",
         "free"
+      ],
+      "categories": [
+        "utilities",
+        "research"
       ]
     },
     {
@@ -658,6 +654,10 @@
         "free",
         "audio",
         "creative"
+      ],
+      "categories": [
+        "audio",
+        "content"
       ]
     },
     {
@@ -749,9 +749,9 @@
     },
     {
       "name": "Mixkit",
-      "description": "Free video clips, music and motion templates",
+      "description": "Free stock video footage, music, sound effects, and motion graphic templates for video creators and content producers",
       "url": "https://www.mixkit.co/",
-      "category": "design",
+      "category": "content",
       "tags": [
         "free",
         "creative",
@@ -759,8 +759,8 @@
         "video"
       ],
       "categories": [
-        "design",
         "content",
+        "design",
         "audio"
       ]
     },
@@ -900,9 +900,9 @@
     },
     {
       "name": "Mapify",
-      "description": "Summarise content into visual mind maps",
+      "description": "AI-powered mind-mapping tool — paste text, URLs, or PDFs and get an auto-generated visual knowledge map for research, study, and presentations",
       "url": "https://mapify.so/",
-      "category": "writing",
+      "category": "research",
       "tags": [
         "ai",
         "writing",
@@ -910,9 +910,9 @@
         "free"
       ],
       "categories": [
-        "writing",
         "research",
-        "study"
+        "study",
+        "writing"
       ]
     },
     {
@@ -1014,17 +1014,17 @@
     },
     {
       "name": "Scribbr Plagiarism",
-      "description": "Plagiarism checker for academic work",
+      "description": "Plagiarism checker for academic writing — scans documents against billions of web pages and academic sources to detect copied or unoriginal content",
       "url": "https://app.scribbr.com/plagiarism-checker",
-      "category": "study",
+      "category": "ai-detection",
       "tags": [
         "study",
         "plagiarism",
         "academic"
       ],
       "categories": [
-        "study",
-        "ai-detection"
+        "ai-detection",
+        "study"
       ]
     },
     {
@@ -1192,6 +1192,10 @@
         "social",
         "ai",
         "free"
+      ],
+      "categories": [
+        "content",
+        "social"
       ]
     },
     {
@@ -1204,13 +1208,17 @@
         "social",
         "ai",
         "free"
+      ],
+      "categories": [
+        "content",
+        "social"
       ]
     },
     {
       "name": "Solidpoint",
-      "description": "YouTube video summarizer paste URL get summary",
+      "description": "AI-powered YouTube video summariser — paste a video URL to get a structured summary, key takeaways, and chapter breakdown without watching the full video",
       "url": "https://solidpoint.ai/",
-      "category": "writing",
+      "category": "research",
       "tags": [
         "ai",
         "writing",
@@ -1218,13 +1226,13 @@
         "free"
       ],
       "categories": [
-        "writing",
-        "research"
+        "research",
+        "study"
       ]
     },
     {
       "name": "PlayPhrase",
-      "description": "A smart movie and TV search tool that helps you find scenes by searching spoken dialogue and phrases.",
+      "description": "Search movies and TV shows by spoken dialogue — find the exact scene where a phrase is said, with instant video clip playback",
       "url": "https://www.playphrase.me/",
       "category": "content",
       "tags": [
@@ -1235,14 +1243,15 @@
       ],
       "categories": [
         "content",
+        "streaming",
         "fun"
       ]
     },
     {
       "name": "EyeCannndy",
-      "description": "Curated cinematic movie stills for inspiration",
+      "description": "Curated archive of cinematic movie stills and colour palettes — visual inspiration for filmmakers, directors of photography, and designers",
       "url": "https://eyecannndy.com",
-      "category": "content",
+      "category": "design",
       "tags": [
         "content",
         "creative",
@@ -1250,15 +1259,15 @@
         "design"
       ],
       "categories": [
-        "content",
-        "design"
+        "design",
+        "streaming"
       ]
     },
     {
       "name": "Film-Grab",
-      "description": "High-quality movie screenshot archive",
+      "description": "High-quality movie screenshot archive organised by film — reference for cinematography, colour grading, and visual storytelling",
       "url": "https://film-grab.com",
-      "category": "content",
+      "category": "design",
       "tags": [
         "content",
         "movies",
@@ -1266,8 +1275,8 @@
         "free"
       ],
       "categories": [
-        "content",
-        "design"
+        "design",
+        "streaming"
       ]
     },
     {
@@ -1407,9 +1416,9 @@
     },
     {
       "name": "Darebee",
-      "description": "Free science-based workout programs and fitness resources",
+      "description": "Free science-based fitness programmes, illustrated workout plans, challenges, and nutrition guides — thousands of exercises requiring no gym equipment",
       "url": "https://darebee.com/",
-      "category": "fun",
+      "category": "study",
       "tags": [
         "fun",
         "free",
@@ -1417,8 +1426,8 @@
         "exercise"
       ],
       "categories": [
-        "fun",
-        "study"
+        "study",
+        "fun"
       ]
     },
     {
@@ -1548,20 +1557,24 @@
     },
     {
       "name": "InstaUsername",
-      "description": "Check Instagram username availability",
+      "description": "Check whether an Instagram username is available before creating or claiming it",
       "url": "https://instausername.com/availability",
-      "category": "security",
+      "category": "utilities",
       "tags": [
         "security",
         "social",
         "free"
+      ],
+      "categories": [
+        "utilities",
+        "social"
       ]
     },
     {
       "name": "Sejda PDF Editor",
-      "description": "Free online PDF editor annotate fill sign",
+      "description": "Free online PDF editor — annotate, fill forms, sign, compress, merge and split PDF files right in the browser, no software install needed",
       "url": "https://www.sejda.com/pdf-editor",
-      "category": "professional",
+      "category": "utilities",
       "tags": [
         "professional",
         "pdf",
@@ -1569,8 +1582,8 @@
         "design"
       ],
       "categories": [
-        "professional",
-        "utilities"
+        "utilities",
+        "professional"
       ]
     },
     {
@@ -1641,16 +1654,16 @@
     },
     {
       "name": "Lenso AI",
-      "description": "AI-powered reverse image search engine",
+      "description": "AI-powered reverse image search engine — upload or paste a photo to find matching images, identify sources, detect face appearances, and track image usage across the web",
       "url": "https://lenso.ai/en",
-      "category": "image-gen",
+      "category": "utilities",
       "tags": [
         "ai",
         "image",
         "security"
       ],
       "categories": [
-        "image-gen",
+        "utilities",
         "security"
       ]
     },
@@ -1694,7 +1707,7 @@
     },
     {
       "name": "Google Antigravity",
-      "description": "Google's free agentic AI IDE — multi-agent coding platform powered by Gemini 3, Claude & GPT models",
+      "description": "Google's free agent-first IDE — spawn and orchestrate multiple autonomous AI agents across editor, terminal, and browser to plan, code, test, and deploy complex software tasks; supports Gemini, Claude, and GPT models",
       "url": "https://antigravity.google/",
       "category": "dev",
       "tags": [
@@ -1704,14 +1717,15 @@
       ],
       "categories": [
         "dev",
-        "ai-assistants"
+        "ai-assistants",
+        "ai-agents"
       ]
     },
     {
       "name": "Google Stitch",
-      "description": "Google's AI-powered tool for generating and iterating on UI designs from prompts",
+      "description": "Google Labs AI-powered UI design tool — describe a screen or component in plain text and get working, iterable design mockups you can refine and export to code",
       "url": "https://stitch.withgoogle.com/",
-      "category": "dev",
+      "category": "design",
       "tags": [
         "ai",
         "dev",
@@ -1719,9 +1733,8 @@
         "free"
       ],
       "categories": [
-        "dev",
         "design",
-        "ai-assistants"
+        "dev"
       ]
     },
     {
@@ -1786,24 +1799,32 @@
     },
     {
       "name": "World Monitor App",
-      "description": "Real-time global intelligence dashboard — OSINT, live news, military tracking, markets & geopolitical data in one view",
+      "description": "Real-time global intelligence dashboard — live news feeds, conflict tracking, OSINT alerts, financial markets, and geopolitical data aggregated in one view",
       "url": "https://www.worldmonitor.app/",
-      "category": "research",
+      "category": "public-knowledge",
       "tags": [
         "research",
         "news",
         "free"
+      ],
+      "categories": [
+        "public-knowledge",
+        "research"
       ]
     },
     {
       "name": "World Monitor",
-      "description": "Real-time global conflict & incident monitoring — live maps, AI summaries, DEFCON tracker & 170+ intelligence feeds",
+      "description": "Real-time global conflict and incident tracker — live maps, AI-generated summaries, DEFCON level tracker, and 170+ intelligence feeds for geopolitical situational awareness",
       "url": "https://world-monitor.com/",
-      "category": "research",
+      "category": "public-knowledge",
       "tags": [
         "research",
         "news",
         "free"
+      ],
+      "categories": [
+        "public-knowledge",
+        "research"
       ]
     },
     {
@@ -1884,7 +1905,8 @@
       ],
       "categories": [
         "dev",
-        "ai-assistants"
+        "ai-assistants",
+        "ai-agents"
       ]
     },
     {
@@ -1911,7 +1933,7 @@
     },
     {
       "name": "Omegle",
-      "description": "Free random video chat platform for anonymous 1-on-1 conversations with strangers through live cam chat, text chat, and interest-based matching.",
+      "description": "Unofficial Omegle-style random video chat — the original Omegle.com permanently shut down in November 2023; omegle.fun is a third-party clone offering anonymous 1-on-1 video and text chat with strangers",
       "url": "https://omegle.fun/",
       "category": "social",
       "tags": [
@@ -1966,9 +1988,9 @@
     },
     {
       "name": "Claude skills",
-      "description": "A curated Claude prompt-codes collection for writing, reasoning, coding, research, and creative workflows.",
+      "description": "Curated GitHub collection of Claude prompt-codes for writing, reasoning, coding, research, and creative workflows — battle-tested system prompts for use with Claude API and products",
       "url": "https://github.com/alirezarezvani/claude-skills",
-      "category": "ai-directories",
+      "category": "prompt",
       "tags": [
         "ai",
         "prompts",
@@ -1976,15 +1998,15 @@
         "free"
       ],
       "categories": [
-        "ai-directories",
+        "prompt",
         "dev"
       ]
     },
     {
       "name": "Superpowers",
-      "description": "Free AI prompt collection for productivity, writing, research, and coding workflows.",
+      "description": "Open-source AI productivity prompt library — plug-and-play prompts for writing, research, coding, and creative workflows, compatible with any LLM",
       "url": "https://github.com/obra/superpowers",
-      "category": "ai-directories",
+      "category": "prompt",
       "tags": [
         "ai",
         "prompts",
@@ -1992,7 +2014,7 @@
         "free"
       ],
       "categories": [
-        "ai-directories",
+        "prompt",
         "dev"
       ]
     },
@@ -2059,9 +2081,9 @@
     },
     {
       "name": "Fabric",
-      "description": "Open-source AI framework with 100+ crowdsourced prompt patterns — pipe any input through CLI to summarise, extract wisdom, write essays, and more across 20+ AI providers",
+      "description": "Open-source CLI framework with 100+ crowdsourced AI prompt patterns — pipe any content through terminal to summarise, extract insights, write essays, and automate AI workflows across 20+ LLM providers",
       "url": "https://github.com/danielmiessler/fabric",
-      "category": "ai-assistants",
+      "category": "dev",
       "tags": [
         "ai",
         "dev",
@@ -2071,8 +2093,8 @@
         "cli"
       ],
       "categories": [
-        "ai-assistants",
-        "dev"
+        "dev",
+        "prompt"
       ]
     },
     {
@@ -2166,9 +2188,9 @@
     },
     {
       "name": "ImageCompressor.com",
-      "description": "Free browser-based image compressor — reduces JPEG, PNG, GIF and SVG file size without visible quality loss, no upload limit per file",
+      "description": "Free browser-based image compressor — reduce JPEG, PNG, GIF, and SVG file sizes without visible quality loss, no per-file upload limits",
       "url": "https://imagecompressor.com/",
-      "category": "design",
+      "category": "utilities",
       "tags": [
         "free",
         "utilities",
@@ -2176,15 +2198,14 @@
         "images"
       ],
       "categories": [
-        "design",
         "utilities"
       ]
     },
     {
       "name": "Squoosh",
-      "description": "Google's open-source image compression web app — compare codecs side-by-side (WebP, AVIF, MozJPEG), tweak quality live, works entirely in the browser with no uploads",
+      "description": "Google's open-source image compression app — compare codecs side-by-side (WebP, AVIF, MozJPEG), tweak quality live, runs entirely in the browser with no server uploads",
       "url": "https://squoosh.app/",
-      "category": "design",
+      "category": "utilities",
       "tags": [
         "free",
         "utilities",
@@ -2194,9 +2215,8 @@
         "opensource"
       ],
       "categories": [
-        "design",
-        "dev",
-        "utilities"
+        "utilities",
+        "dev"
       ]
     },
     {
@@ -2212,9 +2232,9 @@
     },
     {
       "name": "Compress-or-Die",
-      "description": "Advanced browser-based image compressor focused on maximum JPEG/PNG compression — fine-grained quality controls, metadata stripping, and side-by-side preview",
+      "description": "Advanced browser-based image compressor — maximum JPEG/PNG compression with fine-grained quality controls, metadata stripping, and side-by-side before/after preview",
       "url": "https://compress-or-die.com/jpg",
-      "category": "design",
+      "category": "utilities",
       "tags": [
         "free",
         "utilities",
@@ -2222,7 +2242,6 @@
         "images"
       ],
       "categories": [
-        "design",
         "utilities"
       ]
     },
@@ -2236,6 +2255,10 @@
         "dev",
         "automation",
         "agents"
+      ],
+      "categories": [
+        "dev",
+        "ai-agents"
       ]
     },
     {
@@ -2258,9 +2281,9 @@
     },
     {
       "name": "Awesome NotebookLM Prompts",
-      "description": "Curated collection of field-tested NotebookLM prompts for turning papers, notes and transcripts into clean presentation-ready slide decks — includes a citation-checker skill",
+      "description": "Curated collection of field-tested NotebookLM prompts for turning papers, notes, and transcripts into structured slide decks, summaries, and study materials",
       "url": "https://github.com/serenakeyitan/awesome-notebookLM-prompts",
-      "category": "writing",
+      "category": "prompt",
       "tags": [
         "ai",
         "free",
@@ -2269,7 +2292,7 @@
         "opensource"
       ],
       "categories": [
-        "writing",
+        "prompt",
         "research"
       ]
     },
@@ -2312,9 +2335,9 @@
     },
     {
       "name": "Google Earth Engine",
-      "description": "Cloud-based geospatial analysis platform with petabytes of satellite imagery — detect land changes, map trends and run environmental research at planetary scale. Free for non-commercial use.",
+      "description": "Cloud-based geospatial analysis platform with petabytes of satellite imagery — run planetary-scale environmental research, map land changes, and detect trends. Free for non-commercial use.",
       "url": "https://earthengine.google.com/",
-      "category": "dev",
+      "category": "research",
       "tags": [
         "research",
         "dev",
@@ -2324,8 +2347,8 @@
         "science"
       ],
       "categories": [
-        "dev",
-        "research"
+        "research",
+        "dev"
       ]
     },
     {
@@ -2386,7 +2409,8 @@
       ],
       "categories": [
         "dev",
-        "website-builders"
+        "website-builders",
+        "ai-agents"
       ],
       "newUntil": "2026-05-22T11:09:22.194Z"
     },
@@ -2428,33 +2452,34 @@
     },
     {
       "name": "OpenClaw AI",
-      "description": "AI-powered legal research and contract analysis platform — search case law, review documents, spot risky clauses, and automate legal workflows",
+      "description": "Open-source self-hosted AI agent platform — connect messaging apps (Telegram, WhatsApp, Discord) to always-on AI coding agents via a secure gateway, with a skill marketplace and model-agnostic runtime",
       "url": "https://openclaw.ai/",
-      "category": "legal-ai",
+      "category": "ai-agents",
       "tags": [
         "ai",
         "legal",
         "professional"
       ],
       "categories": [
-        "legal-ai",
-        "professional"
+        "ai-agents",
+        "dev"
       ],
       "newUntil": "2026-05-22T11:09:22.194Z"
     },
     {
       "name": "NVIDIA NemoClaw",
-      "description": "NVIDIA's enterprise legal AI platform — specialised LLMs for contract analysis, compliance automation, and legal document processing at scale",
+      "description": "NVIDIA's open-source security stack for deploying sandboxed, always-on AI agents — installs NVIDIA OpenShell runtime in one command, adding privacy controls, policy enforcement, and lifecycle management to OpenClaw agent deployments",
       "url": "https://www.nvidia.com/en-us/ai/nemoclaw/",
-      "category": "legal-ai",
+      "category": "dev",
       "tags": [
         "ai",
         "legal",
         "professional"
       ],
       "categories": [
-        "legal-ai",
-        "professional"
+        "dev",
+        "ai-agents",
+        "security"
       ],
       "newUntil": "2026-05-22T11:09:22.194Z"
     },
@@ -2501,17 +2526,17 @@
     },
     {
       "name": "Netlify",
-      "description": "Frontend cloud platform for deploying static sites and web apps — git-push deployment, global CDN, serverless functions, forms, and edge network built in",
+      "description": "Frontend cloud platform for deploying static sites and web apps — git-push deployment, global CDN, serverless functions, form handling, and edge network out of the box",
       "url": "https://www.netlify.com/",
-      "category": "dev",
+      "category": "website-builders",
       "tags": [
         "dev",
         "hosting",
         "free"
       ],
       "categories": [
-        "dev",
-        "website-builders"
+        "website-builders",
+        "dev"
       ],
       "newUntil": "2026-05-22T11:09:22.194Z"
     },
@@ -2720,7 +2745,7 @@
     },
     {
       "name": "Handshake",
-      "description": "Student and early-career job marketplace — connect with 1,400+ top employers for internships, entry-level roles, and on-campus recruiting events",
+      "description": "Student and early-career job marketplace — connect with 1M+ employers for internships, entry-level roles, and on-campus recruiting events",
       "url": "https://joinhandshake.com/",
       "category": "career-&-jobs",
       "tags": [
