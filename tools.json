@@ -2796,6 +2796,256 @@
         "free"
       ],
       "newUntil": "2026-05-22T11:09:22.194Z"
+    },
+    {
+      "name": "Jules by Google",
+      "description": "Google's async AI coding agent — assign a GitHub issue and Jules clones your repo into a secure cloud VM, writes code, fixes bugs, and opens pull requests while you do other things. Free tier: 15 tasks/day. Paid tiers via Google AI Pro/Ultra. Powered by Gemini 3.1 Pro.",
+      "url": "https://jules.google.com/session",
+      "category": "dev",
+      "categories": [
+        "dev",
+        "ai-agents"
+      ],
+      "tags": [
+        "coding agent",
+        "github",
+        "async",
+        "google",
+        "free"
+      ]
+    },
+    {
+      "name": "Octogent",
+      "description": "Fully autonomous local AI agent — 8 parallel workers, zero API costs, persistent memory, 10+ built-in tools, and self-healing tasks. Runs on your hardware forever via Ollama. Note: includes Pump.fun agentic mode and on-chain tokenomics; review those elements before use.",
+      "url": "https://www.octogent.com/",
+      "category": "ai-agents",
+      "categories": [
+        "ai-agents",
+        "dev"
+      ],
+      "tags": [
+        "autonomous agent",
+        "local",
+        "ollama",
+        "open source"
+      ]
+    },
+    {
+      "name": "Draftly",
+      "description": "AI-powered 3D cinematic website builder — describe a scroll site in a prompt; AI generates a video, extracts frames, and outputs production-ready HTML/CSS/JS with a 3D parallax scroll effect. No WebGL, no Three.js, no coding required.",
+      "url": "https://www.draftly.space/",
+      "category": "website-builders",
+      "categories": [
+        "website-builders",
+        "design"
+      ],
+      "tags": [
+        "3d website",
+        "cinematic",
+        "no-code",
+        "ai builder"
+      ]
+    },
+    {
+      "name": "Emily AI",
+      "description": "AI productivity Chrome extension — visit any webpage or YouTube video to ask questions, get summaries, extract structured data, generate social posts, and translate content in real time without leaving the tab. Supports GPT-4o, Claude, DeepSeek, Gemini, and more.",
+      "url": "https://meetemily.ai/",
+      "category": "ai-assistants",
+      "categories": [
+        "ai-assistants",
+        "utilities"
+      ],
+      "tags": [
+        "chrome extension",
+        "browser ai",
+        "summarizer",
+        "free"
+      ]
+    },
+    {
+      "name": "Wispr Flow",
+      "description": "AI voice dictation tool — speak naturally and get clean, polished text in any app 4x faster than typing; auto-removes filler words, adds punctuation, and adapts tone by context. Works in every app on Mac, Windows, iOS, and Android. HIPAA-ready, SOC 2 Type II compliant, supports 100+ languages including Hinglish.",
+      "url": "https://wisprflow.ai/",
+      "category": "utilities",
+      "categories": [
+        "utilities",
+        "audio",
+        "writing"
+      ],
+      "tags": [
+        "voice to text",
+        "dictation",
+        "accessibility",
+        "speech"
+      ]
+    },
+    {
+      "name": "Shodan",
+      "description": "Search engine for internet-connected devices — scans and indexes servers, webcams, routers, IoT devices, and industrial control systems by open ports, service banners, software versions, and known CVEs. The industry-standard OSINT and attack surface reconnaissance tool used by security professionals worldwide.",
+      "url": "https://www.shodan.io/",
+      "category": "security",
+      "categories": [
+        "security",
+        "research"
+      ],
+      "tags": [
+        "osint",
+        "internet scanner",
+        "iot",
+        "cybersecurity",
+        "free"
+      ]
+    },
+    {
+      "name": "FOFA",
+      "description": "Chinese-developed cyberspace mapping search engine — indexes 4B+ global internet assets using fingerprint-based queries with strong Asian infrastructure coverage. Used for defensive asset mapping and security research. Note: developed by Beijing Huashun Xin'an Technology; dual-use tool documented in threat actor playbooks.",
+      "url": "https://en.fofa.info/",
+      "category": "security",
+      "categories": [
+        "security",
+        "research"
+      ],
+      "tags": [
+        "osint",
+        "internet scanner",
+        "cyberspace mapping",
+        "fingerprint"
+      ]
+    },
+    {
+      "name": "Censys",
+      "description": "Internet intelligence platform — continuously scans all 65,535 ports and 200+ protocols to index every internet-facing host, certificate, and service globally. Used by CISA and Fortune 500 SOC teams for attack surface management, threat hunting, and certificate transparency analysis.",
+      "url": "https://search.censys.io/",
+      "category": "security",
+      "categories": [
+        "security",
+        "research"
+      ],
+      "tags": [
+        "osint",
+        "internet scanner",
+        "attack surface",
+        "ssl certificates",
+        "free"
+      ]
+    },
+    {
+      "name": "Umingle",
+      "description": "Free random video and text chat platform — connect instantly with strangers worldwide with no sign-up required; supports optional interest-tag matching, one-on-one video or text mode, and mobile browser access. 18+ only. Moderated with reporting tools.",
+      "url": "https://umingle.com/",
+      "category": "social",
+      "categories": [
+        "social",
+        "fun"
+      ],
+      "tags": [
+        "random chat",
+        "video chat",
+        "anonymous",
+        "free"
+      ]
+    },
+    {
+      "name": "Design Arena",
+      "description": "Crowdsourced benchmark for AI-generated design — submit a prompt, see outputs from four AI models side-by-side, and vote on the best result. Community votes power live Elo-based leaderboards ranking which models produce the best UI, images, logos, and data visualisations. Built by YC S25 company Arcada Labs.",
+      "url": "https://www.designarena.ai/",
+      "category": "ai-directories",
+      "categories": [
+        "ai-directories",
+        "design"
+      ],
+      "tags": [
+        "ai benchmark",
+        "design comparison",
+        "elo ranking",
+        "crowdsourced",
+        "free"
+      ]
+    },
+    {
+      "name": "Census of India",
+      "description": "Official Government of India census data portal — access population tables, demographic statistics, and district/village-level data from the 2001 and 2011 censuses, with a searchable Digital Library, data API, and Population Finder covering 85+ indicators at sub-district and ward level.",
+      "url": "https://censusindia.gov.in/census.website/en",
+      "category": "india",
+      "categories": [
+        "india",
+        "research",
+        "public-knowledge"
+      ],
+      "tags": [
+        "census",
+        "demographics",
+        "india",
+        "government",
+        "free"
+      ]
+    },
+    {
+      "name": "India.gov.in",
+      "description": "National Portal of India — official single-window gateway to all central and state government services, schemes, laws, and public information; browsable by citizen segment (farmer, student, senior citizen, business) and sector, in multiple Indian languages.",
+      "url": "https://www.india.gov.in/",
+      "category": "india",
+      "categories": [
+        "india",
+        "public-knowledge"
+      ],
+      "tags": [
+        "government",
+        "india",
+        "services",
+        "portal",
+        "free"
+      ]
+    },
+    {
+      "name": "OSINT Framework",
+      "description": "Interactive web-based mind-map directory of 500+ free OSINT tools organised by investigation type — usernames, email addresses, domains, IP addresses, social networks, geolocation, images, dark web, cryptocurrency, and threat intelligence. Created by Justin Nordine. The essential starting reference for cybersecurity investigators and researchers.",
+      "url": "https://osintframework.com/",
+      "category": "security",
+      "categories": [
+        "security",
+        "research"
+      ],
+      "tags": [
+        "osint",
+        "directory",
+        "investigation",
+        "cybersecurity",
+        "free"
+      ]
+    },
+    {
+      "name": "Flash AI",
+      "description": "AI shopping assistant — prepend flash.co/ before any product page URL to get an instant verdict aggregating expert reviews, YouTube, Reddit, and verified buyer signals. Also compares real-time prices across 15,000+ merchants. Founded by former Flipkart exec, backed by Blume Ventures. Also accessible at flash.co.",
+      "url": "https://flash.tech/",
+      "category": "utilities",
+      "categories": [
+        "utilities",
+        "research"
+      ],
+      "tags": [
+        "shopping",
+        "price comparison",
+        "product research",
+        "free"
+      ]
+    },
+    {
+      "name": "Headroom",
+      "description": "Open-source context compression layer for AI agents — intelligently compresses tool outputs, logs, RAG chunks, files, and conversation history before they reach the LLM, cutting tokens by 60-95% with no quality loss. Available as a Python/TS library, drop-in proxy, or MCP server. Wraps Claude Code, Codex, Cursor, and more. 48k+ GitHub stars.",
+      "url": "https://github.com/headroomlabs-ai/headroom",
+      "category": "dev",
+      "categories": [
+        "dev",
+        "ai-agents"
+      ],
+      "tags": [
+        "context compression",
+        "tokens",
+        "llm proxy",
+        "mcp",
+        "open source"
+      ]
     }
   ]
 }
