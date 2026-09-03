@@ -3061,6 +3061,450 @@
         "open source"
       ],
       "newUntil": "2026-07-25T09:38:01.837Z"
+    },
+    {
+      "name": "Z.ai Chat",
+      "description": "Zhipu AI's free GLM-powered chatbot — reasoning, coding, and web search in one interface",
+      "url": "https://chat.z.ai/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot",
+        "free"
+      ]
+    },
+    {
+      "name": "vidIQ",
+      "description": "YouTube SEO and analytics toolkit — keyword research, competitor tracking, and AI title/thumbnail suggestions for creators",
+      "url": "https://vidiq.com/",
+      "category": "content",
+      "tags": [
+        "ai",
+        "content",
+        "professional"
+      ]
+    },
+    {
+      "name": "InclusionAI (Ant Group)",
+      "description": "Ant Group's open-source AGI research org on GitHub — LLMs (Ling, LLaDA2.0), multi-agent infrastructure, and embodied AI projects",
+      "url": "https://github.com/inclusionAI",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "opensource",
+        "free"
+      ]
+    },
+    {
+      "name": "Inclusion AI",
+      "description": "Official site for Ant Group's InclusionAI initiative — open-source LLMs and AGI research",
+      "url": "https://www.inclusion-ai.org/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "research"
+      ]
+    },
+    {
+      "name": "Descript",
+      "description": "AI-powered video and podcast editor — edit media by editing a text transcript, with AI voice cloning and screen recording",
+      "url": "https://www.descript.com/",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "video",
+        "audio",
+        "content"
+      ]
+    },
+    {
+      "name": "Google Trends",
+      "description": "Explore what's trending in Google Search across regions, topics, and time — free for research and content planning",
+      "url": "https://trends.google.com/trends/",
+      "category": "research",
+      "tags": [
+        "research",
+        "free",
+        "content"
+      ]
+    },
+    {
+      "name": "Pictory",
+      "description": "AI video creation platform — turns scripts, articles, or long-form video into short, captioned social clips",
+      "url": "https://pictory.ai/",
+      "category": "video-gen",
+      "tags": [
+        "ai",
+        "video",
+        "content"
+      ]
+    },
+    {
+      "name": "Vāgdhenu",
+      "description": "Open-source, meter-aware Sanskrit śloka-to-chant text-to-speech system built by an IISc Bengaluru professor — paste a verse in any Indian script and hear it chanted",
+      "url": "https://prathosh.in/vagdhenu/#app",
+      "category": "research",
+      "tags": [
+        "ai",
+        "audio",
+        "research",
+        "india",
+        "opensource",
+        "free"
+      ]
+    },
+    {
+      "name": "Bhāgavata-VāNi",
+      "description": "Free app for the complete Śrīmad Bhāgavatam (all 12 books) with synced AI chant audio and karaoke-style highlighting in 10 Indian scripts — works offline, no ads",
+      "url": "https://bhagavatavani.com/",
+      "category": "india",
+      "tags": [
+        "india",
+        "audio",
+        "free"
+      ]
+    },
+    {
+      "name": "Vāgbodhinī",
+      "description": "AI Sanskrit chant tutor — paste any verse, hear a meter-aware reference chant, then chant along for syllable-by-syllable pronunciation scoring",
+      "url": "https://prathosh.in/vagbodhini/",
+      "category": "study",
+      "tags": [
+        "ai",
+        "study",
+        "audio",
+        "india",
+        "free"
+      ]
+    },
+    {
+      "name": "Make",
+      "description": "Visual no-code automation platform — connect apps and AI models into multi-step workflows (formerly Integromat)",
+      "url": "https://www.make.com/en",
+      "category": "dev",
+      "tags": [
+        "no-code",
+        "dev",
+        "professional"
+      ]
+    },
+    {
+      "name": "ViralityAI",
+      "description": "AI-powered content discovery tool — enter a keyword to surface trending hooks, ideas, and competitor posts by keyword rather than hashtag",
+      "url": "https://viralityai.net/",
+      "category": "content",
+      "tags": [
+        "ai",
+        "content",
+        "social"
+      ]
+    },
+    {
+      "name": "Munch Studio",
+      "description": "AI video repurposing platform — turns long-form videos and podcasts into captioned, platform-ready short clips for TikTok, Reels, and Shorts",
+      "url": "https://www.munchstudio.com/",
+      "category": "content",
+      "tags": [
+        "ai",
+        "video",
+        "content"
+      ]
+    },
+    {
+      "name": "Oxaam",
+      "description": "SECURITY WARNING: Markets itself as an exam-prep/digital-services hub, but functions as a shared-account marketplace reselling access to premium subscriptions (Netflix, Claude Max, Perplexity Pro, etc.) via shared login credentials rather than your own account — likely breaches those services' terms, and Trustpilot has suppressed its rating for guideline violations.",
+      "url": "https://www.oxaam.com/",
+      "category": "utilities",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "Free To Use — Music",
+      "description": "Unlimited free royalty-free background music downloads, no sign-up required — attribution needed unless you subscribe",
+      "url": "https://freetouse.com/music",
+      "category": "audio",
+      "tags": [
+        "audio",
+        "free",
+        "content"
+      ]
+    },
+    {
+      "name": "Abacus.AI",
+      "description": "Enterprise AI platform — ChatLLM workspace, autonomous AI agents, and custom LLM/ML deployment tools",
+      "url": "https://abacus.ai/",
+      "category": "ai-agents",
+      "tags": [
+        "ai",
+        "professional"
+      ]
+    },
+    {
+      "name": "Genspark",
+      "description": "AI \"Super Agent\" platform — combines search, agents, and generative tools to complete multi-step tasks and generate content",
+      "url": "https://www.genspark.ai/",
+      "category": "ai-agents",
+      "tags": [
+        "ai",
+        "free"
+      ]
+    },
+    {
+      "name": "Cliphi",
+      "description": "AI podcast and livestream clip maker — paste a video link to auto-detect highlights and generate captioned vertical clips with AI music",
+      "url": "https://www.cliphi.com/",
+      "category": "content",
+      "tags": [
+        "ai",
+        "video",
+        "content",
+        "free"
+      ]
+    },
+    {
+      "name": "Histography",
+      "description": "Interactive visual timeline of world history from the Big Bang to today, built from Wikipedia data",
+      "url": "https://histography.io/",
+      "category": "fun",
+      "tags": [
+        "research",
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "FutureMe",
+      "description": "Write a letter to your future self, scheduled for delivery by email years from now",
+      "url": "https://www.futureme.org/",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "Radio Garden",
+      "description": "Explore and listen to live radio stations from around the world on an interactive globe",
+      "url": "https://radio.garden/settings",
+      "category": "fun",
+      "tags": [
+        "audio",
+        "fun",
+        "free"
+      ]
+    },
+    {
+      "name": "PC Bio Unlock",
+      "description": "Open-source app that unlocks your Windows, Linux, or macOS PC with your phone's fingerprint or face — your password never leaves your PC",
+      "url": "https://github.com/MeisApps/pcbu-desktop",
+      "category": "security",
+      "tags": [
+        "security",
+        "opensource",
+        "free"
+      ]
+    },
+    {
+      "name": "NVIDIA Nemotron 3 Ultra",
+      "description": "NVIDIA's open-weight, 550B-parameter frontier reasoning model built for long-running agentic workflows, with a 1M-token context window",
+      "url": "https://research.nvidia.com/labs/nemotron/Nemotron-3-Ultra/",
+      "category": "dev",
+      "tags": [
+        "ai",
+        "dev",
+        "opensource",
+        "research",
+        "free"
+      ]
+    },
+    {
+      "name": "Focus Room",
+      "description": "Turns any YouTube video or playlist into a structured course with notes, progress tracking, and a built-in Pomodoro timer",
+      "url": "https://focusroom.club/",
+      "category": "study",
+      "tags": [
+        "study",
+        "free"
+      ]
+    },
+    {
+      "name": "Hop.Earth",
+      "description": "Free browser-based 3D driving game that lets you drive anywhere on Earth, generating roads and terrain live from OpenStreetMap and satellite data",
+      "url": "https://hop.earth/",
+      "category": "fun",
+      "tags": [
+        "fun",
+        "games",
+        "free"
+      ]
+    },
+    {
+      "name": "Clarify Your Brain",
+      "description": "PAID PRODUCT ($27 one-time): An indie-made Obsidian vault template plus guide for using Claude as a personal knowledge/life-organization system. Not a standalone app — quality and support depend entirely on one independent creator.",
+      "url": "https://clarifyyourbrain.com/#offer",
+      "category": "professional",
+      "tags": [
+        "professional"
+      ]
+    },
+    {
+      "name": "F1Net",
+      "description": "Unofficial live Formula 1 streaming dashboard with real-time timing, race control, and team radio",
+      "url": "https://f1net.vercel.app/stream",
+      "category": "streaming",
+      "tags": [
+        "movies",
+        "free"
+      ]
+    },
+    {
+      "name": "BooksWagon",
+      "description": "Indian online bookstore with a large catalog of new and used books shipped across India",
+      "url": "https://www.bookswagon.com/",
+      "category": "india",
+      "tags": [
+        "india",
+        "books"
+      ]
+    },
+    {
+      "name": "Crossword",
+      "description": "Crossword Bookstores — one of India's largest book and stationery retail chains, with online shopping",
+      "url": "https://www.crossword.in/",
+      "category": "india",
+      "tags": [
+        "india",
+        "books"
+      ]
+    },
+    {
+      "name": "Clankart Books",
+      "description": "Online marketplace for buying and selling books in India",
+      "url": "https://www.clankart.com/books",
+      "category": "india",
+      "tags": [
+        "india",
+        "books"
+      ]
+    },
+    {
+      "name": "MyPustak",
+      "description": "Indian platform for buying, selling, and renting new and secondhand books",
+      "url": "https://www.mypustak.com/",
+      "category": "india",
+      "tags": [
+        "india",
+        "books"
+      ]
+    },
+    {
+      "name": "God's Eye View",
+      "description": "Open-source live 3D globe visualizing public spatial-intelligence data — aircraft, ships, satellites, fires, and public cameras. Explicitly excludes person-tracking or facial recognition by project policy.",
+      "url": "https://github.com/bilawalsidhu/gods-eye-view",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "opensource",
+        "osint",
+        "free"
+      ]
+    },
+    {
+      "name": "Hermes Agent",
+      "description": "Open-source, self-improving AI coding/task agent by Nous Research — learns skills from experience and works with any model provider",
+      "url": "https://github.com/nousresearch/hermes-agent",
+      "category": "ai-agents",
+      "tags": [
+        "ai",
+        "dev",
+        "opensource",
+        "free"
+      ]
+    },
+    {
+      "name": "OmniRoute",
+      "description": "Open-source AI gateway — one OpenAI-compatible endpoint routing across 300+ model providers with auto-fallback and token-saving compression",
+      "url": "https://github.com/diegosouzapw/OmniRoute",
+      "category": "dev",
+      "tags": [
+        "dev",
+        "opensource",
+        "free",
+        "ai"
+      ]
+    },
+    {
+      "name": "MaxAI",
+      "description": "Browser extension AI sidebar — summarize, write, translate, and chat with GPT/Claude/Gemini on any webpage",
+      "url": "https://www.maxai.co/",
+      "category": "ai-assistants",
+      "tags": [
+        "ai",
+        "chatbot",
+        "free"
+      ]
+    },
+    {
+      "name": "Creatoom",
+      "description": "Library of free and premium PSD mockups for branding, packaging, and product presentations",
+      "url": "https://creatoom.com/",
+      "category": "design",
+      "tags": [
+        "design",
+        "free"
+      ]
+    },
+    {
+      "name": "Unblast",
+      "description": "Free design resources — mockups, fonts, icons, illustrations, and UI kits for designers",
+      "url": "https://unblast.com/",
+      "category": "design",
+      "tags": [
+        "design",
+        "free"
+      ]
+    },
+    {
+      "name": "GoodMockups",
+      "description": "Free high-quality PSD mockup templates for devices, packaging, and branding presentations",
+      "url": "https://goodmockups.com/",
+      "category": "design",
+      "tags": [
+        "design",
+        "free"
+      ]
+    },
+    {
+      "name": "Artkit",
+      "description": "Collection of free, browser-based creative tools for image editing, motion graphics, and web graphics",
+      "url": "https://artkit.cc/",
+      "category": "design",
+      "tags": [
+        "design",
+        "creative",
+        "free"
+      ]
+    },
+    {
+      "name": "Hura",
+      "description": "SECURITY WARNING: Markets itself as an AI-powered mental health/journaling companion (mood tracking, therapy chat, breathing exercises), but is built by a gaming studio around its own ERC-20 cryptocurrency (LYA, on Polygon) with 'blockchain-secured privacy' — mixing sensitive mental-health data with a speculative crypto-monetization scheme. Exercise caution before entering personal health information.",
+      "url": "https://hura.huralya.com/",
+      "category": "utilities",
+      "tags": [
+        "security"
+      ]
+    },
+    {
+      "name": "ArtStudio.com",
+      "description": "UNVERIFIED: Could not confirm what this domain actually hosts. A similarly named digital painting/photo-editing app, ArtStudio Pro, is published by Lucky Clan at luckyclan.com — not this domain. Verify the site's actual content before relying on this listing.",
+      "url": "https://www.artstudio.com/",
+      "category": "design",
+      "tags": [
+        "design"
+      ]
     }
   ]
 }
