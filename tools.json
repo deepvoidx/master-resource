@@ -2889,21 +2889,16 @@
     },
     {
       "name": "Shodan",
-      "description": "Search engine for internet-connected devices — scans and indexes servers, webcams, routers, IoT devices, and industrial control systems by open ports, service banners, software versions, and known CVEs. The industry-standard OSINT and attack surface reconnaissance tool used by security professionals worldwide.",
+      "description": "Search engine for internet-connected devices — scans and indexes servers, webcams, routers, IoT devices, and industrial control systems by open ports, service banners, software versions, and known CVE",
       "url": "https://www.shodan.io/",
-      "category": "security",
-      "categories": [
-        "security",
-        "research"
-      ],
+      "category": "osint",
       "tags": [
         "osint",
         "internet scanner",
         "iot",
         "cybersecurity",
         "free"
-      ],
-      "newUntil": "2026-07-25T09:38:01.837Z"
+      ]
     },
     {
       "name": "FOFA",
