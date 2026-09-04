@@ -3261,14 +3261,18 @@
       "name": "Cliphi",
       "description": "AI podcast and livestream clip maker — paste a video link to auto-detect highlights and generate captioned vertical clips with AI music",
       "url": "https://www.cliphi.com/",
-      "category": "content",
+      "category": "video-gen",
       "tags": [
         "ai",
         "video",
         "content",
         "free"
       ],
-      "newUntil": "2026-10-03T22:22:52.592Z"
+      "categories": [
+        "video-gen",
+        "content"
+      ],
+      "newUntil": "2026-10-04T23:15:19.956Z"
     },
     {
       "name": "Histography",
