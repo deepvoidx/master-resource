@@ -2404,18 +2404,17 @@
       "name": "Bolt.new",
       "description": "AI-powered full-stack web app builder by StackBlitz — describe your app, get working code with live preview, and deploy instantly inside the browser",
       "url": "https://bolt.new/",
-      "category": "dev",
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "dev",
         "no-code"
       ],
       "categories": [
-        "dev",
+        "ai-assistants",
         "website-builders",
         "ai-agents"
-      ],
-      "newUntil": "2026-05-22T11:09:22.194Z"
+      ]
     },
     {
       "name": "VibeVoice",
