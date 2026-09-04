@@ -3201,13 +3201,17 @@
       "name": "Munch Studio",
       "description": "AI video repurposing platform — turns long-form videos and podcasts into captioned, platform-ready short clips for TikTok, Reels, and Shorts",
       "url": "https://www.munchstudio.com/",
-      "category": "content",
+      "category": "video-gen",
       "tags": [
         "ai",
         "video",
         "content"
       ],
-      "newUntil": "2026-10-03T22:22:52.592Z"
+      "categories": [
+        "video-gen",
+        "content"
+      ],
+      "newUntil": "2026-10-04T23:15:02.443Z"
     },
     {
       "name": "Oxaam",
