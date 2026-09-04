@@ -1092,16 +1092,12 @@
       "name": "RedactAI Review",
       "description": "Free AI-powered LinkedIn profile review",
       "url": "https://redactai.io/free-tools/linkedin-profile-review",
-      "category": "ai-assistants",
+      "category": "career-&-jobs",
       "tags": [
         "professional",
         "linkedin",
         "ai",
         "free"
-      ],
-      "categories": [
-        "ai-assistants",
-        "career-&-jobs"
       ]
     },
     {
