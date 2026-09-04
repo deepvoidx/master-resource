@@ -3413,16 +3413,16 @@
     },
     {
       "name": "God's Eye View",
-      "description": "Open-source live 3D globe visualizing public spatial-intelligence data — aircraft, ships, satellites, fires, and public cameras. Explicitly excludes person-tracking or facial recognition by project policy.",
+      "description": "Open-source live 3D globe visualizing public spatial-intelligence data — aircraft, ships, satellites, fires, and public cameras. Explicitly excludes person-tracking or facial recognition by project po",
       "url": "https://github.com/bilawalsidhu/gods-eye-view",
-      "category": "dev",
+      "category": "public-knowledge",
       "tags": [
         "dev",
         "opensource",
         "osint",
         "free"
       ],
-      "newUntil": "2026-10-03T22:22:52.592Z"
+      "newUntil": "2026-10-04T23:08:34.990Z"
     },
     {
       "name": "Hermes Agent",
