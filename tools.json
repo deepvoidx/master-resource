@@ -3051,18 +3051,17 @@
       "name": "vidIQ",
       "description": "YouTube SEO and analytics toolkit — keyword research, competitor tracking, and AI title/thumbnail suggestions for creators",
       "url": "https://vidiq.com/",
-      "category": "research",
+      "category": "content",
       "tags": [
         "ai",
         "content",
         "professional"
       ],
       "categories": [
-        "research",
         "content",
         "seo-analytics"
       ],
-      "newUntil": "2026-10-04T23:20:32.624Z"
+      "newUntil": "2026-10-04T23:33:27.690Z"
     },
     {
       "name": "InclusionAI (Ant Group)",
