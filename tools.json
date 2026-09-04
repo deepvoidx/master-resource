@@ -1100,15 +1100,11 @@
     {
       "name": "Self.so",
       "description": "Convert your LinkedIn PDF into a personal website",
-      "url": "https://self.so",
-      "category": "professional",
+      "url": "https://self.so/",
+      "category": "career-&-jobs",
       "tags": [
         "professional",
         "linkedin",
-        "dev"
-      ],
-      "categories": [
-        "professional",
         "dev"
       ]
     },
