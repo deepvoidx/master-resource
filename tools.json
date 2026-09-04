@@ -1659,14 +1659,10 @@
       "name": "Lenso AI",
       "description": "AI-powered reverse image search engine — upload or paste a photo to find matching images, identify sources, detect face appearances, and track image usage across the web",
       "url": "https://lenso.ai/en",
-      "category": "utilities",
+      "category": "osint",
       "tags": [
         "ai",
         "image",
-        "security"
-      ],
-      "categories": [
-        "utilities",
         "security"
       ]
     },
