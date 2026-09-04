@@ -1525,8 +1525,8 @@
     {
       "name": "Search4Faces",
       "description": "Facial recognition search engine",
-      "url": "",
-      "category": "security",
+      "url": "https://./",
+      "category": "osint",
       "tags": [
         "security",
         "faces"
