@@ -1628,15 +1628,11 @@
       "name": "Lovable",
       "description": "AI-powered full-stack web app builder from prompts",
       "url": "https://lovable.dev/",
-      "category": "ai-assistants",
+      "category": "website-builders",
       "tags": [
         "ai",
         "dev",
         "no-code"
-      ],
-      "categories": [
-        "ai-assistants",
-        "website-builders"
       ]
     },
     {
