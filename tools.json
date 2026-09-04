@@ -3129,7 +3129,12 @@
         "free",
         "content"
       ],
-      "newUntil": "2026-10-03T22:22:52.592Z"
+      "categories": [
+        "research",
+        "content",
+        "seo-analytics"
+      ],
+      "newUntil": "2026-10-04T23:19:40.451Z"
     },
     {
       "name": "Pictory",
