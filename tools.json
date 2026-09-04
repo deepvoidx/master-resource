@@ -73,7 +73,7 @@
     {
       "id": "ai-detection",
       "label": "AI Detection",
-      "short": "Detection",
+      "short": "AI Detection",
       "icon": "🔍",
       "color": "#ef4444"
     },
