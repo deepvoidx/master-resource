@@ -332,7 +332,7 @@
       ],
       "categories": [
         "content",
-        "utilities"
+        "seo-analytics"
       ]
     },
     {
@@ -3075,7 +3075,11 @@
         "content",
         "professional"
       ],
-      "newUntil": "2026-10-03T22:22:52.592Z"
+      "categories": [
+        "content",
+        "seo-analytics"
+      ],
+      "newUntil": "2026-10-04T23:18:18.415Z"
     },
     {
       "name": "InclusionAI (Ant Group)",
