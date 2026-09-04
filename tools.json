@@ -2902,20 +2902,15 @@
     },
     {
       "name": "FOFA",
-      "description": "Chinese-developed cyberspace mapping search engine — indexes 4B+ global internet assets using fingerprint-based queries with strong Asian infrastructure coverage. Used for defensive asset mapping and security research. Note: developed by Beijing Huashun Xin'an Technology; dual-use tool documented in threat actor playbooks.",
+      "description": "Chinese-developed cyberspace mapping search engine — indexes 4B+ global internet assets using fingerprint-based queries with strong Asian infrastructure coverage. Used for defensive asset mapping and ",
       "url": "https://en.fofa.info/",
-      "category": "security",
-      "categories": [
-        "security",
-        "research"
-      ],
+      "category": "osint",
       "tags": [
         "osint",
         "internet scanner",
         "cyberspace mapping",
         "fingerprint"
-      ],
-      "newUntil": "2026-07-25T09:38:01.837Z"
+      ]
     },
     {
       "name": "Censys",
