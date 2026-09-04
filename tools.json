@@ -3187,18 +3187,17 @@
       "name": "ViralityAI",
       "description": "AI-powered content discovery tool — enter a keyword to surface trending hooks, ideas, and competitor posts by keyword rather than hashtag",
       "url": "https://viralityai.net/",
-      "category": "research",
+      "category": "content",
       "tags": [
         "ai",
         "content",
         "social"
       ],
       "categories": [
-        "research",
         "content",
         "seo-analytics"
       ],
-      "newUntil": "2026-10-04T23:20:08.804Z"
+      "newUntil": "2026-10-04T23:33:43.541Z"
     },
     {
       "name": "Munch Studio",
