@@ -2999,13 +2999,9 @@
     },
     {
       "name": "OSINT Framework",
-      "description": "Interactive web-based mind-map directory of 500+ free OSINT tools organised by investigation type — usernames, email addresses, domains, IP addresses, social networks, geolocation, images, dark web, cryptocurrency, and threat intelligence. Created by Justin Nordine. The essential starting reference for cybersecurity investigators and researchers.",
+      "description": "Interactive web-based mind-map directory of 500+ free OSINT tools organised by investigation type — usernames, email addresses, domains, IP addresses, social networks, geolocation, images, dark web, c",
       "url": "https://osintframework.com/",
-      "category": "security",
-      "categories": [
-        "security",
-        "research"
-      ],
+      "category": "osint",
       "tags": [
         "osint",
         "directory",
@@ -3013,7 +3009,7 @@
         "cybersecurity",
         "free"
       ],
-      "newUntil": "2026-10-03T22:23:25.120Z"
+      "newUntil": "2026-10-04T23:01:59.153Z"
     },
     {
       "name": "Flash AI",
