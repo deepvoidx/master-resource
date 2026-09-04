@@ -1536,15 +1536,15 @@
       "name": "Facecheck.id",
       "description": "Search the web by face photo",
       "url": "https://facecheck.id/",
-      "category": "security",
+      "category": "ai-detection",
       "tags": [
         "security",
         "ai",
         "faces"
       ],
       "categories": [
-        "security",
-        "ai-detection"
+        "ai-detection",
+        "osint"
       ]
     },
     {
