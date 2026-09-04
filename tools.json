@@ -1515,8 +1515,8 @@
     {
       "name": "Findclone",
       "description": "Reverse facial search Russian photo database",
-      "url": "",
-      "category": "security",
+      "url": "https://./",
+      "category": "osint",
       "tags": [
         "security",
         "faces"
