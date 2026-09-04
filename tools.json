@@ -167,6 +167,13 @@
       "short": "India",
       "icon": "🇮🇳",
       "color": "#ff9933"
+    },
+    {
+      "id": "osint",
+      "label": "OSINT & Recon",
+      "short": "OSINT & Recon",
+      "icon": "🕵️",
+      "color": "#b91c1c"
     }
   ],
   "tools": [
