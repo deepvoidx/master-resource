@@ -1973,15 +1973,11 @@
       "name": "Emergent",
       "description": "AI app builder for creating and deploying full-stack web and mobile apps from prompts.",
       "url": "https://app.emergent.sh/",
-      "category": "ai-assistants",
+      "category": "website-builders",
       "tags": [
         "ai",
         "dev",
         "no-code"
-      ],
-      "categories": [
-        "ai-assistants",
-        "website-builders"
       ]
     },
     {
@@ -2399,14 +2395,13 @@
       "name": "Bolt.new",
       "description": "AI-powered full-stack web app builder by StackBlitz — describe your app, get working code with live preview, and deploy instantly inside the browser",
       "url": "https://bolt.new/",
-      "category": "ai-assistants",
+      "category": "website-builders",
       "tags": [
         "ai",
         "dev",
         "no-code"
       ],
       "categories": [
-        "ai-assistants",
         "website-builders",
         "ai-agents"
       ]
