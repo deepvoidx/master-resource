@@ -1978,15 +1978,15 @@
       "name": "Emergent",
       "description": "AI app builder for creating and deploying full-stack web and mobile apps from prompts.",
       "url": "https://app.emergent.sh/",
-      "category": "dev",
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "dev",
         "no-code"
       ],
       "categories": [
-        "dev",
-        "ai-assistants"
+        "ai-assistants",
+        "website-builders"
       ]
     },
     {
