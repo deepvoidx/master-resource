@@ -2914,21 +2914,16 @@
     },
     {
       "name": "Censys",
-      "description": "Internet intelligence platform — continuously scans all 65,535 ports and 200+ protocols to index every internet-facing host, certificate, and service globally. Used by CISA and Fortune 500 SOC teams for attack surface management, threat hunting, and certificate transparency analysis.",
+      "description": "Internet intelligence platform — continuously scans all 65,535 ports and 200+ protocols to index every internet-facing host, certificate, and service globally. Used by CISA and Fortune 500 SOC teams f",
       "url": "https://search.censys.io/",
-      "category": "security",
-      "categories": [
-        "security",
-        "research"
-      ],
+      "category": "osint",
       "tags": [
         "osint",
         "internet scanner",
         "attack surface",
         "ssl certificates",
         "free"
-      ],
-      "newUntil": "2026-07-25T09:38:01.837Z"
+      ]
     },
     {
       "name": "Umingle",
