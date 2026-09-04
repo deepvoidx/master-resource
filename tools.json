@@ -1172,8 +1172,8 @@
     {
       "name": "Captions AI",
       "description": "AI script writer, auto captions, video editing app",
-      "url": "https://www.captions.ai",
-      "category": "content",
+      "url": "https://www.captions.ai/",
+      "category": "ai-assistants",
       "tags": [
         "ai",
         "content",
@@ -1181,8 +1181,9 @@
         "video"
       ],
       "categories": [
-        "content",
-        "ai-assistants"
+        "ai-assistants",
+        "video-gen",
+        "content"
       ]
     },
     {
