@@ -1551,15 +1551,11 @@
       "name": "PimEyes",
       "description": "Powerful facial search engine",
       "url": "https://pimeyes.com/",
-      "category": "security",
+      "category": "osint",
       "tags": [
         "security",
         "ai",
         "faces"
-      ],
-      "categories": [
-        "security",
-        "ai-detection"
       ]
     },
     {
