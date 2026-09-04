@@ -171,7 +171,7 @@
     {
       "id": "osint",
       "label": "OSINT & Recon",
-      "short": "OSINT & Recon",
+      "short": "OSINT",
       "icon": "🕵️",
       "color": "#b91c1c"
     }
