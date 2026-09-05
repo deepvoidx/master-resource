@@ -1,3 +1,11 @@
 {
-  "pending": []
+  "pending": [
+    {
+      "id": "mtonufca59hd7",
+      "name": "Venice AI",
+      "url": "https://venice.ai/",
+      "submittedAt": "2026-09-05T17:32:16.810Z",
+      "status": "pending"
+    }
+  ]
 }
